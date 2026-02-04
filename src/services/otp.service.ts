@@ -47,7 +47,7 @@ export class OTPService {
 
     this.validateConfig();
 
-    logger.info(
+    logger.debug(
       {
         config: this.config,
       },

@@ -55,7 +55,7 @@ app.use(
 
 app.get<object>("/", (req, res) => {
   res.json({
-    message: "SuperFly-service-API",
+    message: "project-service-API",
   });
 });
 

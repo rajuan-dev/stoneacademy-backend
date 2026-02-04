@@ -8,7 +8,7 @@ const envSchema = z.object({
   APP_NAME: z.string().default("SuperFly - service provider Platform"),
   BASE_URL: z.string().default("/api/v1"),
   PORT: z.coerce.number().default(3000),
-  MONGO_URI: z.url().nonempty("MONGO_URI is required"),
+  MONGO_URI: z.string().trim().optional().default(""),
   JWT_SECRET: z.string().default("lp01yPo31ACozd4pDI9Z1DSD30A"),
   JWT_REFRESH_SECRET: z.string().default("rwN17KgtvujqVe6jANmu3r5FIFY0jw"),
   JWT_EXPIRY: z.string().default("7d"),
@@ -16,9 +16,7 @@ const envSchema = z.object({
   SALT_ROUNDS: z.coerce.number().default(12),
 
   // Frontend URL
-  CLIENT_URL: z
-    .url()
-    .default("https://clinton-bottle-yacht-don.trycloudflare.com/"),
+  CLIENT_URL: z.url().default("http://localhost:3000"),
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),
@@ -45,15 +43,15 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
 
-  STRIPE_SECRET_KEY: z.string().min(1, "STRIPE_SECRET_KEY is required"),
-  STRIPE_WEBHOOK_SECRET: z.string().min(1, "STRIPE_WEBHOOK_SECRET is required"),
-  STRIPE_CHECKOUT_SUCCESS_URL: z.string().min(1).optional(),
-  STRIPE_CHECKOUT_CANCEL_URL: z.string().min(1).optional(),
+  STRIPE_SECRET_KEY: z.string().optional().default(""),
+  STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
+  STRIPE_CHECKOUT_SUCCESS_URL: z.string().optional(),
+  STRIPE_CHECKOUT_CANCEL_URL: z.string().optional(),
 
-  AWS_ACCESS_KEY: z.string().min(1, "AWS access key is required."),
-  AWS_SECRET_ACCESS_KEY: z.string().min(1, "AWS secret key is required."),
-  AWS_REGION: z.string().min(1, "AWS region is required."),
-  AWS_S3_BUCKET: z.string().min(1, "S3 bucket name is required."),
+  AWS_ACCESS_KEY: z.string().optional().default(""),
+  AWS_SECRET_ACCESS_KEY: z.string().optional().default(""),
+  AWS_REGION: z.string().optional().default(""),
+  AWS_S3_BUCKET: z.string().optional().default(""),
   AWS_S3_ENDPOINT: z.string().optional(),
 });
 
@@ -74,3 +72,18 @@ try {
 
 // eslint-disable-next-line node/no-process-env
 export const env = envSchema.parse(process.env);
+
+const requiredInProduction = ["MONGO_URI", "JWT_SECRET", "JWT_REFRESH_SECRET"];
+if (env.NODE_ENV === "production") {
+  const missing = requiredInProduction.filter((key) => {
+    const value = env[key as keyof typeof env];
+    return typeof value !== "string" || value.trim() === "";
+  });
+  if (missing.length > 0) {
+    console.error(
+      "Missing required environment variables for production:",
+      missing,
+    );
+    process.exit(1);
+  }
+}
