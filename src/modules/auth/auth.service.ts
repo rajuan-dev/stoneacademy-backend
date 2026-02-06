@@ -1,12 +1,12 @@
 // file: src/modules/auth/auth.service.ts
 
 import {
-  ACCOUNT_STATUS,
   AUTH,
   MESSAGES,
+  OTP_PURPOSES,
   ROLES,
+  USER_STATUS,
 } from "@/constants/app.constants";
-import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
 import { EmailService } from "@/services/email.service";
 import {
@@ -15,12 +15,7 @@ import {
   UnauthorizedException,
 } from "@/utils/app-error.utils";
 import { comparePassword, hashPassword } from "@/utils/password.utils";
-import { EmailVerificationService } from "../email-verification/email-verification.service";
-import {
-  IResendOTPRequest,
-  UserType,
-} from "../email-verification/email-verification.types";
-import { PasswordResetService } from "../password/password.service";
+import { otpService } from "../otp/otp.service";
 import type { IUser } from "../user/user.interface";
 import { UserService } from "../user/user.service";
 import type { UserResponse } from "../user/user.type";
@@ -28,26 +23,20 @@ import type {
   AuthServiceResponse,
   LoginPayload,
   RegisterPayload,
-  VerifyEmailPayload,
+  SendOtpPayload,
+  VerifyOtpPayload,
 } from "./auth.type";
 import { AuthUtil } from "./auth.utils";
 
 export class AuthService {
   private userService: UserService;
-  private passwordResetService: PasswordResetService;
-  private emailVerificationService: EmailVerificationService;
   private emailService: EmailService;
 
   constructor() {
     this.userService = new UserService();
-    this.passwordResetService = new PasswordResetService();
     this.emailService = new EmailService();
-    this.emailVerificationService = new EmailVerificationService();
   }
 
-  /**
-   * Login user (All roles: Admin, Cleaner, Client)
-   */
   async login(payload: LoginPayload): Promise<AuthServiceResponse> {
     const user = await this.userService.getUserByEmailWithPassword(
       payload.email,
@@ -57,36 +46,33 @@ export class AuthService {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    if (!user.emailVerified) {
-      throw new UnauthorizedException(MESSAGES.AUTH.EMAIL_NOT_VERIFIED);
+    if (!user.emailVerifiedAt && !user.emailVerified) {
+      throw new UnauthorizedException("NEEDS_OTP_VERIFY");
     }
 
-    if (user.accountStatus === ACCOUNT_STATUS.SUSPENDED) {
+    if (user.status === USER_STATUS.SUSPENDED) {
       throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
     }
 
-    if (user.accountStatus !== ACCOUNT_STATUS.ACTIVE) {
+    if (user.status === USER_STATUS.DELETED) {
       throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
     }
 
-    // Verify password
-    if (!user.password) {
+    if (!user.passwordHash) {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
     const isPasswordValid = await comparePassword(
       payload.password,
-      user.password,
+      user.passwordHash,
     );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    // Update last login
     await this.userService.updateLastLogin(user._id.toString());
 
-    // Generate tokens
     const tokens = this.generateTokens(user);
 
     return {
@@ -95,78 +81,122 @@ export class AuthService {
     };
   }
 
-  /**
-   * Register user (Admin, Cleaner, Client)
-   */
   async register(payload: RegisterPayload): Promise<{
     user: UserResponse;
     verification: { expiresAt: Date; expiresInMinutes: number };
   }> {
-    if (payload.role && payload.role !== ROLES.CLIENT) {
-      throw new BadRequestException("Only clients can register");
+    if (payload.role && payload.role !== ROLES.USER) {
+      throw new BadRequestException("Only users can self-register");
     }
 
     const user = await this.userService.createUser({
       email: payload.email,
       password: payload.password,
       fullName: payload.fullName,
-      phoneNumber: payload.phoneNumber,
-      address: payload.address,
-      role: ROLES.CLIENT,
-      emailVerified: false,
-      accountStatus: ACCOUNT_STATUS.PENDING,
+      role: ROLES.USER,
+      status: USER_STATUS.ACTIVE,
+      emailVerifiedAt: null,
     });
 
-    const verification = await this.emailVerificationService.createOTP({
-      userId: user._id.toString(),
+    const otp = await otpService.sendOtp({
       email: user.email,
-      userType: user.role as UserType,
+      purpose: OTP_PURPOSES.VERIFY_EMAIL,
+      meta: payload.meta,
+    });
+
+    await this.emailService.sendEmailVerification({
+      to: user.email,
       userName: user.fullName,
+      userType: user.role,
+      verificationCode: otp.code,
+      expiresIn: String(otp.expiresInMinutes),
     });
 
     return {
       user: this.userService.toUserResponse(user),
       verification: {
-        expiresAt: verification.expiresAt,
-        expiresInMinutes: verification.expiresInMinutes,
+        expiresAt: otp.expiresAt,
+        expiresInMinutes: otp.expiresInMinutes,
       },
     };
   }
 
-  /**
-   * Verify email
-   */
-  async verifyEmail(payload: VerifyEmailPayload): Promise<{ message: string }> {
-    const result = await this.emailVerificationService.verifyOTP({
+  async sendOtp(payload: SendOtpPayload): Promise<{
+    expiresAt: Date;
+    expiresInMinutes: number;
+  }> {
+    const user = await this.userService.getUserByEmail(payload.email);
+    if (!user && payload.purpose !== OTP_PURPOSES.LOGIN_OTP_OPTIONAL) {
+      return {
+        expiresAt: new Date(),
+        expiresInMinutes: AUTH.OTP_EXPIRY_MINUTES,
+      };
+    }
+
+    if (payload.purpose === OTP_PURPOSES.VERIFY_EMAIL) {
+      if (!user) {
+        throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+      }
+      if (user.emailVerifiedAt) {
+        throw new BadRequestException(MESSAGES.AUTH.EMAIL_ALREADY_VERIFIED);
+      }
+    }
+
+    const otp = await otpService.sendOtp({
       email: payload.email,
+      purpose: payload.purpose,
+      meta: payload.meta,
+    });
+
+    if (payload.purpose === OTP_PURPOSES.RESET_PASSWORD) {
+      await this.emailService.sendPasswordResetOTP(
+        user?.fullName,
+        payload.email,
+        otp.code,
+        otp.expiresInMinutes,
+      );
+    } else {
+      await this.emailService.sendEmailVerification({
+        to: payload.email,
+        userName: user?.fullName || "there",
+        userType: user?.role || ROLES.USER,
+        verificationCode: otp.code,
+        expiresIn: String(otp.expiresInMinutes),
+      });
+    }
+
+    return {
+      expiresAt: otp.expiresAt,
+      expiresInMinutes: otp.expiresInMinutes,
+    };
+  }
+
+  async verifyOtp(payload: VerifyOtpPayload): Promise<{ message: string }> {
+    const record = await otpService.verifyOtp({
+      email: payload.email,
+      purpose: payload.purpose,
       code: payload.code,
     });
 
-    const user = await this.userService.getUserByEmail(payload.email);
-    if (!user) {
-      throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+    if (payload.purpose === OTP_PURPOSES.VERIFY_EMAIL) {
+      const user = await this.userService.getUserByEmail(payload.email);
+      if (!user) {
+        throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+      }
+      user.emailVerified = true;
+      user.emailVerifiedAt = new Date();
+      user.status = USER_STATUS.ACTIVE;
+      await user.save();
     }
 
-    await this.userService.markEmailAsVerified(result.userId);
-
     logger.info(
-      { userId: result.userId, userType: result.userType },
-      "Email verified and user marked",
+      { email: payload.email, purpose: record.purpose },
+      "OTP verified",
     );
 
-    await this.emailService.sendWelcomeEmail({
-      to: user.email,
-      userName: user.fullName,
-      userType: result.userType,
-      loginLink: `${env.CLIENT_URL}/login`,
-    });
-
-    return { message: MESSAGES.AUTH.EMAIL_VERIFIED_SUCCESS };
+    return { message: "OTP verified successfully" };
   }
 
-  /**
-   * Request password reset
-   */
   async requestPasswordReset(
     email: string,
   ): Promise<{ message: string; expiresAt?: Date; expiresInMinutes?: number }> {
@@ -176,91 +206,46 @@ export class AuthService {
       return { message: MESSAGES.AUTH.PASSWORD_RESET_OTP_SENT };
     }
 
-    // Step 2: Generate OTP using password reset service
-    const result = await this.passwordResetService.requestPasswordReset(
-      user._id.toString(),
-      user.email,
+    const otp = await otpService.sendOtp({
+      email: user.email,
+      purpose: OTP_PURPOSES.RESET_PASSWORD,
+    });
+
+    await this.emailService.sendPasswordResetOTP(
       user.fullName,
+      user.email,
+      otp.code,
+      otp.expiresInMinutes,
     );
 
-    logger.info(
-      { userId: user._id, email: user.email },
-      "Password reset requested",
-    );
-
-    return result;
+    return {
+      message: MESSAGES.AUTH.PASSWORD_RESET_OTP_SENT,
+      expiresAt: otp.expiresAt,
+      expiresInMinutes: otp.expiresInMinutes,
+    };
   }
 
-  /**
-   * Verify password reset OTP
-   */
-  async verifyPasswordOTP(
-    email: string,
-    otp: string,
-  ): Promise<{ message: string }> {
-    // Step 1: Find user
-    const user = await this.userService.getUserByEmail(email);
-
-    if (!user) {
-      throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
-    }
-
-    // Step 2: Verify OTP
-    const result = await this.passwordResetService.verifyOTP(
-      user._id.toString(),
-      otp,
-    );
-
-    logger.info({ userId: user._id, email }, "Password reset OTP verified");
-
-    return result;
-  }
-
-  /**
-   * Verify OTP
-   */
-  async verifyOTP(email: string, otp: string): Promise<{ message: string }> {
-    const user = await this.userService.getUserByEmail(email);
-
-    if (!user) {
-      throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
-    }
-
-    // ✅ FIXED: Use PasswordResetService.verifyOTP() which handles all logic
-    return this.passwordResetService.verifyOTP(user._id.toString(), otp);
-  }
-
-  /**
-   * Reset password with OTP
-   */
   async resetPassword(
     email: string,
-    otp: string,
+    code: string,
     newPassword: string,
   ): Promise<{ message: string }> {
-    // Step 1: Find user
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    // Step 2: Verify OTP again (double check)
-    await this.passwordResetService.verifyOTP(user._id.toString(), otp);
+    await otpService.verifyOtp({
+      email,
+      purpose: OTP_PURPOSES.RESET_PASSWORD,
+      code,
+    });
 
-    // Step 3: Hash new password
     const hashedPassword = await hashPassword(newPassword);
 
-    // Step 4: Update user password
     await this.userService.updatePassword(user._id.toString(), hashedPassword);
 
-    // Step 5: Mark OTP as used
-    await this.passwordResetService.markOTPAsUsed(user._id.toString());
-
-    // Step 6: Clean up all reset OTPs for this user
-    await this.passwordResetService.deleteUserOTPs(user._id.toString());
-
-    // Step 7: Send security notification email
     await this.emailService.sendPasswordResetConfirmation(
       user.fullName,
       user.email,
@@ -271,45 +256,30 @@ export class AuthService {
       "Password reset successfully completed",
     );
 
-    // Step 8: Log out user from all devices (invalidate all tokens)
-    // This is optional - you can skip if not implemented yet
-    // await this.authTokenService.revokeAllTokensForUser(user._id.toString());
-
     return {
       message:
         "Password reset successfully. Please log in with your new password.",
     };
   }
 
-  /**
-   * Resend password reset OTP
-   */
+  async verifyPasswordOTP(
+    email: string,
+    code: string,
+  ): Promise<{ message: string }> {
+    await otpService.verifyOtp({
+      email,
+      purpose: OTP_PURPOSES.RESET_PASSWORD,
+      code,
+    });
+    return { message: "OTP verified successfully" };
+  }
+
   async resendPasswordOTP(
     email: string,
   ): Promise<{ message: string; expiresAt?: Date; expiresInMinutes?: number }> {
-    const user = await this.userService.getUserByEmail(email);
-
-    if (!user) {
-      return {
-        message:
-          "If an account exists, a password reset code will be sent to the email address",
-      };
-    }
-
-    const result = await this.passwordResetService.requestPasswordReset(
-      user._id.toString(),
-      user.email,
-      user.fullName,
-    );
-
-    logger.info({ userId: user._id, email }, "Password reset OTP resent");
-
-    return result;
+    return this.requestPasswordReset(email);
   }
 
-  /**
-   * Refresh access token
-   */
   async refreshAccessToken(
     refreshToken: string,
   ): Promise<{ accessToken: string }> {
@@ -322,15 +292,15 @@ export class AuthService {
         throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
       }
 
-      if (!user.emailVerified) {
+      if (!user.emailVerifiedAt && !user.emailVerified) {
         throw new UnauthorizedException(MESSAGES.AUTH.EMAIL_NOT_VERIFIED);
       }
 
-      if (user.accountStatus === ACCOUNT_STATUS.SUSPENDED) {
+      if (user.status === USER_STATUS.SUSPENDED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
       }
 
-      if (user.accountStatus !== ACCOUNT_STATUS.ACTIVE) {
+      if (user.status === USER_STATUS.DELETED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
       }
 
@@ -338,8 +308,12 @@ export class AuthService {
         userId: user._id.toString(),
         email: user.email,
         role: user.role,
+        status: user.status,
         accountStatus: user.accountStatus,
         emailVerified: user.emailVerified,
+        emailVerifiedAt: user.emailVerifiedAt
+          ? user.emailVerifiedAt.toISOString()
+          : null,
       });
 
       return { accessToken };
@@ -348,9 +322,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Generate JWT tokens
-   */
   private generateTokens(user: IUser): {
     accessToken: string;
     refreshToken: string;
@@ -360,8 +331,12 @@ export class AuthService {
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
+      status: user.status,
       accountStatus: user.accountStatus,
       emailVerified: user.emailVerified,
+      emailVerifiedAt: user.emailVerifiedAt
+        ? user.emailVerifiedAt.toISOString()
+        : null,
     });
 
     const refreshToken = AuthUtil.generateRefreshToken(user._id.toString());
@@ -373,62 +348,12 @@ export class AuthService {
     };
   }
 
-  /**
-   * Resend verification code
-   */
-  async resendVerificationCode(
-    request: Partial<IResendOTPRequest>,
-  ): Promise<{ message: string }> {
-    // Find user first
-    const user = await this.userService.getUserByEmail(request.email!);
-
-    if (!user) {
-      return {
-        message: "If an account exists, a verification code will be sent",
-      };
-    }
-
-    if (user.emailVerified) {
-      throw new BadRequestException("Email already verified");
-    }
-
-    // Step 3: Get userType (from request or user.role)
-    const userType = (request.userType || user.role) as UserType;
-    const userName = request.userName || user.fullName;
-
-    // Step 4: Call email verification service to resend OTP
-    const result = await this.emailVerificationService.resendOTP({
-      email: request.email!,
-      userType,
-      userName,
-    });
-
-    logger.info(
-      {
-        email: request.email,
-        userType,
-        userId: user._id,
-      },
-      "Verification code resend initiated",
-    );
-
-    return { message: result.message };
-  }
-
-  /**
-   * Logout user (clear tokens and sessions)
-   *  Required by auth controller
-   */
   async logout(token: string, userId: string): Promise<{ message: string }> {
     try {
       logger.info(
         { userId, token: token.substring(0, 20) + "..." },
         "User logged out",
       );
-
-      // [TODO]:
-      // Optional: Add token blacklist logic here if implemented
-      // await this.authTokenService.revokeToken(token);
 
       return { message: "Logged out successfully" };
     } catch (error) {
@@ -437,26 +362,20 @@ export class AuthService {
     }
   }
 
-  /**
-   * Change password for authenticated user
-   */
-
   async changePassword(
     userId: string,
     currentPassword: string,
     newPassword: string,
   ): Promise<{ message: string }> {
-    // Step 1: Get user by ID (including password field)
     const user = await this.userService.getUserByIdWithPassword(userId);
 
     if (!user) {
       throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
     }
 
-    // Step 2: Verify current password matches
     const isPasswordValid = await comparePassword(
       currentPassword,
-      user.password!,
+      user.passwordHash!,
     );
 
     if (!isPasswordValid) {
@@ -467,16 +386,10 @@ export class AuthService {
       throw new UnauthorizedException("Current password is incorrect");
     }
 
-    // Step 3: Hash new password
     const hashedPassword = await hashPassword(newPassword);
-
-    // Step 4: Update user password in database
     await this.userService.updatePassword(userId, hashedPassword);
-
-    // Step 5: Invalidate all refresh tokens (force re-login everywhere)
     await this.userService.invalidateAllRefreshTokens(userId);
 
-    // Step 6: Send password change confirmation email
     await this.userService.notifyPasswordChange(
       user.email,
       user.fullName,

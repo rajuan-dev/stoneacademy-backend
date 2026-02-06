@@ -3,10 +3,9 @@
 export interface IRegisterRequest {
   email: string;
   password: string;
+  confirmPassword?: string;
   fullName: string;
-  phoneNumber: string;
-  address: string;
-  role?: "client";
+  role?: "user";
 }
 
 export interface ILoginRequest {
@@ -25,12 +24,13 @@ export interface IRequestPasswordResetRequest {
 
 export interface IVerifyOTPRequest {
   email: string;
-  otp: string;
+  purpose: "verify_email" | "reset_password" | "login_otp_optional";
+  code: string;
 }
 
 export interface IResetPasswordRequest {
   email: string;
-  otp: string;
+  code: string;
   newPassword: string;
 }
 

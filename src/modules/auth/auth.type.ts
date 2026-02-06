@@ -2,6 +2,7 @@
 
 import type { ROLES } from "@/constants/app.constants";
 import type { UserResponse } from "../user/user.type";
+import type { OtpPurpose } from "../otp/otp.model";
 
 /**
  * Register Payload - common fields only
@@ -9,10 +10,13 @@ import type { UserResponse } from "../user/user.type";
 export type RegisterPayload = {
   email: string;
   password: string;
+  confirmPassword?: string;
   fullName: string;
-  phoneNumber: string;
-  address: string;
-  role?: (typeof ROLES)["CLIENT"];
+  role?: (typeof ROLES)["USER"];
+  meta?: {
+    ip?: string;
+    userAgent?: string;
+  };
 };
 
 export type LoginPayload = {
@@ -62,10 +66,17 @@ export type ChangePasswordPayload = {
   newPassword: string;
 };
 
-/**
- * Email Verification Request
- */
-export type VerifyEmailPayload = {
+export type VerifyOtpPayload = {
   email: string;
-  code: string; // 4-digit OTP
+  purpose: OtpPurpose;
+  code: string;
+};
+
+export type SendOtpPayload = {
+  email: string;
+  purpose: OtpPurpose;
+  meta?: {
+    ip?: string;
+    userAgent?: string;
+  };
 };

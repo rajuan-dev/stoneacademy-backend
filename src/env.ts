@@ -14,6 +14,7 @@ const envSchema = z.object({
   JWT_EXPIRY: z.string().default("7d"),
   JWT_REFRESH_EXPIRY: z.string().default("30d"),
   SALT_ROUNDS: z.coerce.number().default(12),
+  OTP_SECRET: z.string().optional(),
 
   // Frontend URL
   CLIENT_URL: z.url().default("http://localhost:3000"),
@@ -22,7 +23,7 @@ const envSchema = z.object({
     .default("info"),
 
   EMAIL_PROVIDER: z
-    .enum(["auto", "postmark", "smtp", "disabled"])
+    .enum(["auto", "postmark", "smtp", "resend", "disabled"])
     .default("auto"),
   EMAIL_MAX_RETRIES: z.coerce.number().int().min(0).default(0),
   EMAIL_RETRY_DELAY_MS: z.coerce.number().int().min(0).default(0),
@@ -35,6 +36,7 @@ const envSchema = z.object({
   POSTMARK_API_TOKEN: z.string().optional(),
   POSTMARK_MESSAGE_STREAM: z.string().optional(),
   POSTMARK_SANDBOX_MODE: z.coerce.boolean().optional(),
+  RESEND_API_KEY: z.string().optional(),
 
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),

@@ -4,6 +4,7 @@ import { EMAIL_CONFIG, EMAIL_ENABLED } from "@/config/email.config";
 import { APP } from "@/constants/app.constants";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
+import axios from "axios";
 import nodemailer, { type Transporter } from "nodemailer";
 import * as postmark from "postmark";
 
@@ -44,9 +45,10 @@ type AccountCredentialsPayload = {
 };
 
 export class EmailService {
-  private provider: "postmark" | "smtp" | "disabled";
+  private provider: "postmark" | "smtp" | "resend" | "disabled";
   private transporter?: Transporter;
   private postmarkClient?: postmark.ServerClient;
+  private resendApiKey?: string;
   private readonly fromName: string;
   private readonly fromAddress: string;
   private readonly replyTo?: string;
@@ -82,6 +84,8 @@ export class EmailService {
         this.postmarkClient = new postmark.ServerClient(
           EMAIL_CONFIG.postmark.apiToken,
         );
+      } else if (this.provider === "resend") {
+        this.resendApiKey = EMAIL_CONFIG.resend.apiToken;
       } else if (this.provider === "smtp") {
         this.transporter = nodemailer.createTransport({
           host: EMAIL_CONFIG.smtp.host,
@@ -235,6 +239,9 @@ export class EmailService {
       if (this.provider === "postmark" && this.postmarkClient) {
         return this.sendWithRetry(() => this.sendPostmark(payload), payload);
       }
+      if (this.provider === "resend" && this.resendApiKey) {
+        return this.sendWithRetry(() => this.sendResend(payload), payload);
+      }
 
       logger.warn(
         { to: payload.to, subject: payload.subject },
@@ -351,6 +358,34 @@ export class EmailService {
       html: payload.html,
       text: payload.text,
     });
+  }
+
+  private async sendResend(payload: BasicEmailPayload): Promise<void> {
+    if (!this.resendApiKey) {
+      throw new Error("Resend API key not configured");
+    }
+
+    const from = this.formatFromAddress();
+    if (!from) {
+      throw new Error("Email from address is not configured");
+    }
+
+    await axios.post(
+      "https://api.resend.com/emails",
+      {
+        from,
+        to: payload.to,
+        subject: payload.subject,
+        html: payload.html,
+        text: payload.text,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
   }
 
   private formatFromAddress(): string {

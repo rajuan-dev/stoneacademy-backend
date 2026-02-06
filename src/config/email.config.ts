@@ -6,15 +6,18 @@ const postmarkConfigured = Boolean(env.POSTMARK_API_TOKEN);
 const smtpConfigured = Boolean(
   env.SMTP_HOST && env.SMTP_PORT && env.SMTP_USER && env.SMTP_PASS
 );
+const resendConfigured = Boolean(env.RESEND_API_KEY);
 const providerPreference = env.EMAIL_PROVIDER;
 const postmarkSandboxMode = env.POSTMARK_SANDBOX_MODE ?? false;
 
-const resolveProvider = (): "postmark" | "smtp" | "disabled" => {
+const resolveProvider = (): "postmark" | "smtp" | "resend" | "disabled" => {
   switch (providerPreference) {
     case "postmark":
       return postmarkConfigured ? "postmark" : "disabled";
     case "smtp":
       return smtpConfigured ? "smtp" : "disabled";
+    case "resend":
+      return resendConfigured ? "resend" : "disabled";
     case "disabled":
       return "disabled";
     case "auto":
@@ -24,6 +27,9 @@ const resolveProvider = (): "postmark" | "smtp" | "disabled" => {
       }
       if (smtpConfigured) {
         return "smtp";
+      }
+      if (resendConfigured) {
+        return "resend";
       }
       if (postmarkConfigured) {
         return "postmark";
@@ -54,6 +60,9 @@ export const EMAIL_CONFIG = {
     apiToken: env.POSTMARK_API_TOKEN || "",
     messageStream: env.POSTMARK_MESSAGE_STREAM || "outbound",
     sandboxMode: env.POSTMARK_SANDBOX_MODE ?? false,
+  },
+  resend: {
+    apiToken: env.RESEND_API_KEY || "",
   },
   smtp: {
     host: env.SMTP_HOST,

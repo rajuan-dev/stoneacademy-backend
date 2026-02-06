@@ -1,8 +1,13 @@
 // file: src/modules/user/user.model.ts
 
-import { ACCOUNT_STATUS, ROLES } from "@/constants/app.constants";
+import {
+  ACCOUNT_STATUS,
+  GENDERS,
+  ROLES,
+  USER_STATUS,
+} from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Query } from "mongoose";
+import { model, Query, Schema } from "mongoose";
 import type { IUser } from "./user.interface";
 
 const userSchema = BaseSchemaUtil.createSchema<IUser>({
@@ -18,9 +23,19 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         trim: true,
         index: true,
       },
+      phone: {
+        type: String,
+        trim: true,
+      },
+      dob: {
+        type: Date,
+      },
+      gender: {
+        type: String,
+        enum: Object.values(GENDERS),
+      },
       address: {
         type: String,
-        required: true,
         trim: true,
       },
       role: {
@@ -29,6 +44,69 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         required: true,
         index: true,
       },
+      status: {
+        type: String,
+        enum: Object.values(USER_STATUS),
+        default: USER_STATUS.ACTIVE,
+        index: true,
+      },
+      creatorStatus: {
+        subscriptionActive: {
+          type: Boolean,
+          default: false,
+        },
+        subscriptionId: {
+          type: String,
+          default: null,
+        },
+      },
+      rating: {
+        avg: {
+          type: Number,
+          default: 0,
+          min: 0,
+          max: 5,
+        },
+        count: {
+          type: Number,
+          default: 0,
+          min: 0,
+        },
+      },
+      location: {
+        label: {
+          type: String,
+          trim: true,
+        },
+        coordinates: {
+          type: {
+            type: String,
+            enum: ["Point"],
+            default: "Point",
+          },
+          coordinates: {
+            type: [Number],
+            default: undefined,
+          },
+        },
+      },
+      profilePhoto: {
+        type: Schema.Types.ObjectId,
+        ref: "Media",
+        default: null,
+      },
+      gallery: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Media",
+        },
+      ],
+      blockedUsers: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
       accountStatus: {
         type: String,
         enum: Object.values(ACCOUNT_STATUS),
@@ -52,6 +130,9 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         type: Boolean,
         default: false,
         index: true,
+      },
+      emailVerifiedAt: {
+        type: Date,
       },
       emailVerificationToken: {
         type: String,
@@ -85,6 +166,8 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
 userSchema.index({ email: 1, isDeleted: 1 });
 userSchema.index({ role: 1, accountStatus: 1, isDeleted: 1 });
 userSchema.index({ createdAt: -1, isDeleted: 1 });
+userSchema.index({ status: 1, role: 1 });
+userSchema.index({ "location.coordinates": "2dsphere" });
 
 userSchema.pre(/^find/, function (this: Query<any, IUser>) {
   if (!this.getOptions().includeDeleted) {

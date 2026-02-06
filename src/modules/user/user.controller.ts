@@ -13,7 +13,9 @@ import type { StorageUploadInput } from "@/services/s3.service";
 import {
   cleanerIdSchema,
   createCleanerSchema,
+  galleryRemoveSchema,
   listCleanersSchema,
+  userIdSchema,
   updateCleanerSchema,
   updateProfileSchema,
 } from "./user.schema";
@@ -92,6 +94,78 @@ export class UserController {
     );
 
     ApiResponse.success(res, profile, "Profile photo updated successfully");
+  });
+
+  uploadGallery = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const files = (req.files as Express.Multer.File[]) || [];
+    if (!files.length) {
+      throw new BadRequestException("Gallery files are required");
+    }
+
+    const uploads: StorageUploadInput[] = files.map((file) => ({
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      originalName: file.originalname,
+    }));
+
+    const profile = await this.userService.addGallery(userId, uploads);
+    ApiResponse.success(res, profile, "Gallery updated successfully");
+  });
+
+  removeGalleryItem = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(galleryRemoveSchema, req);
+    const profile = await this.userService.removeFromGallery(
+      userId,
+      validated.params.mediaId,
+    );
+
+    ApiResponse.success(res, profile, "Gallery item removed successfully");
+  });
+
+  getPublicProfile = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(userIdSchema, req);
+    const profile = await this.userService.getPublicProfile(
+      validated.params.id,
+    );
+    ApiResponse.success(res, profile, "Profile fetched successfully");
+  });
+
+  blockUser = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(userIdSchema, req);
+    const profile = await this.userService.blockUser(
+      userId,
+      validated.params.id,
+    );
+    ApiResponse.success(res, profile, "User blocked successfully");
+  });
+
+  unblockUser = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(userIdSchema, req);
+    const profile = await this.userService.unblockUser(
+      userId,
+      validated.params.id,
+    );
+    ApiResponse.success(res, profile, "User unblocked successfully");
   });
 
   createCleaner = asyncHandler(async (req: Request, res: Response) => {

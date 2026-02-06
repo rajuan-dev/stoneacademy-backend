@@ -98,7 +98,12 @@ export class BaseSchemaUtil {
 
   static passwordField() {
     return {
-      password: { type: String, required: true, minlength: 8, select: false },
+      passwordHash: {
+        type: String,
+        required: true,
+        minlength: 8,
+        select: false,
+      },
     } as const;
   }
 

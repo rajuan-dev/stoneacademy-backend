@@ -7,10 +7,45 @@ export const APP = {
 } as const;
 
 export const ROLES = {
+  USER: "user",
+  CREATOR: "creator",
+  ADMIN: "admin",
   SUPER_ADMIN: "super_admin",
   CLIENT: "client",
   CLEANER: "cleaner",
-  ADMIN: "admin",
+} as const;
+
+export const USER_STATUS = {
+  ACTIVE: "active",
+  SUSPENDED: "suspended",
+  DELETED: "deleted",
+} as const;
+
+export const GENDERS = {
+  MALE: "male",
+  FEMALE: "female",
+  OTHER: "other",
+  PREFER_NOT: "prefer_not",
+} as const;
+
+export const ACTIVITY_STATUS = {
+  DRAFT: "draft",
+  PUBLISHED: "published",
+  CANCELLED: "cancelled",
+  COMPLETED: "completed",
+} as const;
+
+export const PARTICIPANT_STATUS = {
+  JOINED: "joined",
+  LEFT: "left",
+  KICKED: "kicked",
+  CANCELLED: "cancelled",
+} as const;
+
+export const OTP_PURPOSES = {
+  VERIFY_EMAIL: "verify_email",
+  RESET_PASSWORD: "reset_password",
+  LOGIN_OTP_OPTIONAL: "login_otp_optional",
 } as const;
 
 export const ACCOUNT_STATUS = {

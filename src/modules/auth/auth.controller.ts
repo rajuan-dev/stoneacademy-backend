@@ -10,14 +10,15 @@ import type { NextFunction, Request, Response } from "express";
 import {
   changePasswordSchema,
   loginSchema,
+  otpSendSchema,
+  otpVerifySchema,
   registerSchema,
-  resendVerificationCodeSchema,
   resetPasswordSchema,
-  verifyEmailSchema,
-  verifyOTPSchema,
+  requestPasswordResetSchema,
 } from "./auth.schema";
 import { AuthService } from "./auth.service";
 import { AuthControllerResponse } from "./auth.type";
+import type { OtpPurpose } from "../otp/otp.model";
 
 export class AuthController {
   private authService: AuthService;
@@ -32,7 +33,13 @@ export class AuthController {
    */
   register = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(registerSchema, req);
-    const result = await this.authService.register(validated.body);
+    const result = await this.authService.register({
+      ...validated.body,
+      meta: {
+        ip: req.ip,
+        userAgent: req.get("User-Agent") || undefined,
+      },
+    });
 
     ApiResponse.created(res, result, MESSAGES.AUTH.REGISTER_SUCCESS);
   });
@@ -64,54 +71,56 @@ export class AuthController {
 
   /**
    * Verify email with code
-   * POST /auth/verify-email
+   * POST /auth/otp/verify
    */
-  verifyEmail = asyncHandler(async (req: Request, res: Response) => {
-    const validated = await zParse(verifyEmailSchema, req);
-    const result = await this.authService.verifyEmail(validated.body);
-
-    ApiResponse.success(res, result, MESSAGES.AUTH.EMAIL_VERIFIED_SUCCESS);
+  verifyOtp = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(otpVerifySchema, req);
+    const result = await this.authService.verifyOtp({
+      ...validated.body,
+      purpose: validated.body.purpose as OtpPurpose,
+    });
+    ApiResponse.success(res, result, "OTP verified successfully");
   });
 
   /**
-   * Resend verification code
-   * POST /auth/resend-verification
+   * Send OTP
+   * POST /auth/otp/send
    */
-  resendVerificationCode = asyncHandler(async (req: Request, res: Response) => {
-    const validated = await zParse(resendVerificationCodeSchema, req);
-
-    const result = await this.authService.resendVerificationCode({
+  sendOtp = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(otpSendSchema, req);
+    const result = await this.authService.sendOtp({
       email: validated.body.email,
-      userType: validated.body.userType,
-      userName: validated.body.userName,
+      purpose: validated.body.purpose as OtpPurpose,
+      meta: {
+        ip: req.ip,
+        userAgent: req.get("User-Agent") || undefined,
+      },
     });
 
-    ApiResponse.success(res, result, MESSAGES.AUTH.VERIFICATION_CODE_SENT);
+    ApiResponse.success(res, result, "OTP sent");
   });
 
   /**
-   * Verify OTP
-   * POST /auth/verify-otp
+   * Request password reset
+   * POST /auth/password/forgot
    */
-  verifyOTP = asyncHandler(async (req: Request, res: Response) => {
-    const validated = await zParse(verifyOTPSchema, req);
-    const result = await this.authService.verifyOTP(
-      validated.body.email,
-      validated.body.otp
+  requestPasswordReset = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(requestPasswordResetSchema, req);
+    const result = await this.authService.requestPasswordReset(
+      validated.body.email
     );
-
-    ApiResponse.success(res, result);
+    ApiResponse.success(res, result, MESSAGES.AUTH.PASSWORD_RESET_OTP_SENT);
   });
 
   /**
    * Reset password
-   * POST /auth/reset-password
+   * POST /auth/password/reset
    */
   resetPassword = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(resetPasswordSchema, req);
     const result = await this.authService.resetPassword(
       validated.body.email,
-      validated.body.otp,
+      validated.body.code,
       validated.body.newPassword
     );
 
@@ -120,11 +129,13 @@ export class AuthController {
 
   /**
    * Refresh token
-   * POST /auth/refresh-token
+   * POST /auth/token/refresh
    */
   refreshToken = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const refreshToken = req.cookies[COOKIE_CONFIG.REFRESH_TOKEN.name];
+      const refreshToken =
+        req.body?.refreshToken ||
+        req.cookies[COOKIE_CONFIG.REFRESH_TOKEN.name];
       if (!refreshToken) { 
         throw new UnauthorizedException("Refresh token not found");
       }

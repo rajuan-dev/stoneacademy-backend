@@ -1,5 +1,8 @@
 import authRouter from "@/modules/auth/auth.route";
 import billingRouter from "@/modules/billing/billing.route";
+import activityRouter from "@/modules/activity/activity.route";
+import adminCategoryRouter from "@/modules/category/admin-category.route";
+import categoryRouter from "@/modules/category/category.route";
 import cleaningServiceRouter from "@/modules/cleaning-service/cleaning-service.route";
 import cleaningReportRouter from "@/modules/cleaning-report/cleaning-report.route";
 import quoteRouter from "@/modules/quote/quote.route";
@@ -14,6 +17,18 @@ const moduleRoutes = [
   {
     path: "/auth",
     route: authRouter,
+  },
+  {
+    path: "/categories",
+    route: categoryRouter,
+  },
+  {
+    path: "/admin/categories",
+    route: adminCategoryRouter,
+  },
+  {
+    path: "/activities",
+    route: activityRouter,
   },
   {
     path: "/billing",
@@ -36,7 +51,7 @@ const moduleRoutes = [
     route: quoteRouter,
   },
   {
-    path: "/user",
+    path: "/users",
     route: userRouter,
   },
 ];

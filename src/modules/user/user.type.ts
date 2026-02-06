@@ -1,18 +1,43 @@
 // file: src/modules/user/user.type.ts
 
-import type { ACCOUNT_STATUS, ROLES } from "@/constants/app.constants";
+import type {
+  ACCOUNT_STATUS,
+  GENDERS,
+  ROLES,
+  USER_STATUS,
+} from "@/constants/app.constants";
 import type { PaginationQuery as BasePaginationQuery } from "@/ts/pagination.types";
 
 export type UserResponse = {
   _id: string;
   email: string;
   fullName: string;
-  phone: string;
-  address: string;
+  phone?: string;
+  dob?: Date;
+  gender?: (typeof GENDERS)[keyof typeof GENDERS];
+  location?: {
+    label?: string;
+    coordinates?: {
+      type: "Point";
+      coordinates: [number, number];
+    };
+  };
+  profilePhoto?: string | null;
+  gallery?: string[];
   role: (typeof ROLES)[keyof typeof ROLES];
-  accountStatus: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
-  emailVerified: boolean;
-  cleanerPercentage?: number;
+  accountStatus?: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
+  status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];
+  emailVerified?: boolean;
+  emailVerifiedAt?: Date | null;
+  creatorStatus?: {
+    subscriptionActive?: boolean;
+    subscriptionId?: string | null;
+  };
+  rating?: {
+    avg?: number;
+    count?: number;
+  };
+  blockedUsers?: string[];
   lastLoginAt?: Date;
   profileImage?: string;
 
@@ -24,12 +49,19 @@ export type UserCreatePayload = {
   email: string;
   password?: string;
   fullName: string;
-  phoneNumber: string;
   phone?: string;
-  address: string;
+  dob?: Date;
+  gender?: (typeof GENDERS)[keyof typeof GENDERS];
+  location?: {
+    label?: string;
+    coordinates?: {
+      type: "Point";
+      coordinates: [number, number];
+    };
+  };
   role: (typeof ROLES)[keyof typeof ROLES];
-  emailVerified?: boolean;
-  accountStatus?: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
+  status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];
+  emailVerifiedAt?: Date | null;
   cleanerPercentage?: number;
 };
 
@@ -55,11 +87,19 @@ export type PaginationQuery = BasePaginationQuery;
 
 export type UpdateUserPayload = {
   fullName?: string;
-  phoneNumber?: string;
   phone?: string;
-  address?: string;
+  dob?: Date;
+  gender?: (typeof GENDERS)[keyof typeof GENDERS];
+  location?: {
+    label?: string;
+    coordinates?: {
+      type: "Point";
+      coordinates: [number, number];
+    };
+  };
   email?: string;
-  profileImageUrl?: string;
+  profilePhoto?: string | null;
+  gallery?: string[];
 };
 
 export type ChangePasswordPayload = {
@@ -71,8 +111,21 @@ export type JWTPayload = {
   userId: string;
   email: string;
   role: string;
-  accountStatus: string;
+  status?: string;
+  accountStatus?: string;
+  emailVerifiedAt?: string | null;
   emailVerified?: boolean;
   iat?: number;
   exp?: number;
+};
+
+export type PublicProfileResponse = {
+  _id: string;
+  fullName: string;
+  profilePhoto?: string | null;
+  gallery?: string[];
+  rating?: {
+    avg?: number;
+    count?: number;
+  };
 };

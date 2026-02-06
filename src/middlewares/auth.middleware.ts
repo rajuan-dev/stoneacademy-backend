@@ -21,8 +21,10 @@ declare global {
         userId: string;
         email: string;
         role: string;
-        accountStatus: string;
+        status?: string;
+        accountStatus?: string;
         emailVerified?: boolean;
+        emailVerifiedAt?: string | null;
         iat?: number;
         exp?: number;
       };
@@ -56,8 +58,10 @@ export class AuthMiddleware {
         userId: payload.userId,
         email: payload.email,
         role: payload.role,
+        status: payload.status,
         accountStatus: payload.accountStatus,
         emailVerified: payload.emailVerified,
+        emailVerifiedAt: payload.emailVerifiedAt,
         iat: payload.iat,
         exp: payload.exp,
       };
@@ -112,8 +116,10 @@ export class AuthMiddleware {
           userId: payload.userId,
           email: payload.email,
           role: payload.role,
+          status: payload.status,
           accountStatus: payload.accountStatus,
           emailVerified: payload.emailVerified,
+          emailVerifiedAt: payload.emailVerifiedAt,
           iat: payload.iat,
           exp: payload.exp,
         };
@@ -165,10 +171,12 @@ export class AuthMiddleware {
   ) => {
     try {
       if (!req.user?.emailVerified) {
+        if (!req.user?.emailVerifiedAt) {
         throw new ForbiddenException(
           "Please verify your email address before accessing this resource.",
           ErrorCodeEnum.ACCESS_UNAUTHORIZED
         );
+        }
       }
 
       next();

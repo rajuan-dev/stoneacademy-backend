@@ -40,12 +40,13 @@ export class AdminSeeder {
       // Create admin user
       const adminUser = new User({
         email: this.DEFAULT_ADMIN.email,
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         fullName: this.DEFAULT_ADMIN.fullName,
         phoneNumber: this.DEFAULT_ADMIN.phoneNumber,
         address: this.DEFAULT_ADMIN.address,
         role: ROLES.ADMIN,
         emailVerified: true,
+        emailVerifiedAt: new Date(),
         accountStatus: ACCOUNT_STATUS.ACTIVE,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -84,7 +85,7 @@ export class AdminSeeder {
       const admin = await User.findOneAndUpdate(
         { email: this.DEFAULT_ADMIN.email, role: ROLES.ADMIN },
         {
-          password: hashedPassword,
+          passwordHash: hashedPassword,
           mustChangePassword: true, // Force password change
         },
         { new: true },

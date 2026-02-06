@@ -1,18 +1,46 @@
-import { ACCOUNT_STATUS, ROLES } from "@/constants/app.constants";
+import {
+  ACCOUNT_STATUS,
+  GENDERS,
+  ROLES,
+  USER_STATUS,
+} from "@/constants/app.constants";
 import type { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
   email: string;
-  password?: string;
+  passwordHash?: string;
   phoneNumber?: string;
-  address: string;
+  phone?: string;
+  address?: string;
   fullName: string;
   role: (typeof ROLES)[keyof typeof ROLES];
   accountStatus: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
+  status: (typeof USER_STATUS)[keyof typeof USER_STATUS];
+  dob?: Date;
+  gender?: (typeof GENDERS)[keyof typeof GENDERS];
+  location?: {
+    label?: string;
+    coordinates?: {
+      type: "Point";
+      coordinates: [number, number];
+    };
+  };
+  profilePhoto?: Types.ObjectId | null;
+  gallery?: Types.ObjectId[];
+  creatorStatus?: {
+    subscriptionActive?: boolean;
+    subscriptionId?: string | null;
+  };
+  rating?: {
+    avg?: number;
+    count?: number;
+  };
+  blockedUsers?: Types.ObjectId[];
   profileImageUrl?: string | null;
   cleanerPercentage?: number;
   emailVerified: boolean;
+  emailVerifiedAt?: Date | null;
   emailVerificationToken?: string;
   emailVerificationExpiresAt?: Date;
   lastLoginAt?: Date;

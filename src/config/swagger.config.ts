@@ -39,7 +39,7 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
     schemas: {
       AuthRegisterRequest: {
         type: "object",
-        required: ["email", "password", "fullName", "phoneNumber", "address"],
+        required: ["email", "password", "confirmPassword", "fullName"],
         properties: {
           email: {
             type: "string",
@@ -47,9 +47,13 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
             example: "client@superfly.com",
           },
           password: { type: "string", minLength: 8, example: "StrongP@ssw0rd" },
+          confirmPassword: {
+            type: "string",
+            minLength: 8,
+            example: "StrongP@ssw0rd",
+          },
           fullName: { type: "string", example: "Jane Client" },
-          phoneNumber: { type: "string", example: "+1-555-123-4567" },
-          address: { type: "string", example: "742 Evergreen Terrace" },
+          role: { type: "string", enum: ["user"], example: "user" },
         },
       },
       AuthRegisterResponse: {
@@ -83,17 +87,59 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
         type: "object",
         properties: {
           user: { $ref: "#/components/schemas/UserProfile" },
-          tokens: {
-            type: "object",
-            properties: {
-              accessToken: { type: "string", description: "JWT access token" },
-              refreshToken: {
-                type: "string",
-                description: "Long-lived refresh token",
-              },
-              expiresIn: { type: "integer", example: 3600 },
-            },
+          accessToken: { type: "string", description: "JWT access token" },
+          expiresIn: { type: "string", example: "7d" },
+        },
+      },
+      OtpSendRequest: {
+        type: "object",
+        required: ["email", "purpose"],
+        properties: {
+          email: { type: "string", format: "email" },
+          purpose: {
+            type: "string",
+            enum: ["verify_email", "reset_password", "login_otp_optional"],
           },
+        },
+      },
+      OtpVerifyRequest: {
+        type: "object",
+        required: ["email", "purpose", "code"],
+        properties: {
+          email: { type: "string", format: "email" },
+          purpose: {
+            type: "string",
+            enum: ["verify_email", "reset_password", "login_otp_optional"],
+          },
+          code: { type: "string", example: "1234" },
+        },
+      },
+      Category: {
+        type: "object",
+        properties: {
+          _id: { type: "string" },
+          name: { type: "string" },
+          isActive: { type: "boolean" },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      Activity: {
+        type: "object",
+        properties: {
+          _id: { type: "string" },
+          hostId: { type: "string" },
+          title: { type: "string" },
+          typeCategoryId: { type: "string" },
+          description: { type: "string", nullable: true },
+          startAt: { type: "string", format: "date-time" },
+          endAt: { type: "string", format: "date-time", nullable: true },
+          status: {
+            type: "string",
+            enum: ["draft", "published", "cancelled", "completed"],
+          },
+          participantLimit: { type: "integer", nullable: true },
+          distanceMiles: { type: "number", nullable: true },
         },
       },
       UserProfile: {
@@ -102,14 +148,23 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
           _id: { type: "string", example: "665fe91a3f6b4a2b6c3a1234" },
           email: { type: "string", format: "email" },
           fullName: { type: "string" },
-          phone: { type: "string" },
-          address: { type: "string" },
+          phone: { type: "string", nullable: true },
+          dob: { type: "string", format: "date-time", nullable: true },
+          gender: {
+            type: "string",
+            enum: ["male", "female", "other", "prefer_not"],
+            nullable: true,
+          },
           role: {
             type: "string",
-            enum: ["client", "cleaner", "admin", "super_admin"],
+            enum: ["user", "creator", "admin", "super_admin"],
           },
-          accountStatus: { type: "string" },
-          emailVerified: { type: "boolean" },
+          status: { type: "string", enum: ["active", "suspended", "deleted"] },
+          emailVerifiedAt: {
+            type: "string",
+            format: "date-time",
+            nullable: true,
+          },
           lastLoginAt: { type: "string", format: "date-time", nullable: true },
           profileImage: { type: "string", nullable: true },
           createdAt: { type: "string", format: "date-time" },
@@ -184,6 +239,8 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
   },
   tags: [
     { name: "Auth", description: "Authentication & authorization" },
+    { name: "Categories", description: "Activity categories" },
+    { name: "Activities", description: "Activities and participation" },
     { name: "Quotes", description: "Quote management & cleaner workflow" },
     { name: "Users", description: "User profile & account endpoints" },
     { name: "Password", description: "Password reset & recovery" },
