@@ -69,3 +69,10 @@ export const changePasswordSchema = z.object({
     newPassword: z.string().min(8, MESSAGES.VALIDATION.PASSWORD_TOO_SHORT),
   }),
 });
+
+export const googleAuthSchema = z.object({
+  body: z.object({
+    idToken: z.string().min(10),
+    fullName: z.string().trim().min(2).max(100).optional(),
+  }),
+});

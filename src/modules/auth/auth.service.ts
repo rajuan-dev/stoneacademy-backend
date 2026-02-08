@@ -7,6 +7,7 @@ import {
   ROLES,
   USER_STATUS,
 } from "@/constants/app.constants";
+import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
 import { EmailService } from "@/services/email.service";
 import {
@@ -15,6 +16,7 @@ import {
   UnauthorizedException,
 } from "@/utils/app-error.utils";
 import { comparePassword, hashPassword } from "@/utils/password.utils";
+import { OAuth2Client } from "google-auth-library";
 import { otpService } from "../otp/otp.service";
 import type { IUser } from "../user/user.interface";
 import { UserService } from "../user/user.service";
@@ -31,10 +33,14 @@ import { AuthUtil } from "./auth.utils";
 export class AuthService {
   private userService: UserService;
   private emailService: EmailService;
+  private googleClient?: OAuth2Client;
 
   constructor() {
     this.userService = new UserService();
     this.emailService = new EmailService();
+    if (env.GOOGLE_CLIENT_ID) {
+      this.googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
+    }
   }
 
   async login(payload: LoginPayload): Promise<AuthServiceResponse> {
@@ -73,6 +79,65 @@ export class AuthService {
 
     await this.userService.updateLastLogin(user._id.toString());
 
+    const tokens = this.generateTokens(user);
+
+    return {
+      user: this.userService.toUserResponse(user),
+      tokens,
+    };
+  }
+
+  async loginWithGoogle(payload: {
+    idToken: string;
+    fullName?: string;
+  }): Promise<AuthServiceResponse> {
+    if (!env.GOOGLE_CLIENT_ID || !this.googleClient) {
+      throw new BadRequestException("Google auth is not configured");
+    }
+
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken: payload.idToken,
+      audience: env.GOOGLE_CLIENT_ID,
+    });
+
+    const googlePayload = ticket.getPayload();
+    if (!googlePayload?.email) {
+      throw new UnauthorizedException("Invalid Google token");
+    }
+
+    if (!googlePayload.email_verified) {
+      throw new UnauthorizedException("Google email not verified");
+    }
+
+    let user = await this.userService.getUserByEmail(googlePayload.email);
+
+    if (!user) {
+      const fullName = payload.fullName || googlePayload.name || "Google User";
+      user = await this.userService.createUser({
+        email: googlePayload.email,
+        fullName,
+        role: ROLES.USER,
+        status: USER_STATUS.ACTIVE,
+        emailVerifiedAt: new Date(),
+      });
+    } else {
+      if (user.status === USER_STATUS.SUSPENDED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
+      }
+      if (user.status === USER_STATUS.DELETED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
+      }
+      if (!user.emailVerified) {
+        user.emailVerified = true;
+        user.emailVerifiedAt = new Date();
+      }
+      if (!user.profileImageUrl && googlePayload.picture) {
+        user.profileImageUrl = googlePayload.picture;
+      }
+      await user.save();
+    }
+
+    await this.userService.updateLastLogin(user._id.toString());
     const tokens = this.generateTokens(user);
 
     return {

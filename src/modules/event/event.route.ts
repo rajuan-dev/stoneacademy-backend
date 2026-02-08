@@ -12,5 +12,6 @@ router.patch("/:id", authMiddleware.verifyToken, controller.update);
 router.delete("/:id", authMiddleware.verifyToken, controller.remove);
 router.post("/:id/join", authMiddleware.verifyToken, controller.join);
 router.post("/:id/leave", authMiddleware.verifyToken, controller.leave);
+router.get("/:id/pass", authMiddleware.verifyToken, controller.pass);
 
 export default router;

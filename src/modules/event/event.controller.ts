@@ -80,4 +80,11 @@ export class EventController {
     const participant = await this.service.leave(validated.params.id, userId);
     ApiResponse.success(res, participant, "Left event successfully");
   });
+
+  pass = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(eventIdSchema, req);
+    const userId = req.user?.userId as string;
+    const pass = await this.service.pass(validated.params.id, userId);
+    ApiResponse.success(res, pass, "Event pass generated");
+  });
 }

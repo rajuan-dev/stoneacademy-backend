@@ -11,10 +11,12 @@ import {
   NotFoundException,
 } from "@/utils/app-error.utils";
 import type { FilterQuery } from "mongoose";
+import { randomBytes } from "node:crypto";
 import { User } from "../user/user.model";
 import { Event } from "./event.model";
 import { EventParticipant } from "./event-participant.model";
 import { PaymentTransaction } from "./payment-transaction.model";
+import { EventQrToken } from "./event-qr-token.model";
 
 type ListQuery = {
   q?: string;
@@ -369,6 +371,38 @@ export class EventService {
     }).exec();
 
     return participant;
+  }
+
+  async pass(eventId: string, userId: string) {
+    const participant = await EventParticipant.findOne({
+      eventId,
+      userId,
+      status: PARTICIPANT_STATUS.JOINED,
+    }).exec();
+
+    if (!participant) {
+      throw new BadRequestException("You are not a participant of this event");
+    }
+
+    let token = await EventQrToken.findOne({
+      participantId: participant._id,
+      revokedAt: { $exists: false },
+    }).exec();
+
+    if (!token) {
+      const payload = randomBytes(24).toString("hex");
+      token = await EventQrToken.create({
+        kind: "event",
+        participantId: participant._id,
+        payload,
+      });
+    }
+
+    return {
+      participantId: participant._id.toString(),
+      eventId,
+      qrPayload: token.payload,
+    };
   }
 
   private roundMoney(value: number): number {

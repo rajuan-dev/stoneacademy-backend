@@ -147,6 +147,12 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         type: Date,
         index: true,
       },
+      onboardingCompletedAt: {
+        type: Date,
+      },
+      onboardingSkippedAt: {
+        type: Date,
+      },
       passwordChangedAt: {
         type: Date,
       },

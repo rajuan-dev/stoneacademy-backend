@@ -45,6 +45,8 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
 
+  GOOGLE_CLIENT_ID: z.string().optional(),
+
   STRIPE_SECRET_KEY: z.string().optional().default(""),
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
   STRIPE_CHECKOUT_SUCCESS_URL: z.string().optional(),
@@ -55,6 +57,8 @@ const envSchema = z.object({
   AWS_REGION: z.string().optional().default(""),
   AWS_S3_BUCKET: z.string().optional().default(""),
   AWS_S3_ENDPOINT: z.string().optional(),
+
+  REMINDER_MINUTES: z.coerce.number().default(30),
 });
 
 try {

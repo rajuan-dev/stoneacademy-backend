@@ -54,6 +54,30 @@ router.post("/login", authController.login);
 
 /**
  * @openapi
+ * /auth/google:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Google login/signup
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [idToken]
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *               fullName:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Logged in
+ */
+router.post("/google", authController.googleAuth);
+
+/**
+ * @openapi
  * /auth/otp/send:
  *   post:
  *     tags: [Auth]

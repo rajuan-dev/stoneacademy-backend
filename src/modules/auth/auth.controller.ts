@@ -9,6 +9,7 @@ import { zParse } from "@/utils/validators.utils";
 import type { NextFunction, Request, Response } from "express";
 import {
   changePasswordSchema,
+  googleAuthSchema,
   loginSchema,
   otpSendSchema,
   otpVerifySchema,
@@ -213,5 +214,28 @@ export class AuthController {
     );
 
     ApiResponse.success(res, result, "Password changed successfully");
+  });
+
+  /**
+   * Google login/signup
+   * POST /auth/google
+   */
+  googleAuth = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(googleAuthSchema, req);
+    const result = await this.authService.loginWithGoogle(validated.body);
+
+    res.cookie(
+      COOKIE_CONFIG.REFRESH_TOKEN.name,
+      result.tokens.refreshToken,
+      COOKIE_CONFIG.REFRESH_TOKEN.options
+    );
+
+    const response: AuthControllerResponse = {
+      user: result.user,
+      accessToken: result.tokens.accessToken,
+      expiresIn: result.tokens.expiresIn,
+    };
+
+    ApiResponse.success(res, response, MESSAGES.AUTH.LOGIN_SUCCESS);
   });
 }

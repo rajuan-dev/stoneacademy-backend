@@ -62,6 +62,8 @@ export class UserService {
       blockedUsers: (user.blockedUsers || []).map((id) => id.toString()),
       lastLoginAt: user.lastLoginAt,
       profileImage: user.profileImageUrl || undefined,
+      onboardingCompletedAt: user.onboardingCompletedAt,
+      onboardingSkippedAt: user.onboardingSkippedAt,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

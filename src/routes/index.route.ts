@@ -12,6 +12,9 @@ import messageRouter from "@/modules/message/message.route";
 import notificationRouter from "@/modules/notification/notification.route";
 import supportRouter from "@/modules/support/support.route";
 import userRouter from "@/modules/user/user.route";
+import onboardingRouter from "@/modules/onboarding/onboarding.route";
+import shopRouter from "@/modules/shop/shop.route";
+import settingsRouter from "@/modules/settings/settings.route";
 
 import { Router } from "express";
 
@@ -33,6 +36,10 @@ const moduleRoutes = [
   {
     path: "/admin",
     route: adminRouter,
+  },
+  {
+    path: "/admin/settings",
+    route: settingsRouter,
   },
   {
     path: "/activities",
@@ -73,6 +80,14 @@ const moduleRoutes = [
   {
     path: "/users",
     route: userRouter,
+  },
+  {
+    path: "/onboarding",
+    route: onboardingRouter,
+  },
+  {
+    path: "/shop",
+    route: shopRouter,
   },
 ];
 

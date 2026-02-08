@@ -48,6 +48,12 @@ export const PAYMENT_STATUS = {
   REFUNDED: "refunded",
 } as const;
 
+export const ORDER_STATUS = {
+  PENDING: "pending",
+  PLACED: "placed",
+  CANCELLED: "cancelled",
+} as const;
+
 export const PARTICIPANT_STATUS = {
   JOINED: "joined",
   LEFT: "left",

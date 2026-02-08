@@ -1,4 +1,4 @@
-import { PAGINATION } from "@/constants/app.constants";
+import { ACTIVITY_STATUS, PAGINATION } from "@/constants/app.constants";
 import { NotFoundException } from "@/utils/app-error.utils";
 import { User } from "../user/user.model";
 import { Activity } from "../activity/activity.model";
@@ -109,5 +109,109 @@ export class AdminService {
         creatorShare: 0,
       },
     };
+  }
+
+  async listActivities(query: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    status?: string;
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const filter: Record<string, any> = {};
+    if (query.q) {
+      const pattern = new RegExp(query.q, "i");
+      filter.$or = [{ title: pattern }, { description: pattern }];
+    }
+    if (query.status) {
+      filter.status = query.status;
+    }
+
+    const [data, totalItems] = await Promise.all([
+      Activity.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      Activity.countDocuments(filter),
+    ]);
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async listEvents(query: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    status?: string;
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const filter: Record<string, any> = {};
+    if (query.q) {
+      const pattern = new RegExp(query.q, "i");
+      filter.$or = [{ title: pattern }, { description: pattern }];
+    }
+    if (query.status) {
+      filter.status = query.status;
+    }
+
+    const [data, totalItems] = await Promise.all([
+      Event.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      Event.countDocuments(filter),
+    ]);
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async updateActivityStatus(activityId: string, status: string) {
+    if (!Object.values(ACTIVITY_STATUS).includes(status as any)) {
+      throw new NotFoundException("Invalid status");
+    }
+    const activity = await Activity.findByIdAndUpdate(
+      activityId,
+      { status },
+      { new: true },
+    ).exec();
+    if (!activity) {
+      throw new NotFoundException("Activity not found");
+    }
+    return activity;
+  }
+
+  async updateEventStatus(eventId: string, status: string) {
+    if (!Object.values(ACTIVITY_STATUS).includes(status as any)) {
+      throw new NotFoundException("Invalid status");
+    }
+    const event = await Event.findByIdAndUpdate(
+      eventId,
+      { status },
+      { new: true },
+    ).exec();
+    if (!event) {
+      throw new NotFoundException("Event not found");
+    }
+    return event;
   }
 }

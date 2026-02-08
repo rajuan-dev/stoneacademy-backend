@@ -40,6 +40,8 @@ export type UserResponse = {
   blockedUsers?: string[];
   lastLoginAt?: Date;
   profileImage?: string;
+  onboardingCompletedAt?: Date;
+  onboardingSkippedAt?: Date;
 
   createdAt: Date;
   updatedAt: Date;
