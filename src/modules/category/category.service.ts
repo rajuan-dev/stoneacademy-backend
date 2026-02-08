@@ -2,6 +2,8 @@
 
 import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
 import { Category, type ICategory } from "./category.model";
+import { Activity } from "../activity/activity.model";
+import { Event } from "../event/event.model";
 
 export class CategoryService {
   async list(activeOnly?: boolean): Promise<ICategory[]> {
@@ -47,6 +49,16 @@ export class CategoryService {
   }
 
   async delete(id: string) {
+    const activityCount = await Activity.countDocuments({
+      typeCategoryId: id,
+    });
+    const eventCount = await Event.countDocuments({
+      typeCategoryId: id,
+    });
+    if (activityCount > 0 || eventCount > 0) {
+      throw new BadRequestException("Category is in use and cannot be deleted");
+    }
+
     const category = await Category.findByIdAndDelete(id).exec();
     if (!category) {
       throw new NotFoundException("Category not found");

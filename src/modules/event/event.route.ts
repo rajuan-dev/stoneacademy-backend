@@ -7,7 +7,7 @@ const controller = new EventController();
 
 router.get("/", controller.list);
 router.post("/", authMiddleware.verifyToken, controller.create);
-router.get("/:id", controller.getById);
+router.get("/:id", authMiddleware.optionalAuth, controller.getById);
 router.patch("/:id", authMiddleware.verifyToken, controller.update);
 router.delete("/:id", authMiddleware.verifyToken, controller.remove);
 router.post("/:id/join", authMiddleware.verifyToken, controller.join);

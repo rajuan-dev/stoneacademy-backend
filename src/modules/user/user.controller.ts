@@ -191,4 +191,13 @@ export class UserController {
     await this.userService.deleteCleaner(validated.params.cleanerId);
     ApiResponse.success(res, { message: "Cleaner deleted successfully" });
   });
+
+  deleteAccount = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+    await this.userService.deleteAccount(userId);
+    ApiResponse.success(res, { message: "Account deleted successfully" });
+  });
 }

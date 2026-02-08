@@ -41,7 +41,9 @@ export class EventService {
     const limit = query.limit ?? 10;
     const skip = (page - 1) * limit;
 
-    const filter: FilterQuery<any> = {};
+    const filter: FilterQuery<any> = {
+      status: ACTIVITY_STATUS.APPROVED,
+    };
 
     if (query.q) {
       const pattern = new RegExp(query.q, "i");
@@ -169,16 +171,31 @@ export class EventService {
         : undefined,
       participantLimit: payload.participantLimit,
       media: payload.mediaIds || [],
-      status: payload.status || ACTIVITY_STATUS.DRAFT,
+      status: payload.status || ACTIVITY_STATUS.PENDING,
       ticketPrice: payload.ticketPrice,
       currency: payload.currency || "USD",
       stats: { joinedCount: 0 },
     });
   }
 
-  async getById(eventId: string) {
+  async getById(eventId: string, options?: { allowUnapproved?: boolean }) {
     const event = await Event.findById(eventId).exec();
     if (!event) {
+      throw new NotFoundException("Event not found");
+    }
+    if (!options?.allowUnapproved && event.status !== ACTIVITY_STATUS.APPROVED) {
+      throw new NotFoundException("Event not found");
+    }
+    return event;
+  }
+
+  async getByIdForUser(eventId: string, userId?: string) {
+    const event = await Event.findById(eventId).exec();
+    if (!event) {
+      throw new NotFoundException("Event not found");
+    }
+    const isCreator = userId && event.creatorId.toString() === userId;
+    if (!isCreator && event.status !== ACTIVITY_STATUS.APPROVED) {
       throw new NotFoundException("Event not found");
     }
     return event;
@@ -201,7 +218,7 @@ export class EventService {
       currency?: string;
     },
   ) {
-    const event = await this.getById(eventId);
+    const event = await this.getById(eventId, { allowUnapproved: true });
 
     if (event.creatorId.toString() !== userId) {
       throw new ForbiddenException("Only creator can edit this event");
@@ -235,7 +252,7 @@ export class EventService {
   }
 
   async remove(eventId: string, userId: string) {
-    const event = await this.getById(eventId);
+    const event = await this.getById(eventId, { allowUnapproved: true });
     if (event.creatorId.toString() !== userId) {
       throw new ForbiddenException("Only creator can cancel this event");
     }
@@ -270,6 +287,11 @@ export class EventService {
 
     if (event.creatorId.toString() === userId) {
       throw new BadRequestException("Creator cannot join own event");
+    }
+
+    const blocked = await this.isBlocked(userId, event.creatorId.toString());
+    if (blocked) {
+      throw new ForbiddenException("You cannot join this event");
     }
 
     const existing = await EventParticipant.findOne({
@@ -407,5 +429,20 @@ export class EventService {
 
   private roundMoney(value: number): number {
     return Number(value.toFixed(2));
+  }
+
+  private async isBlocked(userId: string, otherUserId: string) {
+    if (userId === otherUserId) return false;
+    const [user, other] = await Promise.all([
+      User.findById(userId).select("blockedUsers").exec(),
+      User.findById(otherUserId).select("blockedUsers").exec(),
+    ]);
+    const userBlocksOther = user?.blockedUsers?.some(
+      (id) => id.toString() === otherUserId,
+    );
+    const otherBlocksUser = other?.blockedUsers?.some(
+      (id) => id.toString() === userId,
+    );
+    return Boolean(userBlocksOther || otherBlocksUser);
   }
 }

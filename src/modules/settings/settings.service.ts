@@ -8,6 +8,8 @@ export type PlatformSettings = {
   cancellationPolicy: string;
   refundPolicy: string;
   reminderMinutes: number;
+  subscriptionMonthlyPrice: number;
+  subscriptionYearlyPrice: number;
 };
 
 const DEFAULT_SETTINGS: PlatformSettings = {
@@ -15,6 +17,8 @@ const DEFAULT_SETTINGS: PlatformSettings = {
   cancellationPolicy: "Standard cancellation policy.",
   refundPolicy: "Refunds are handled according to the event policy.",
   reminderMinutes: env.REMINDER_MINUTES ?? 30,
+  subscriptionMonthlyPrice: 9.99,
+  subscriptionYearlyPrice: 99.99,
 };
 
 export class SettingsService {

@@ -42,6 +42,12 @@ export class MessageController {
     ApiResponse.created(res, conversation, "Conversation created successfully");
   });
 
+  createSupportConversation = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId as string;
+    const conversation = await this.service.createSupportConversation(userId);
+    ApiResponse.created(res, conversation, "Support conversation created successfully");
+  });
+
   listMessages = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(listMessagesSchema, req);
     const userId = req.user?.userId as string;

@@ -17,6 +17,9 @@ export interface IUser extends Document {
   role: (typeof ROLES)[keyof typeof ROLES];
   accountStatus: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
   status: (typeof USER_STATUS)[keyof typeof USER_STATUS];
+  blockedReason?: string;
+  blockedAt?: Date;
+  blockedBy?: Types.ObjectId;
   dob?: Date;
   gender?: (typeof GENDERS)[keyof typeof GENDERS];
   location?: {
@@ -44,6 +47,9 @@ export interface IUser extends Document {
   emailVerificationToken?: string;
   emailVerificationExpiresAt?: Date;
   lastLoginAt?: Date;
+  loginAttempts?: number;
+  loginLockedUntil?: Date;
+  refreshTokenInvalidBefore?: Date;
   onboardingCompletedAt?: Date;
   onboardingSkippedAt?: Date;
   mustChangePassword?: boolean;

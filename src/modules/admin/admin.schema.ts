@@ -23,6 +23,7 @@ export const updateUserStatusSchema = z.object({
   }),
   body: z.object({
     status: z.enum(Object.values(USER_STATUS) as [string, ...string[]]),
+    reason: z.string().trim().max(500).optional(),
   }),
 });
 
@@ -72,5 +73,15 @@ export const updateEventStatusSchema = z.object({
   }),
   body: z.object({
     status: z.enum(Object.values(ACTIVITY_STATUS) as [string, ...string[]]),
+  }),
+});
+
+export const listSubscriptionsSchema = z.object({
+  query: z.object({
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+    status: z.string().trim().optional(),
+    plan: z.string().trim().optional(),
+    search: z.string().trim().max(200).optional(),
   }),
 });

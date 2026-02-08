@@ -6,6 +6,7 @@ import {
   listUsersSchema,
   listActivitiesSchema,
   listEventsSchema,
+  listSubscriptionsSchema,
   updateActivityStatusSchema,
   updateEventStatusSchema,
   updateUserRoleSchema,
@@ -31,6 +32,8 @@ export class AdminController {
     const user = await this.service.updateUserStatus(
       validated.params.id,
       validated.body.status,
+      validated.body.reason,
+      req.user?.userId as string,
     );
     ApiResponse.success(res, user, "User status updated successfully");
   });
@@ -47,6 +50,11 @@ export class AdminController {
   dashboardOverview = asyncHandler(async (req: Request, res: Response) => {
     const result = await this.service.dashboardOverview();
     ApiResponse.success(res, result, "Dashboard overview fetched successfully");
+  });
+
+  dashboardAnalytics = asyncHandler(async (_req: Request, res: Response) => {
+    const result = await this.service.dashboardAnalytics();
+    ApiResponse.success(res, result, "Dashboard analytics fetched successfully");
   });
 
   listActivities = asyncHandler(async (req: Request, res: Response) => {
@@ -71,6 +79,7 @@ export class AdminController {
     const activity = await this.service.updateActivityStatus(
       validated.params.id,
       validated.body.status,
+      req.user?.userId as string,
     );
     ApiResponse.success(res, activity, "Activity status updated");
   });
@@ -80,7 +89,19 @@ export class AdminController {
     const event = await this.service.updateEventStatus(
       validated.params.id,
       validated.body.status,
+      req.user?.userId as string,
     );
     ApiResponse.success(res, event, "Event status updated");
+  });
+
+  listSubscriptions = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listSubscriptionsSchema, req);
+    const result = await this.service.listSubscriptions(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Subscriptions fetched",
+    );
   });
 }

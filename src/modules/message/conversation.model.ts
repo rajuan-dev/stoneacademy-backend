@@ -3,7 +3,7 @@ import { model, Schema, type Types } from "mongoose";
 
 export interface IConversation {
   _id: Types.ObjectId;
-  type: "direct";
+  type: "direct" | "support";
   participantIds: Types.ObjectId[];
   lastMessageId?: Types.ObjectId | null;
   lastMessageText?: string | null;
@@ -16,7 +16,7 @@ export interface IConversation {
 const conversationSchema = BaseSchemaUtil.createSchema<IConversation>({
   type: {
     type: String,
-    enum: ["direct"],
+    enum: ["direct", "support"],
     default: "direct",
     index: true,
   },

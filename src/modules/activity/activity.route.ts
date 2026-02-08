@@ -130,7 +130,7 @@ router.post("/", authMiddleware.verifyToken, controller.create);
  *             schema:
  *               $ref: '#/components/schemas/Activity'
  */
-router.get("/:id", controller.getById);
+router.get("/:id", authMiddleware.optionalAuth, controller.getById);
 /**
  * @openapi
  * /activities/{id}:

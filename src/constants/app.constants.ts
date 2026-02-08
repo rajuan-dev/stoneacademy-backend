@@ -29,6 +29,9 @@ export const GENDERS = {
 } as const;
 
 export const ACTIVITY_STATUS = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
   DRAFT: "draft",
   PUBLISHED: "published",
   CANCELLED: "cancelled",

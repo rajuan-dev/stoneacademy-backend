@@ -42,7 +42,8 @@ export class ActivityController {
 
   getById = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(activityIdSchema, req);
-    const activity = await this.service.getById(validated.params.id);
+    const userId = req.user?.userId as string | undefined;
+    const activity = await this.service.getByIdForUser(validated.params.id, userId);
     ApiResponse.success(res, activity, "Activity fetched successfully");
   });
 

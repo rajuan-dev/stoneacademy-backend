@@ -6,6 +6,8 @@ import { Event } from "../event/event.model";
 import { Report } from "../report/report.model";
 import { SupportTicket } from "../support/support-ticket.model";
 import { PaymentTransaction } from "../event/payment-transaction.model";
+import { AdminAuditLog } from "./admin-audit-log.model";
+import { Subscription } from "../subscription/subscription.model";
 
 export class AdminService {
   async listUsers(query: {
@@ -50,10 +52,17 @@ export class AdminService {
     };
   }
 
-  async updateUserStatus(userId: string, status: string) {
+  async updateUserStatus(userId: string, status: string, reason?: string, adminId?: string) {
+    const update: Record<string, any> = { status };
+    if (reason !== undefined) {
+      update.blockedReason = reason;
+      update.blockedAt = status === "suspended" ? new Date() : null;
+      update.blockedBy = status === "suspended" && adminId ? adminId : null;
+    }
+
     const user = await User.findByIdAndUpdate(
       userId,
-      { status },
+      update,
       { new: true },
     ).select("-passwordHash").exec();
     if (!user) throw new NotFoundException("User not found");
@@ -108,6 +117,62 @@ export class AdminService {
         platformFee: 0,
         creatorShare: 0,
       },
+    };
+  }
+
+  async dashboardAnalytics() {
+    const since = new Date();
+    since.setMonth(since.getMonth() - 6);
+
+    const [userSeries, activitySeries, eventSeries, revenueSeries] =
+      await Promise.all([
+        User.aggregate([
+          { $match: { createdAt: { $gte: since } } },
+          {
+            $group: {
+              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { "_id.year": 1, "_id.month": 1 } },
+        ]),
+        Activity.aggregate([
+          { $match: { createdAt: { $gte: since } } },
+          {
+            $group: {
+              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { "_id.year": 1, "_id.month": 1 } },
+        ]),
+        Event.aggregate([
+          { $match: { createdAt: { $gte: since } } },
+          {
+            $group: {
+              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { "_id.year": 1, "_id.month": 1 } },
+        ]),
+        PaymentTransaction.aggregate([
+          { $match: { status: "succeeded", createdAt: { $gte: since } } },
+          {
+            $group: {
+              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              gross: { $sum: "$grossAmount" },
+            },
+          },
+          { $sort: { "_id.year": 1, "_id.month": 1 } },
+        ]),
+      ]);
+
+    return {
+      users: userSeries,
+      activities: activitySeries,
+      events: eventSeries,
+      revenue: revenueSeries,
     };
   }
 
@@ -185,7 +250,7 @@ export class AdminService {
     };
   }
 
-  async updateActivityStatus(activityId: string, status: string) {
+  async updateActivityStatus(activityId: string, status: string, adminId?: string) {
     if (!Object.values(ACTIVITY_STATUS).includes(status as any)) {
       throw new NotFoundException("Invalid status");
     }
@@ -197,10 +262,19 @@ export class AdminService {
     if (!activity) {
       throw new NotFoundException("Activity not found");
     }
+    if (adminId) {
+      await AdminAuditLog.create({
+        adminId,
+        action: "activity_status_updated",
+        entityType: "activity",
+        entityId: activity._id,
+        meta: { status },
+      });
+    }
     return activity;
   }
 
-  async updateEventStatus(eventId: string, status: string) {
+  async updateEventStatus(eventId: string, status: string, adminId?: string) {
     if (!Object.values(ACTIVITY_STATUS).includes(status as any)) {
       throw new NotFoundException("Invalid status");
     }
@@ -212,6 +286,67 @@ export class AdminService {
     if (!event) {
       throw new NotFoundException("Event not found");
     }
+    if (adminId) {
+      await AdminAuditLog.create({
+        adminId,
+        action: "event_status_updated",
+        entityType: "event",
+        entityId: event._id,
+        meta: { status },
+      });
+    }
     return event;
+  }
+
+  async listSubscriptions(query: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    plan?: string;
+    search?: string;
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const filter: Record<string, any> = {};
+    if (query.status) filter.status = query.status;
+    if (query.plan) filter.plan = query.plan;
+
+    let userFilter: Record<string, any> | undefined;
+    if (query.search) {
+      const pattern = new RegExp(query.search, "i");
+      userFilter = { $or: [{ fullName: pattern }, { email: pattern }] };
+    }
+
+    const [data, totalItems] = await Promise.all([
+      Subscription.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: "userId",
+          select: "fullName email",
+          match: userFilter,
+        })
+        .exec(),
+      Subscription.countDocuments(filter),
+    ]);
+
+    const filteredData = userFilter
+      ? data.filter((item) => item.userId)
+      : data;
+
+    return {
+      data: filteredData,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
   }
 }

@@ -45,6 +45,7 @@ router.get("/me", authMiddleware.verifyToken, userController.getProfile);
  *         description: Updated
  */
 router.patch("/me", authMiddleware.verifyToken, userController.updateProfile);
+router.delete("/me", authMiddleware.verifyToken, userController.deleteAccount);
 
 /**
  * @openapi

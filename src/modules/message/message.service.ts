@@ -1,4 +1,4 @@
-import { PAGINATION } from "@/constants/app.constants";
+import { PAGINATION, ROLES, USER_STATUS } from "@/constants/app.constants";
 import { notificationService } from "@/modules/notification/notification.service";
 import {
   BadRequestException,
@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from "@/utils/app-error.utils";
 import type { Types } from "mongoose";
+import { User } from "../user/user.model";
 import { Conversation } from "./conversation.model";
 import { Message } from "./message.model";
 
@@ -48,6 +49,11 @@ export class MessageService {
   async createDirectConversation(userId: string, participantId: string) {
     if (userId === participantId) {
       throw new BadRequestException("Cannot create conversation with yourself");
+    }
+
+    const blocked = await this.isBlocked(userId, participantId);
+    if (blocked) {
+      throw new ForbiddenException("You cannot message this user");
     }
 
     const participantIds = [userId, participantId].sort();
@@ -122,6 +128,18 @@ export class MessageService {
       userId,
       payload.conversationId,
     );
+
+    if (conversation.type === "direct") {
+      const otherId = conversation.participantIds
+        .map((id) => id.toString())
+        .find((id) => id !== userId);
+      if (otherId) {
+        const blocked = await this.isBlocked(userId, otherId);
+        if (blocked) {
+          throw new ForbiddenException("You cannot message this user");
+        }
+      }
+    }
 
     const text = payload.text?.trim();
     if ((!text || text.length === 0) && (!payload.mediaIds || payload.mediaIds.length === 0)) {
@@ -216,5 +234,51 @@ export class MessageService {
     }
 
     return conversation;
+  }
+
+  async createSupportConversation(userId: string) {
+    const admin = await User.findOne({
+      role: { $in: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+      status: USER_STATUS.ACTIVE,
+    })
+      .sort({ role: 1, createdAt: 1 })
+      .exec();
+
+    if (!admin) {
+      throw new NotFoundException("No admin available");
+    }
+
+    const participantIds = [userId, admin._id.toString()].sort();
+
+    const existing = await Conversation.findOne({
+      type: "support",
+      participantIds: { $all: participantIds },
+      $expr: { $eq: [{ $size: "$participantIds" }, 2] },
+    }).exec();
+
+    if (existing) {
+      return existing;
+    }
+
+    return Conversation.create({
+      type: "support",
+      participantIds,
+      createdBy: userId,
+    });
+  }
+
+  private async isBlocked(userId: string, otherUserId: string) {
+    if (userId === otherUserId) return false;
+    const [user, other] = await Promise.all([
+      User.findById(userId).select("blockedUsers").exec(),
+      User.findById(otherUserId).select("blockedUsers").exec(),
+    ]);
+    const userBlocksOther = user?.blockedUsers?.some(
+      (id) => id.toString() === otherUserId,
+    );
+    const otherBlocksUser = other?.blockedUsers?.some(
+      (id) => id.toString() === userId,
+    );
+    return Boolean(userBlocksOther || otherBlocksUser);
   }
 }

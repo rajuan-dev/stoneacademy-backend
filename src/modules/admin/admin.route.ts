@@ -12,6 +12,7 @@ router.use(
 );
 
 router.get("/dashboard/overview", controller.dashboardOverview);
+router.get("/dashboard/analytics", controller.dashboardAnalytics);
 router.get("/users", controller.listUsers);
 router.patch("/users/:id/status", controller.updateUserStatus);
 router.patch("/users/:id/role", controller.updateUserRole);
@@ -19,5 +20,6 @@ router.get("/activities", controller.listActivities);
 router.patch("/activities/:id/status", controller.updateActivityStatus);
 router.get("/events", controller.listEvents);
 router.patch("/events/:id/status", controller.updateEventStatus);
+router.get("/subscriptions", controller.listSubscriptions);
 
 export default router;

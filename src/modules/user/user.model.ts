@@ -50,6 +50,18 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         default: USER_STATUS.ACTIVE,
         index: true,
       },
+      blockedReason: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+      },
+      blockedAt: {
+        type: Date,
+      },
+      blockedBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
       creatorStatus: {
         subscriptionActive: {
           type: Boolean,
@@ -146,6 +158,16 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
       lastLoginAt: {
         type: Date,
         index: true,
+      },
+      loginAttempts: {
+        type: Number,
+        default: 0,
+      },
+      loginLockedUntil: {
+        type: Date,
+      },
+      refreshTokenInvalidBefore: {
+        type: Date,
       },
       onboardingCompletedAt: {
         type: Date,

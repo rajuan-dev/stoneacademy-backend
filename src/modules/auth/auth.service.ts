@@ -17,6 +17,7 @@ import {
 } from "@/utils/app-error.utils";
 import { comparePassword, hashPassword } from "@/utils/password.utils";
 import { OAuth2Client } from "google-auth-library";
+import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
 import { otpService } from "../otp/otp.service";
 import type { IUser } from "../user/user.interface";
 import { UserService } from "../user/user.service";
@@ -52,6 +53,10 @@ export class AuthService {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
+    if (user.loginLockedUntil && user.loginLockedUntil > new Date()) {
+      throw new UnauthorizedException("Account temporarily locked. Please try again later.");
+    }
+
     if (!user.emailVerifiedAt && !user.emailVerified) {
       throw new UnauthorizedException("NEEDS_OTP_VERIFY");
     }
@@ -74,10 +79,16 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
+      await this.userService.recordFailedLogin(
+        user._id.toString(),
+        AUTH.MAX_LOGIN_ATTEMPTS,
+        AUTH.LOGIN_LOCKOUT_MINUTES,
+      );
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
     await this.userService.updateLastLogin(user._id.toString());
+    await this.userService.resetLoginAttempts(user._id.toString());
 
     const tokens = this.generateTokens(user);
 
@@ -175,6 +186,16 @@ export class AuthService {
       userType: user.role,
       verificationCode: otp.code,
       expiresIn: String(otp.expiresInMinutes),
+    });
+
+    await adminNotificationService.create({
+      type: "new_user",
+      title: "New user registered",
+      body: `${user.fullName} just registered.`,
+      payload: {
+        userId: user._id.toString(),
+        email: user.email,
+      },
     });
 
     return {
@@ -310,6 +331,7 @@ export class AuthService {
     const hashedPassword = await hashPassword(newPassword);
 
     await this.userService.updatePassword(user._id.toString(), hashedPassword);
+    await this.userService.invalidateAllRefreshTokensForUser(user._id.toString());
 
     await this.emailService.sendPasswordResetConfirmation(
       user.fullName,
@@ -354,6 +376,18 @@ export class AuthService {
       const user = await this.userService.getById(payload.userId);
 
       if (!user) {
+        throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
+      }
+
+      if (await this.userService.isRefreshTokenBlacklisted(refreshToken)) {
+        throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
+      }
+
+      if (
+        user.refreshTokenInvalidBefore &&
+        payload.iat &&
+        payload.iat * 1000 < user.refreshTokenInvalidBefore.getTime()
+      ) {
         throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
       }
 
@@ -420,6 +454,18 @@ export class AuthService {
         "User logged out",
       );
 
+      const payload = AuthUtil.verifyRefreshToken(token);
+      const expiresAt = payload.exp
+        ? new Date(payload.exp * 1000)
+        : AuthUtil.getTokenExpirationTime(AUTH.REFRESH_TOKEN_EXPIRY);
+
+      await this.userService.addRefreshTokenToBlacklist(
+        userId,
+        token,
+        expiresAt,
+        "logout",
+      );
+
       return { message: "Logged out successfully" };
     } catch (error) {
       logger.error({ error, userId }, "Logout failed");
@@ -453,7 +499,7 @@ export class AuthService {
 
     const hashedPassword = await hashPassword(newPassword);
     await this.userService.updatePassword(userId, hashedPassword);
-    await this.userService.invalidateAllRefreshTokens(userId);
+    await this.userService.invalidateAllRefreshTokensForUser(userId);
 
     await this.userService.notifyPasswordChange(
       user.email,
@@ -467,5 +513,10 @@ export class AuthService {
       message:
         "Password changed successfully. Please login again with your new password.",
     };
+  }
+
+  async logoutAll(userId: string): Promise<{ message: string }> {
+    await this.userService.invalidateAllRefreshTokensForUser(userId);
+    return { message: "All sessions logged out successfully" };
   }
 }

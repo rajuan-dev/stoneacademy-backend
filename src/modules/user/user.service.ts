@@ -55,6 +55,9 @@ export class UserService {
       role: user.role,
       accountStatus: user.accountStatus,
       status: user.status,
+      blockedReason: user.blockedReason,
+      blockedAt: user.blockedAt,
+      blockedBy: user.blockedBy ? user.blockedBy.toString() : null,
       emailVerified: user.emailVerified,
       emailVerifiedAt: user.emailVerifiedAt ?? null,
       creatorStatus: user.creatorStatus,
@@ -394,6 +397,51 @@ export class UserService {
     await this.userRepository.updateLastLogin(userId);
   }
 
+  async recordFailedLogin(userId: string, maxAttempts: number, lockoutMinutes: number) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) return;
+
+    const attempts = (user.loginAttempts || 0) + 1;
+    user.loginAttempts = attempts;
+
+    if (attempts >= maxAttempts) {
+      const lockedUntil = new Date();
+      lockedUntil.setMinutes(lockedUntil.getMinutes() + lockoutMinutes);
+      user.loginLockedUntil = lockedUntil;
+      user.loginAttempts = 0;
+    }
+
+    await user.save();
+  }
+
+  async resetLoginAttempts(userId: string) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) return;
+    user.loginAttempts = 0;
+    user.loginLockedUntil = undefined;
+    await user.save();
+  }
+
+  async addRefreshTokenToBlacklist(
+    userId: string,
+    token: string,
+    expiresAt: Date,
+    reason?: string,
+  ) {
+    return this.userRepository.addRefreshTokenToBlacklist(userId, token, expiresAt, reason);
+  }
+
+  async isRefreshTokenBlacklisted(token: string) {
+    return this.userRepository.isRefreshTokenBlacklisted(token);
+  }
+
+  async invalidateAllRefreshTokensForUser(userId: string) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) return;
+    user.refreshTokenInvalidBefore = new Date();
+    await user.save();
+  }
+
   async invalidateAllRefreshTokens(userId: string): Promise<void> {
     await this.userRepository.deleteAllRefreshTokens(userId);
   }
@@ -586,5 +634,17 @@ export class UserService {
 
     await user.save();
     return this.toUserResponse(user);
+  }
+
+  async deleteAccount(userId: string): Promise<void> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+    }
+    user.status = USER_STATUS.DELETED;
+    user.accountStatus = ACCOUNT_STATUS.INACTIVE;
+    user.isDeleted = true as any;
+    user.deletedAt = new Date() as any;
+    await user.save();
   }
 }

@@ -1,5 +1,6 @@
 import { PAGINATION } from "@/constants/app.constants";
 import { notificationService } from "@/modules/notification/notification.service";
+import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
 import {
   ForbiddenException,
   NotFoundException,
@@ -11,7 +12,7 @@ export class SupportService {
     userId: string,
     payload: { category: string; subject: string; message: string },
   ) {
-    return SupportTicket.create({
+    const ticket = await SupportTicket.create({
       userId,
       category: payload.category,
       subject: payload.subject,
@@ -25,6 +26,15 @@ export class SupportService {
         },
       ],
     });
+
+    await adminNotificationService.create({
+      type: "support_ticket",
+      title: "New support ticket",
+      body: payload.subject,
+      payload: { ticketId: ticket._id.toString() },
+    });
+
+    return ticket;
   }
 
   async listMine(
@@ -59,6 +69,13 @@ export class SupportService {
       ticket.status = "in_progress";
     }
     await ticket.save();
+
+    await adminNotificationService.create({
+      type: "support_reply",
+      title: "Support ticket updated",
+      body: "A user replied to a support ticket.",
+      payload: { ticketId: ticket._id.toString() },
+    });
     return ticket;
   }
 

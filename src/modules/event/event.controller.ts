@@ -41,7 +41,8 @@ export class EventController {
 
   getById = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(eventIdSchema, req);
-    const event = await this.service.getById(validated.params.id);
+    const userId = req.user?.userId as string | undefined;
+    const event = await this.service.getByIdForUser(validated.params.id, userId);
     ApiResponse.success(res, event, "Event fetched successfully");
   });
 

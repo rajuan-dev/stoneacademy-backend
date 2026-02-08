@@ -1,5 +1,6 @@
 import { PAGINATION } from "@/constants/app.constants";
 import { notificationService } from "@/modules/notification/notification.service";
+import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
 import { NotFoundException } from "@/utils/app-error.utils";
 import { Report } from "./report.model";
 
@@ -16,6 +17,17 @@ export class ReportService {
     const report = await Report.create({
       reporterId,
       ...payload,
+    });
+
+    await adminNotificationService.create({
+      type: "report_submitted",
+      title: "New report submitted",
+      body: "A new report has been submitted.",
+      payload: {
+        reportId: report._id.toString(),
+        entityType: report.entityType,
+        entityId: report.entityId.toString(),
+      },
     });
 
     return report;

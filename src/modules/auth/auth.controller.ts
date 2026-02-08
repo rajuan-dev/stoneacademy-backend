@@ -161,27 +161,14 @@ export class AuthController {
     if (!userId) {
       throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
     }
-    // const token = req.headers.authorization?.replace("Bearer ", "") || "";
+    const refreshToken =
+      req.body?.refreshToken || req.cookies[COOKIE_CONFIG.REFRESH_TOKEN.name];
 
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      throw new UnauthorizedException("No authorization header provided");
+    if (!refreshToken) {
+      throw new UnauthorizedException("Refresh token not found");
     }
 
-    const parts = authHeader.split(" ");
-
-    if (parts.length !== 2 || parts[0] !== "Bearer") {
-      throw new UnauthorizedException("Invalid authorization header format");
-    }
-
-    const token = parts[1];
-
-    if (!token) {
-      throw new UnauthorizedException("No token provided");
-    }
-
-    const result = await this.authService.logout(token, userId);
+    const result = await this.authService.logout(refreshToken, userId);
 
     res.clearCookie(COOKIE_CONFIG.REFRESH_TOKEN.name, {
       httpOnly: true,
@@ -191,6 +178,24 @@ export class AuthController {
     });
 
     ApiResponse.success(res, result, MESSAGES.AUTH.LOGOUT_SUCCESS);
+  });
+
+  logoutAll = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const result = await this.authService.logoutAll(userId);
+
+    res.clearCookie(COOKIE_CONFIG.REFRESH_TOKEN.name, {
+      httpOnly: true,
+      secure: COOKIE_CONFIG.REFRESH_TOKEN.options.secure,
+      sameSite: COOKIE_CONFIG.REFRESH_TOKEN.options.sameSite,
+      path: "/",
+    });
+
+    ApiResponse.success(res, result, "Logged out from all sessions");
   });
 
   /**

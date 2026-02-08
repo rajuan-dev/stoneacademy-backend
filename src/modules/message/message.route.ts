@@ -15,6 +15,11 @@ router.post(
   authMiddleware.verifyToken,
   controller.createDirectConversation,
 );
+router.post(
+  "/conversations/support",
+  authMiddleware.verifyToken,
+  controller.createSupportConversation,
+);
 router.get(
   "/conversations/:conversationId/messages",
   authMiddleware.verifyToken,

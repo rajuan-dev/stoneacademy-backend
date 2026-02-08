@@ -27,6 +27,9 @@ export type UserResponse = {
   role: (typeof ROLES)[keyof typeof ROLES];
   accountStatus?: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
   status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];
+  blockedReason?: string;
+  blockedAt?: Date;
+  blockedBy?: string | null;
   emailVerified?: boolean;
   emailVerifiedAt?: Date | null;
   creatorStatus?: {

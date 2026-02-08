@@ -1,6 +1,6 @@
 // file: src/middlewares/auth.middleware.ts
 
-import { MESSAGES } from "@/constants/app.constants";
+import { MESSAGES, USER_STATUS } from "@/constants/app.constants";
 import { ErrorCodeEnum } from "@/enums/error-code.enum";
 
 import { logger } from "@/middlewares/pino-logger";
@@ -65,6 +65,13 @@ export class AuthMiddleware {
         iat: payload.iat,
         exp: payload.exp,
       };
+
+      if (req.user.status === USER_STATUS.SUSPENDED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
+      }
+      if (req.user.status === USER_STATUS.DELETED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
+      }
 
       next();
     } catch (error) {

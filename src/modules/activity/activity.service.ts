@@ -14,6 +14,7 @@ import type { FilterQuery } from "mongoose";
 import { Activity } from "./activity.model";
 import { ActivityParticipant } from "./activity-participant.model";
 import { QrToken } from "./qr-token.model";
+import { User } from "../user/user.model";
 
 type ListQuery = {
   q?: string;
@@ -36,7 +37,9 @@ export class ActivityService {
     const limit = query.limit ?? 10;
     const skip = (page - 1) * limit;
 
-    const filter: FilterQuery<any> = {};
+    const filter: FilterQuery<any> = {
+      status: ACTIVITY_STATUS.APPROVED,
+    };
 
     if (query.q) {
       const pattern = new RegExp(query.q, "i");
@@ -143,14 +146,29 @@ export class ActivityService {
       participantLimit: payload.participantLimit,
       distanceMiles: payload.distanceMiles,
       media: payload.mediaIds || [],
-      status: payload.status || ACTIVITY_STATUS.DRAFT,
+      status: payload.status || ACTIVITY_STATUS.PENDING,
       stats: { joinedCount: 0 },
     });
   }
 
-  async getById(activityId: string) {
+  async getById(activityId: string, options?: { allowUnapproved?: boolean }) {
     const activity = await Activity.findById(activityId).exec();
     if (!activity) {
+      throw new NotFoundException("Activity not found");
+    }
+    if (!options?.allowUnapproved && activity.status !== ACTIVITY_STATUS.APPROVED) {
+      throw new NotFoundException("Activity not found");
+    }
+    return activity;
+  }
+
+  async getByIdForUser(activityId: string, userId?: string) {
+    const activity = await Activity.findById(activityId).exec();
+    if (!activity) {
+      throw new NotFoundException("Activity not found");
+    }
+    const isHost = userId && activity.hostId.toString() === userId;
+    if (!isHost && activity.status !== ACTIVITY_STATUS.APPROVED) {
       throw new NotFoundException("Activity not found");
     }
     return activity;
@@ -172,7 +190,7 @@ export class ActivityService {
       status?: string;
     },
   ) {
-    const activity = await this.getById(activityId);
+    const activity = await this.getById(activityId, { allowUnapproved: true });
 
     if (activity.hostId.toString() !== userId) {
       throw new ForbiddenException("Only host can edit this activity");
@@ -207,7 +225,7 @@ export class ActivityService {
   }
 
   async remove(activityId: string, userId: string) {
-    const activity = await this.getById(activityId);
+    const activity = await this.getById(activityId, { allowUnapproved: true });
     if (activity.hostId.toString() !== userId) {
       throw new ForbiddenException("Only host can delete this activity");
     }
@@ -224,7 +242,16 @@ export class ActivityService {
   }
 
   async join(activityId: string, userId: string) {
-    const activity = await this.getById(activityId);
+    const activity = await this.getById(activityId, { allowUnapproved: true });
+
+    if (activity.status !== ACTIVITY_STATUS.APPROVED) {
+      throw new BadRequestException("Activity is not approved");
+    }
+
+    const blocked = await this.isBlocked(userId, activity.hostId.toString());
+    if (blocked) {
+      throw new ForbiddenException("You cannot join this activity");
+    }
 
     if (activity.status === ACTIVITY_STATUS.CANCELLED) {
       throw new BadRequestException("Activity is cancelled");
@@ -366,4 +393,20 @@ export class ActivityService {
       throw error;
     }
   }
+
+  private async isBlocked(userId: string, otherUserId: string) {
+    if (userId === otherUserId) return false;
+    const [user, other] = await Promise.all([
+      User.findById(userId).select("blockedUsers").exec(),
+      User.findById(otherUserId).select("blockedUsers").exec(),
+    ]);
+    const userBlocksOther = user?.blockedUsers?.some(
+      (id) => id.toString() === otherUserId,
+    );
+    const otherBlocksUser = other?.blockedUsers?.some(
+      (id) => id.toString() === userId,
+    );
+    return Boolean(userBlocksOther || otherBlocksUser);
+  }
 }
+

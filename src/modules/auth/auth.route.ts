@@ -226,5 +226,6 @@ router.put(
  *         description: Logged out
  */
 router.post("/logout", authMiddleware.verifyToken, authController.logout);
+router.post("/logout-all", authMiddleware.verifyToken, authController.logoutAll);
 
 export default router;

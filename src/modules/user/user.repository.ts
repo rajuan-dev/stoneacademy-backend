@@ -125,4 +125,23 @@ export class UserRepository extends BaseRepository<IUser> {
       throw error;
     }
   }
+
+  async addRefreshTokenToBlacklist(
+    userId: string,
+    token: string,
+    expiresAt: Date,
+    reason?: string,
+  ) {
+    return RefreshTokenBlacklist.create({
+      userId,
+      token,
+      expiresAt,
+      reason: reason || "logout",
+    });
+  }
+
+  async isRefreshTokenBlacklisted(token: string): Promise<boolean> {
+    const record = await RefreshTokenBlacklist.findOne({ token }).select("_id").exec();
+    return Boolean(record);
+  }
 }
