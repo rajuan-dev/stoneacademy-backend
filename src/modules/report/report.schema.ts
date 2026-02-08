@@ -1,0 +1,29 @@
+import { z } from "zod";
+
+export const createReportSchema = z.object({
+  body: z.object({
+    entityType: z.enum(["user", "activity", "event", "message"]),
+    entityId: z.string().trim().min(1),
+    reason: z.string().trim().min(3).max(250),
+    details: z.string().trim().max(3000).optional(),
+  }),
+});
+
+export const listReportSchema = z.object({
+  query: z.object({
+    status: z.enum(["open", "under_review", "resolved", "rejected"]).optional(),
+    entityType: z.enum(["user", "activity", "event", "message"]).optional(),
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+  }),
+});
+
+export const updateReportStatusSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z.object({
+    status: z.enum(["under_review", "resolved", "rejected"]),
+    adminNote: z.string().trim().max(3000).optional(),
+  }),
+});

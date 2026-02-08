@@ -3,6 +3,7 @@
 import { ACTIVITY_STATUS, PARTICIPANT_STATUS } from "@/constants/app.constants";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
+import { notificationService } from "@/modules/notification/notification.service";
 import {
   BadRequestException,
   ForbiddenException,
@@ -282,6 +283,19 @@ export class ActivityService {
     });
     activity.stats = { joinedCount: updatedCount };
     await activity.save();
+
+    if (activity.hostId.toString() !== userId) {
+      await notificationService.create({
+        userId: activity.hostId.toString(),
+        type: "activity_joined",
+        title: "New activity join",
+        body: "A user joined your activity.",
+        payload: {
+          activityId: activity._id.toString(),
+          participantId: participant._id.toString(),
+        },
+      });
+    }
 
     return participant;
   }

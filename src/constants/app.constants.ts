@@ -35,6 +35,19 @@ export const ACTIVITY_STATUS = {
   COMPLETED: "completed",
 } as const;
 
+export const SUBSCRIPTION_STATUS = {
+  ACTIVE: "active",
+  EXPIRED: "expired",
+  CANCELLED: "cancelled",
+} as const;
+
+export const PAYMENT_STATUS = {
+  PENDING: "pending",
+  SUCCEEDED: "succeeded",
+  FAILED: "failed",
+  REFUNDED: "refunded",
+} as const;
+
 export const PARTICIPANT_STATUS = {
   JOINED: "joined",
   LEFT: "left",

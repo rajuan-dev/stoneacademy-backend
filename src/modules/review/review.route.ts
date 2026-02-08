@@ -1,13 +1,11 @@
-// file: src/modules/review/review.route.ts
-
+import { authMiddleware } from "@/middlewares/auth.middleware";
 import { Router } from "express";
+import { ReviewController } from "./review.controller";
 
 const router = Router();
+const controller = new ReviewController();
 
-router.all("/", (req, res) => {
-  res.status(501).json({
-    message: "Review module placeholder for demo/template use.",
-  });
-});
+router.get("/", controller.list);
+router.post("/", authMiddleware.verifyToken, controller.create);
 
 export default router;
