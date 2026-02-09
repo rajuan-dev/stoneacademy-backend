@@ -37,6 +37,7 @@ const envSchema = z.object({
   POSTMARK_MESSAGE_STREAM: z.string().optional(),
   POSTMARK_SANDBOX_MODE: z.coerce.boolean().optional(),
   RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM: z.string().email().optional(),
 
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),

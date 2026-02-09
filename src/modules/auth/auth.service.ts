@@ -12,6 +12,7 @@ import { logger } from "@/middlewares/pino-logger";
 import { EmailService } from "@/services/email.service";
 import {
   BadRequestException,
+  ConflictException,
   NotFoundException,
   UnauthorizedException,
 } from "@/utils/app-error.utils";
@@ -29,6 +30,7 @@ import type {
   SendOtpPayload,
   VerifyOtpPayload,
 } from "./auth.type";
+import { PendingRegistration } from "./pending-registration.model";
 import { AuthUtil } from "./auth.utils";
 
 export class AuthService {
@@ -158,48 +160,54 @@ export class AuthService {
   }
 
   async register(payload: RegisterPayload): Promise<{
-    user: UserResponse;
+    email: string;
     verification: { expiresAt: Date; expiresInMinutes: number };
   }> {
     if (payload.role && payload.role !== ROLES.USER) {
       throw new BadRequestException("Only users can self-register");
     }
 
-    const user = await this.userService.createUser({
-      email: payload.email,
-      password: payload.password,
-      fullName: payload.fullName,
-      role: ROLES.USER,
-      status: USER_STATUS.ACTIVE,
-      emailVerifiedAt: null,
-    });
+    const email = payload.email.toLowerCase();
+    const existingUser = await this.userService.getUserByEmail(email);
+    if (existingUser) {
+      throw new ConflictException(MESSAGES.AUTH.EMAIL_ALREADY_EXISTS);
+    }
+
+    const passwordHash = await hashPassword(payload.password);
 
     const otp = await otpService.sendOtp({
-      email: user.email,
+      email,
       purpose: OTP_PURPOSES.VERIFY_EMAIL,
       meta: payload.meta,
     });
 
-    await this.emailService.sendEmailVerification({
-      to: user.email,
-      userName: user.fullName,
-      userType: user.role,
+    await this.sendEmailVerificationOrThrow({
+      to: email,
+      userName: payload.fullName,
+      userType: ROLES.USER,
       verificationCode: otp.code,
       expiresIn: String(otp.expiresInMinutes),
     });
 
-    await adminNotificationService.create({
-      type: "new_user",
-      title: "New user registered",
-      body: `${user.fullName} just registered.`,
-      payload: {
-        userId: user._id.toString(),
-        email: user.email,
+    await PendingRegistration.findOneAndUpdate(
+      { email },
+      {
+        email,
+        fullName: payload.fullName,
+        passwordHash,
+        role: ROLES.USER,
+        expiresAt: otp.expiresAt,
+        meta: payload.meta,
       },
-    });
+      {
+        upsert: true,
+        new: true,
+        runValidators: true,
+      },
+    ).exec();
 
     return {
-      user: this.userService.toUserResponse(user),
+      email,
       verification: {
         expiresAt: otp.expiresAt,
         expiresInMinutes: otp.expiresInMinutes,
@@ -212,7 +220,18 @@ export class AuthService {
     expiresInMinutes: number;
   }> {
     const user = await this.userService.getUserByEmail(payload.email);
-    if (!user && payload.purpose !== OTP_PURPOSES.LOGIN_OTP_OPTIONAL) {
+    const pendingRegistration = payload.purpose === OTP_PURPOSES.VERIFY_EMAIL
+      ? await PendingRegistration.findOne({
+          email: payload.email.toLowerCase(),
+          expiresAt: { $gt: new Date() },
+        }).exec()
+      : null;
+
+    if (
+      !user
+      && !pendingRegistration
+      && payload.purpose !== OTP_PURPOSES.LOGIN_OTP_OPTIONAL
+    ) {
       return {
         expiresAt: new Date(),
         expiresInMinutes: AUTH.OTP_EXPIRY_MINUTES,
@@ -220,10 +239,7 @@ export class AuthService {
     }
 
     if (payload.purpose === OTP_PURPOSES.VERIFY_EMAIL) {
-      if (!user) {
-        throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
-      }
-      if (user.emailVerifiedAt) {
+      if (user?.emailVerifiedAt) {
         throw new BadRequestException(MESSAGES.AUTH.EMAIL_ALREADY_VERIFIED);
       }
     }
@@ -235,17 +251,17 @@ export class AuthService {
     });
 
     if (payload.purpose === OTP_PURPOSES.RESET_PASSWORD) {
-      await this.emailService.sendPasswordResetOTP(
+      await this.sendPasswordResetOtpOrThrow(
         user?.fullName,
         payload.email,
         otp.code,
         otp.expiresInMinutes,
       );
     } else {
-      await this.emailService.sendEmailVerification({
+      await this.sendEmailVerificationOrThrow({
         to: payload.email,
-        userName: user?.fullName || "there",
-        userType: user?.role || ROLES.USER,
+        userName: user?.fullName || pendingRegistration?.fullName || "there",
+        userType: user?.role || pendingRegistration?.role || ROLES.USER,
         verificationCode: otp.code,
         expiresIn: String(otp.expiresInMinutes),
       });
@@ -266,13 +282,46 @@ export class AuthService {
 
     if (payload.purpose === OTP_PURPOSES.VERIFY_EMAIL) {
       const user = await this.userService.getUserByEmail(payload.email);
-      if (!user) {
-        throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+      if (user) {
+        user.emailVerified = true;
+        user.emailVerifiedAt = new Date();
+        user.status = USER_STATUS.ACTIVE;
+        await user.save();
+      } else {
+        const pending = await PendingRegistration.findOne({
+          email: payload.email.toLowerCase(),
+          expiresAt: { $gt: new Date() },
+        })
+          .select("+passwordHash")
+          .exec();
+
+        if (!pending) {
+          throw new BadRequestException(
+            "No pending registration found. Please register again.",
+          );
+        }
+
+        const createdUser = await this.userService.createUserWithHashedPassword({
+          email: pending.email,
+          passwordHash: pending.passwordHash,
+          fullName: pending.fullName,
+          role: pending.role,
+          status: USER_STATUS.ACTIVE,
+          emailVerifiedAt: new Date(),
+        });
+
+        await PendingRegistration.deleteOne({ _id: pending._id }).exec();
+
+        await adminNotificationService.create({
+          type: "new_user",
+          title: "New user registered",
+          body: `${createdUser.fullName} just registered.`,
+          payload: {
+            userId: createdUser._id.toString(),
+            email: createdUser.email,
+          },
+        });
       }
-      user.emailVerified = true;
-      user.emailVerifiedAt = new Date();
-      user.status = USER_STATUS.ACTIVE;
-      await user.save();
     }
 
     logger.info(
@@ -297,7 +346,7 @@ export class AuthService {
       purpose: OTP_PURPOSES.RESET_PASSWORD,
     });
 
-    await this.emailService.sendPasswordResetOTP(
+    await this.sendPasswordResetOtpOrThrow(
       user.fullName,
       user.email,
       otp.code,
@@ -518,5 +567,52 @@ export class AuthService {
   async logoutAll(userId: string): Promise<{ message: string }> {
     await this.userService.invalidateAllRefreshTokensForUser(userId);
     return { message: "All sessions logged out successfully" };
+  }
+
+  private async sendEmailVerificationOrThrow(payload: {
+    to: string;
+    userName: string;
+    userType: string;
+    verificationCode: string;
+    expiresIn: string;
+  }): Promise<void> {
+    try {
+      await this.emailService.sendEmailVerification(payload);
+    } catch (error) {
+      this.throwEmailDeliveryError(error, payload.to);
+    }
+  }
+
+  private async sendPasswordResetOtpOrThrow(
+    userName: string | undefined,
+    to: string,
+    code: string,
+    expiresInMinutes: number,
+  ): Promise<void> {
+    try {
+      await this.emailService.sendPasswordResetOTP(
+        userName,
+        to,
+        code,
+        expiresInMinutes,
+      );
+    } catch (error) {
+      this.throwEmailDeliveryError(error, to);
+    }
+  }
+
+  private throwEmailDeliveryError(error: unknown, to: string): never {
+    const reason = error instanceof Error ? error.message : "Unknown error";
+    logger.warn(
+      {
+        to,
+        error,
+      },
+      "Email delivery failed",
+    );
+
+    throw new BadRequestException(
+      `Unable to send verification email. ${reason}`,
+    );
   }
 }

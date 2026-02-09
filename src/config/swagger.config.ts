@@ -59,9 +59,7 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
       AuthRegisterResponse: {
         type: "object",
         properties: {
-          user: {
-            $ref: "#/components/schemas/UserProfile",
-          },
+          email: { type: "string", format: "email" },
           verification: {
             type: "object",
             properties: {

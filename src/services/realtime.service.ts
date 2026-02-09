@@ -16,14 +16,6 @@ type AuthenticatedSocket = Socket & {
   };
 };
 
-export type ReportSubmittedEvent = {
-  quoteId: string;
-  submittedBy: string;
-  assignedCleanerIds: string[];
-  reportStatus: string;
-  submittedAt: string;
-};
-
 export type ChatMessageCreatedEvent = {
   conversationId: string;
   participantIds: string[];
@@ -191,31 +183,6 @@ class RealtimeService {
       conversationId: event.conversationId,
       userId: event.userId,
       isTyping: event.isTyping,
-    });
-  }
-
-  emitReportSubmitted(event: ReportSubmittedEvent): void {
-    if (!this.io) {
-      logger.warn(
-        { quoteId: event.quoteId },
-        "WebSocket server not initialized; skipping report:submitted emit"
-      );
-      return;
-    }
-
-    const uniqueRecipients = Array.from(
-      new Set(event.assignedCleanerIds.filter(Boolean))
-    );
-
-    const payload = {
-      quoteId: event.quoteId,
-      submittedBy: event.submittedBy,
-      submittedAt: event.submittedAt,
-      reportStatus: event.reportStatus,
-    };
-
-    uniqueRecipients.forEach((cleanerId) => {
-      this.io!.to(this.userRoom(cleanerId)).emit("report:submitted", payload);
     });
   }
 

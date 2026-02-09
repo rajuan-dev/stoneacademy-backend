@@ -196,7 +196,15 @@
             }
           }
         },
+        {
+          "name": "Get My Gallery",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/gallery?source=created"
+          }
+        },
         { "name": "Remove Gallery Item", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/me/gallery/:mediaId" } },
+        { "name": "Get My Ratings", "request": { "method": "GET", "url": "{{baseUrl}}/users/me/ratings" } },
         { "name": "Public Profile", "request": { "method": "GET", "url": "{{baseUrl}}/users/:id/public" } },
         { "name": "Block User", "request": { "method": "POST", "url": "{{baseUrl}}/users/:id/block" } },
         { "name": "Unblock User", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/:id/block" } }
@@ -709,6 +717,9 @@
       "name": "CMS",
       "item": [
         { "name": "Get Page", "request": { "method": "GET", "url": "{{baseUrl}}/cms/pages/:slug" } },
+        { "name": "Get Terms of Service", "request": { "method": "GET", "url": "{{baseUrl}}/cms/pages/terms-of-service" } },
+        { "name": "Get Privacy Policy", "request": { "method": "GET", "url": "{{baseUrl}}/cms/pages/privacy-policy" } },
+        { "name": "Get About Us", "request": { "method": "GET", "url": "{{baseUrl}}/cms/pages/about-us" } },
         {
           "name": "Admin List Pages",
           "request": {

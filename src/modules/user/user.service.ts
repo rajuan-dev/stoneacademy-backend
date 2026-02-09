@@ -21,6 +21,9 @@ import {
 import { generateRandomPassword, hashPassword } from "@/utils/password.utils";
 import type { IUser } from "./user.interface";
 import { UserRepository } from "./user.repository";
+import { Activity } from "@/modules/activity/activity.model";
+import { Event } from "@/modules/event/event.model";
+import { Review } from "@/modules/review/review.model";
 import type {
   CleanerCreatePayload,
   CleanerCreationResult,
@@ -230,6 +233,33 @@ export class UserService {
       cleanerPercentage: payload.role === ROLES.CLEANER
         ? payload.cleanerPercentage
         : undefined,
+    });
+  }
+
+  async createUserWithHashedPassword(payload: {
+    email: string;
+    passwordHash: string;
+    fullName: string;
+    role: (typeof ROLES)[keyof typeof ROLES];
+    status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];
+    emailVerifiedAt?: Date | null;
+  }): Promise<IUser> {
+    const existing = await this.userRepository.findByEmail(payload.email);
+    if (existing) {
+      throw new ConflictException(MESSAGES.AUTH.EMAIL_ALREADY_EXISTS);
+    }
+
+    return this.userRepository.create({
+      email: payload.email.toLowerCase(),
+      passwordHash: payload.passwordHash,
+      fullName: payload.fullName,
+      role: payload.role,
+      status: payload.status ?? USER_STATUS.ACTIVE,
+      emailVerified: Boolean(payload.emailVerifiedAt),
+      emailVerifiedAt: payload.emailVerifiedAt ?? null,
+      accountStatus: payload.emailVerifiedAt
+        ? ACCOUNT_STATUS.ACTIVE
+        : ACCOUNT_STATUS.PENDING,
     });
   }
 
@@ -634,6 +664,147 @@ export class UserService {
 
     await user.save();
     return this.toUserResponse(user);
+  }
+
+  async getMyGalleryMedia(
+    userId: string,
+    query: { page?: number; limit?: number; source?: "activity" | "event" | "profile" | "all" | "created" },
+  ) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+    }
+
+    const source = query.source ?? "created";
+    const includeActivity = source === "activity" || source === "all" || source === "created";
+    const includeEvent = source === "event" || source === "all" || source === "created";
+    const includeProfile = source === "profile" || source === "all";
+
+    const [activityMediaIds, eventMediaIds] = await Promise.all([
+      includeActivity
+        ? Activity.distinct("media", { hostId: userId })
+        : Promise.resolve([]),
+      includeEvent
+        ? Event.distinct("media", { creatorId: userId })
+        : Promise.resolve([]),
+    ]);
+
+    const profileMediaIds = includeProfile ? (user.gallery || []) : [];
+
+    const sourceMap = new Map<string, Set<string>>();
+    const addSource = (ids: Array<any>, label: string) => {
+      ids
+        .filter(Boolean)
+        .forEach((id) => {
+          const key = id.toString();
+          const existing = sourceMap.get(key) ?? new Set<string>();
+          existing.add(label);
+          sourceMap.set(key, existing);
+        });
+    };
+
+    addSource(activityMediaIds as any[], "activity");
+    addSource(eventMediaIds as any[], "event");
+    addSource(profileMediaIds as any[], "profile");
+
+    const allIds = Array.from(sourceMap.keys());
+    if (!allIds.length) {
+      return {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          itemsPerPage: query.limit ?? PAGINATION.DEFAULT_LIMIT,
+          totalItems: 0,
+          pageCount: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+      };
+    }
+
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const [data, totalItems] = await Promise.all([
+      Media.find({ _id: { $in: allIds } })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Media.countDocuments({ _id: { $in: allIds } }),
+    ]);
+
+    return {
+      data: data.map((doc) => ({
+        _id: doc._id.toString(),
+        url: doc.url,
+        type: doc.type,
+        mimeType: doc.mimeType,
+        sizeBytes: doc.sizeBytes,
+        createdAt: doc.createdAt,
+        sources: Array.from(sourceMap.get(doc._id.toString()) || []),
+      })),
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async listMyRatings(
+    userId: string,
+    query: { page?: number; limit?: number },
+  ) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const [data, totalItems] = await Promise.all([
+      Review.find({ targetUserId: userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("reviewerId", "fullName profilePhoto profileImageUrl")
+        .lean(),
+      Review.countDocuments({ targetUserId: userId }),
+    ]);
+
+    const formatted = data.map((review: any) => ({
+      _id: review._id.toString(),
+      rating: review.rating,
+      comment: review.comment,
+      tags: review.tags,
+      targetType: review.targetType,
+      targetId: review.targetId?.toString(),
+      reviewer: review.reviewerId
+        ? {
+            _id: review.reviewerId._id?.toString(),
+            fullName: review.reviewerId.fullName,
+            profilePhoto: review.reviewerId.profilePhoto
+              ? review.reviewerId.profilePhoto.toString()
+              : null,
+            profileImage: review.reviewerId.profileImageUrl || null,
+          }
+        : null,
+      createdAt: review.createdAt,
+    }));
+
+    return {
+      data: formatted,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
   }
 
   async deleteAccount(userId: string): Promise<void> {

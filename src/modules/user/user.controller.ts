@@ -15,6 +15,8 @@ import {
   createCleanerSchema,
   galleryRemoveSchema,
   listCleanersSchema,
+  listMyGallerySchema,
+  listMyRatingsSchema,
   userIdSchema,
   updateCleanerSchema,
   updateProfileSchema,
@@ -130,6 +132,34 @@ export class UserController {
     );
 
     ApiResponse.success(res, profile, "Gallery item removed successfully");
+  });
+
+  getMyGallery = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listMyGallerySchema, req);
+    const result = await this.userService.getMyGalleryMedia(
+      userId,
+      validated.query,
+    );
+    ApiResponse.paginated(res, result.data, result.pagination, "Gallery fetched successfully");
+  });
+
+  getMyRatings = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listMyRatingsSchema, req);
+    const result = await this.userService.listMyRatings(
+      userId,
+      validated.query,
+    );
+    ApiResponse.paginated(res, result.data, result.pagination, "Ratings fetched successfully");
   });
 
   getPublicProfile = asyncHandler(async (req: Request, res: Response) => {

@@ -191,6 +191,17 @@
           }
         },
         {
+          "name": "Get My Gallery",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}" }]
+            },
+            "url": "{{baseUrl}}/users/me/gallery?source=created"
+          }
+        },
+        {
           "name": "Remove Gallery Item",
           "request": {
             "method": "DELETE",
@@ -199,6 +210,17 @@
               "bearer": [{ "key": "token", "value": "{{accessToken}}" }]
             },
             "url": "{{baseUrl}}/users/me/gallery/{{mediaId}}"
+          }
+        },
+        {
+          "name": "Get My Ratings",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}" }]
+            },
+            "url": "{{baseUrl}}/users/me/ratings"
           }
         },
         {
@@ -228,6 +250,59 @@
               "bearer": [{ "key": "token", "value": "{{accessToken}}" }]
             },
             "url": "{{baseUrl}}/users/{{userId}}/block"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account Settings",
+      "item": [
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}" }]
+            },
+            "url": "{{baseUrl}}/auth/change-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"StrongP@ssw0rd\",\n  \"newPassword\": \"StrongP@ssw0rd1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Terms of Service",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cms/pages/terms-of-service"
+          }
+        },
+        {
+          "name": "Privacy Policy",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cms/pages/privacy-policy"
+          }
+        },
+        {
+          "name": "About Us",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cms/pages/about-us"
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}" }]
+            },
+            "url": "{{baseUrl}}/users/me"
           }
         }
       ]

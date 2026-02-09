@@ -39,7 +39,12 @@ const resolveProvider = (): "postmark" | "smtp" | "resend" | "disabled" => {
 };
 
 const provider = resolveProvider();
-const fromAddress = env.EMAIL_FROM_ADDRESS || env.SMTP_FROM || env.SMTP_USER || "";
+const fromAddress =
+  env.EMAIL_FROM_ADDRESS ||
+  env.RESEND_FROM ||
+  env.SMTP_FROM ||
+  env.SMTP_USER ||
+  "";
 
 export const EMAIL_CONFIG = {
   provider,

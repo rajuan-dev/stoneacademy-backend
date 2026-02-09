@@ -80,6 +80,29 @@ router.post(
 /**
  * @openapi
  * /users/me/gallery:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get my gallery (from created activities/events)
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: source
+ *         schema:
+ *           type: string
+ *           enum: [created, activity, event, profile, all]
+ *         description: created=activities+events, profile=manual uploads
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Gallery list
  *   post:
  *     tags: [Users]
  *     summary: Upload gallery media
@@ -101,6 +124,11 @@ router.post(
  *       200:
  *         description: Updated
  */
+router.get(
+  "/me/gallery",
+  authMiddleware.verifyToken,
+  userController.getMyGallery,
+);
 router.post(
   "/me/gallery",
   authMiddleware.verifyToken,
@@ -131,6 +159,29 @@ router.delete(
   authMiddleware.verifyToken,
   userController.removeGalleryItem,
 );
+
+/**
+ * @openapi
+ * /users/me/ratings:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get my ratings & feedback
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Ratings list
+ */
+router.get("/me/ratings", authMiddleware.verifyToken, userController.getMyRatings);
 
 /**
  * @openapi

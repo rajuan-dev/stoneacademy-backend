@@ -370,22 +370,34 @@ export class EmailService {
       throw new Error("Email from address is not configured");
     }
 
-    await axios.post(
-      "https://api.resend.com/emails",
-      {
-        from,
-        to: payload.to,
-        subject: payload.subject,
-        html: payload.html,
-        text: payload.text,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${this.resendApiKey}`,
-          "Content-Type": "application/json",
+    try {
+      await axios.post(
+        "https://api.resend.com/emails",
+        {
+          from,
+          to: payload.to,
+          subject: payload.subject,
+          html: payload.html,
+          text: payload.text,
         },
-      },
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${this.resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const data = error.response?.data as
+          | { message?: string; error?: string }
+          | undefined;
+        const reason = data?.message || data?.error || error.message;
+        throw new Error(`Resend API error (${status || "unknown"}): ${reason}`);
+      }
+      throw error;
+    }
   }
 
   private formatFromAddress(): string {
