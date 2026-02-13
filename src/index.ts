@@ -6,7 +6,9 @@ import { logger } from "@/middlewares/pino-logger";
 import { realtimeService } from "@/services/realtime.service";
 import { bootstrapApplication } from "./config/bootstrap";
 
-const port = env.PORT;
+// const port = env.PORT;
+const port = process.env.PORT || 5000;
+
 const server = app.listen(port, async () => {
   await connectDB();
   await bootstrapApplication();
