@@ -8,7 +8,7 @@ export interface IActivity {
   _id: Types.ObjectId;
   hostId: Types.ObjectId;
   title: string;
-  typeCategoryId: Types.ObjectId;
+  type: string;
   description?: string;
   startAt: Date;
   endAt?: Date;
@@ -42,10 +42,10 @@ const activitySchema = BaseSchemaUtil.createSchema<IActivity>({
     trim: true,
     index: true,
   },
-  typeCategoryId: {
-    type: Schema.Types.ObjectId,
-    ref: "Category",
+  type: {
+    type: String,
     required: true,
+    trim: true,
     index: true,
   },
   description: {
@@ -68,7 +68,6 @@ const activitySchema = BaseSchemaUtil.createSchema<IActivity>({
       type: {
         type: String,
         enum: ["Point"],
-        default: "Point",
       },
       coordinates: {
         type: [Number],

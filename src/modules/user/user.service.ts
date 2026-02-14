@@ -43,11 +43,13 @@ export class UserService {
   }
 
   toUserResponse(user: IUser): UserResponse {
+    const resolvedPhone = user.phone || user.phoneNumber;
     return {
       _id: user._id.toString(),
       email: user.email,
       fullName: user.fullName,
-      phone: user.phone || user.phoneNumber,
+      phone: resolvedPhone ?? null,
+      phoneNumber: resolvedPhone ?? null,
       dob: user.dob,
       gender: user.gender,
       location: user.location,

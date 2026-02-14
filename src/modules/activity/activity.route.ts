@@ -1,6 +1,7 @@
 // file: src/modules/activity/activity.route.ts
 
 import { authMiddleware } from "@/middlewares/auth.middleware";
+import upload from "@/config/multer.config";
 import { Router } from "express";
 import { ActivityController } from "./activity.controller";
 
@@ -19,7 +20,7 @@ const controller = new ActivityController();
  *         schema:
  *           type: string
  *       - in: query
- *         name: typeCategoryId
+ *         name: type
  *         schema:
  *           type: string
  *       - in: query
@@ -76,11 +77,11 @@ router.get("/", controller.list);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title, typeCategoryId, startAt]
+ *             required: [title, type, startAt]
  *             properties:
  *               title:
  *                 type: string
- *               typeCategoryId:
+ *               type:
  *                 type: string
  *               description:
  *                 type: string
@@ -108,7 +109,12 @@ router.get("/", controller.list);
  *             schema:
  *               $ref: '#/components/schemas/Activity'
  */
-router.post("/", authMiddleware.verifyToken, controller.create);
+router.post(
+  "/",
+  authMiddleware.verifyToken,
+  upload.any(),
+  controller.create,
+);
 
 /**
  * @openapi

@@ -33,8 +33,10 @@ export class ActivityController {
   create = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(createActivitySchema, req);
     const userId = req.user?.userId as string;
+    const mediaFiles = ((req.files as Express.Multer.File[]) || []).filter(Boolean);
     const activity = await this.service.create({
       hostId: userId,
+      mediaFiles,
       ...validated.body,
     });
     ApiResponse.created(res, activity, "Activity created successfully");

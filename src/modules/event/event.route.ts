@@ -1,4 +1,5 @@
 import { authMiddleware } from "@/middlewares/auth.middleware";
+import upload from "@/config/multer.config";
 import { Router } from "express";
 import { EventController } from "./event.controller";
 
@@ -6,7 +7,12 @@ const router = Router();
 const controller = new EventController();
 
 router.get("/", controller.list);
-router.post("/", authMiddleware.verifyToken, controller.create);
+router.post(
+  "/",
+  authMiddleware.verifyToken,
+  upload.any(),
+  controller.create,
+);
 router.get("/:id", authMiddleware.optionalAuth, controller.getById);
 router.patch("/:id", authMiddleware.verifyToken, controller.update);
 router.delete("/:id", authMiddleware.verifyToken, controller.remove);

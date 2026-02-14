@@ -3,22 +3,37 @@
 import { ACTIVITY_STATUS } from "@/constants/app.constants";
 import { z } from "zod";
 
+const parseObject = (value: unknown) => {
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+};
+
 export const createActivitySchema = z.object({
   body: z.object({
-    title: z.string().trim().min(1).max(200),
-    typeCategoryId: z.string().trim().min(1),
+    title: z.string().trim().min(1).max(200).optional(),
+    type: z.string().trim().min(1).max(100).optional(),
     description: z.string().trim().max(2000).optional(),
-    startAt: z.coerce.date(),
+    startAt: z.coerce.date().optional(),
     endAt: z.coerce.date().optional(),
-    location: z
-      .object({
-        label: z.string().trim().min(1).max(200),
-        coordinates: z.tuple([z.number(), z.number()]),
-      })
-      .optional(),
+    location: z.preprocess(
+      parseObject,
+      z
+        .object({
+          label: z.string().trim().min(1).max(200),
+          coordinates: z.tuple([z.coerce.number(), z.coerce.number()]),
+        })
+        .optional(),
+    ),
     participantLimit: z.coerce.number().min(1).optional(),
     distanceMiles: z.coerce.number().min(0).optional(),
-    mediaIds: z.array(z.string().trim().min(1)).optional(),
+    mediaIds: z.preprocess(
+      parseObject,
+      z.array(z.string().trim().min(1)).optional(),
+    ),
     status: z
       .enum(Object.values(ACTIVITY_STATUS) as [string, ...string[]])
       .optional(),
@@ -32,19 +47,25 @@ export const updateActivitySchema = z.object({
   body: z
     .object({
       title: z.string().trim().min(1).max(200).optional(),
-      typeCategoryId: z.string().trim().min(1).optional(),
+      type: z.string().trim().min(1).max(100).optional(),
       description: z.string().trim().max(2000).optional(),
       startAt: z.coerce.date().optional(),
       endAt: z.coerce.date().optional(),
-      location: z
-        .object({
-          label: z.string().trim().min(1).max(200),
-          coordinates: z.tuple([z.number(), z.number()]),
-        })
-        .optional(),
+      location: z.preprocess(
+        parseObject,
+        z
+          .object({
+            label: z.string().trim().min(1).max(200),
+            coordinates: z.tuple([z.coerce.number(), z.coerce.number()]),
+          })
+          .optional(),
+      ),
       participantLimit: z.coerce.number().min(1).optional(),
       distanceMiles: z.coerce.number().min(0).optional(),
-      mediaIds: z.array(z.string().trim().min(1)).optional(),
+      mediaIds: z.preprocess(
+        parseObject,
+        z.array(z.string().trim().min(1)).optional(),
+      ),
       status: z
         .enum(Object.values(ACTIVITY_STATUS) as [string, ...string[]])
         .optional(),
@@ -63,7 +84,7 @@ export const activityIdSchema = z.object({
 export const listActivitiesSchema = z.object({
   query: z.object({
     q: z.string().trim().max(200).optional(),
-    typeCategoryId: z.string().trim().min(1).optional(),
+    type: z.string().trim().max(100).optional(),
     dateFrom: z.coerce.date().optional(),
     dateTo: z.coerce.date().optional(),
     lat: z.coerce.number().optional(),

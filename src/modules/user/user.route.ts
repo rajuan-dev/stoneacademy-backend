@@ -35,16 +35,44 @@ router.get("/me", authMiddleware.verifyToken, userController.getProfile);
  *     security:
  *       - BearerAuth: []
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               dob:
+ *                 type: string
+ *                 format: date
+ *               gender:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *                 description: JSON string, e.g. {"label":"San Francisco, CA"}
+ *               photo:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Updated
  */
-router.patch("/me", authMiddleware.verifyToken, userController.updateProfile);
+router.patch(
+  "/me",
+  authMiddleware.verifyToken,
+  upload.single("photo"),
+  userController.updateProfile,
+);
 router.delete("/me", authMiddleware.verifyToken, userController.deleteAccount);
 
 /**

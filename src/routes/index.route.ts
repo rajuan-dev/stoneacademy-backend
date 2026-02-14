@@ -90,6 +90,10 @@ const moduleRoutes = [
     route: userRouter,
   },
   {
+    path: "/user",
+    route: userRouter,
+  },
+  {
     path: "/onboarding",
     route: onboardingRouter,
   },

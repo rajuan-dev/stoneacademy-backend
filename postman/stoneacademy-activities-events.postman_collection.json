@@ -1,0 +1,434 @@
+{
+  "info": {
+    "_postman_id": "d60a97a7-b6f3-4a5f-8db6-a9fd4a6dd8c8",
+    "name": "StoneAcademy - Activities & Events",
+    "description": "Create/list/join/leave/pass/cancel activity and event APIs. Event create supports frontend multipart fields including mediaFiles and location with latitude/longitude.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "activityId",
+      "value": ""
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Save accessToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const token = res?.data?.accessToken;",
+                  "if (token) pm.collectionVariables.set('accessToken', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Activities",
+      "item": [
+        {
+          "name": "List Activities",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "activities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Activity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const id = res?.data?._id;",
+                  "if (id) pm.collectionVariables.set('activityId', id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Morning Walk",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "walking",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Community activity",
+                  "type": "text"
+                },
+                {
+                  "key": "startAt",
+                  "value": "2026-02-20T08:00:00.000Z",
+                  "type": "text"
+                },
+                {
+                  "key": "participantLimit",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "distanceMiles",
+                  "value": "3",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "{\"latitude\":23.7643863,\"longitude\":90.3890144}",
+                  "type": "text"
+                },
+                {
+                  "key": "media",
+                  "type": "file"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "activities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Join Activity",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/activities/{{activityId}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "activities",
+                "{{activityId}}",
+                "join"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Leave Activity",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/activities/{{activityId}}/leave",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "activities",
+                "{{activityId}}",
+                "leave"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Activity Pass",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/activities/{{activityId}}/pass",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "activities",
+                "{{activityId}}",
+                "pass"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Activity",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/activities/{{activityId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "activities",
+                "{{activityId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "List Events",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Event (Frontend Payload)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const id = res?.data?._id;",
+                  "if (id) pm.collectionVariables.set('eventId', id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "date",
+                  "value": "2026-02-16",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Desc",
+                  "type": "text"
+                },
+                {
+                  "key": "discountPercentage",
+                  "value": "null",
+                  "type": "text"
+                },
+                {
+                  "key": "durationMinutes",
+                  "value": "20",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "{\"latitude\":23.7643863,\"longitude\":90.3890144}",
+                  "type": "text"
+                },
+                {
+                  "key": "participantLimit",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "priceType",
+                  "value": "free",
+                  "type": "text"
+                },
+                {
+                  "key": "startAt",
+                  "value": "2026-02-15T00:48:12.000Z",
+                  "type": "text"
+                },
+                {
+                  "key": "ticketPrice",
+                  "value": "0",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Test",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "I'd",
+                  "type": "text"
+                },
+                {
+                  "key": "mediaFiles",
+                  "type": "file"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Join Event",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "join"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Leave Event",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/leave",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "leave"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Event Pass",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/pass",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "pass"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Event",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

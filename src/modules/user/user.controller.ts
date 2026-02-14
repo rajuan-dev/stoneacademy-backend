@@ -64,11 +64,69 @@ export class UserController {
       throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
     }
 
-    const validated = await zParse(updateProfileSchema, req);
-    const profile = await this.userService.updateProfile(
-      userId,
-      validated.body
-    );
+    const file = req.file;
+    const rawBody = (req.body || {}) as Record<string, unknown>;
+    const normalizedBody: Record<string, unknown> = {};
+    const allowedProfileKeys = new Set([
+      "fullName",
+      "email",
+      "phone",
+      "phoneNumber",
+      "dob",
+      "gender",
+      "location",
+    ]);
+
+    Object.entries(rawBody).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        normalizedBody[key] = value[0];
+        return;
+      }
+      normalizedBody[key] = value;
+    });
+
+    const profileBody: Record<string, unknown> = {};
+    Object.keys(normalizedBody).forEach((key) => {
+      if (!allowedProfileKeys.has(key)) return;
+      profileBody[key] = normalizedBody[key];
+    });
+
+    const bodyKeys = Object.keys(profileBody).filter((key) => {
+      const value = profileBody[key];
+      return value !== undefined && value !== null && String(value).trim() !== "";
+    });
+
+    if (!bodyKeys.length && !file) {
+      throw new BadRequestException(
+        "At least one profile field or photo is required",
+      );
+    }
+
+    if (typeof profileBody.location === "string") {
+      try {
+        profileBody.location = JSON.parse(profileBody.location);
+      } catch {
+        throw new BadRequestException("location must be a valid JSON object");
+      }
+    }
+
+    let profile = await this.userService.getProfile(userId);
+
+    if (bodyKeys.length) {
+      const validated = await updateProfileSchema.parseAsync({
+        body: profileBody,
+      });
+      profile = await this.userService.updateProfile(userId, validated.body);
+    }
+
+    if (file) {
+      const uploadInput: StorageUploadInput = {
+        buffer: file.buffer,
+        mimeType: file.mimetype,
+        originalName: file.originalname,
+      };
+      profile = await this.userService.updateProfilePhoto(userId, uploadInput);
+    }
 
     ApiResponse.success(res, profile, "Profile updated successfully");
   });

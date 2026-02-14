@@ -9,11 +9,11 @@ export async function zParse<T extends ZodTypeAny>(
 ): Promise<z.infer<T>> {
   try {
     const result = await schema.parseAsync({
-      body: req.body,
-      query: req.query as any,
-      params: req.params as any,
-      cookies: req.cookies,
-      headers: req.headers,
+      body: req.body ?? {},
+      query: (req.query as any) ?? {},
+      params: (req.params as any) ?? {},
+      cookies: req.cookies ?? {},
+      headers: req.headers ?? {},
     });
 
     return result;

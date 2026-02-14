@@ -6,7 +6,7 @@ export interface IEvent {
   _id: Types.ObjectId;
   creatorId: Types.ObjectId;
   title: string;
-  typeCategoryId: Types.ObjectId;
+  type: string;
   description?: string;
   startAt: Date;
   endAt?: Date;
@@ -20,7 +20,10 @@ export interface IEvent {
   participantLimit?: number;
   media?: Types.ObjectId[];
   status: (typeof ACTIVITY_STATUS)[keyof typeof ACTIVITY_STATUS];
+  priceType: "free" | "paid";
   ticketPrice: number;
+  discountPercentage: number;
+  durationMinutes?: number;
   currency: string;
   stats?: {
     joinedCount: number;
@@ -42,10 +45,10 @@ const eventSchema = BaseSchemaUtil.createSchema<IEvent>({
     trim: true,
     index: true,
   },
-  typeCategoryId: {
-    type: Schema.Types.ObjectId,
-    ref: "Category",
+  type: {
+    type: String,
     required: true,
+    trim: true,
     index: true,
   },
   description: {
@@ -68,7 +71,6 @@ const eventSchema = BaseSchemaUtil.createSchema<IEvent>({
       type: {
         type: String,
         enum: ["Point"],
-        default: "Point",
       },
       coordinates: {
         type: [Number],
@@ -92,10 +94,27 @@ const eventSchema = BaseSchemaUtil.createSchema<IEvent>({
     default: ACTIVITY_STATUS.DRAFT,
     index: true,
   },
+  priceType: {
+    type: String,
+    enum: ["free", "paid"],
+    default: "free",
+    index: true,
+  },
   ticketPrice: {
     type: Number,
     required: true,
+    default: 0,
     min: 0,
+  },
+  discountPercentage: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 0,
+  },
+  durationMinutes: {
+    type: Number,
+    min: 1,
   },
   currency: {
     type: String,

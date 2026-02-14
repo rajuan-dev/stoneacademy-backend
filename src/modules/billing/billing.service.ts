@@ -160,7 +160,12 @@ export class BillingService {
     }).sort({ createdAt: -1 }).exec();
     if (existing) return existing;
 
-    const grossAmount = Number(event.ticketPrice.toFixed(2));
+    const grossAmount = Number(
+      this.calculatePayableTicketPrice(
+        event.ticketPrice,
+        event.discountPercentage || 0,
+      ).toFixed(2),
+    );
     const platformFeeAmount = Number(((grossAmount * 10) / 100).toFixed(2));
     const creatorShareAmount = Number((grossAmount - platformFeeAmount).toFixed(2));
 
@@ -175,6 +180,15 @@ export class BillingService {
       status: "pending",
       provider: "stripe",
     });
+  }
+
+  private calculatePayableTicketPrice(
+    ticketPrice: number,
+    discountPercentage: number,
+  ): number {
+    if (ticketPrice <= 0) return 0;
+    if (discountPercentage <= 0) return ticketPrice;
+    return Math.max(0, ticketPrice - (ticketPrice * discountPercentage) / 100);
   }
 
   private async listTransactionsCommon(input: {

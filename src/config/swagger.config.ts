@@ -128,7 +128,7 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
           _id: { type: "string" },
           hostId: { type: "string" },
           title: { type: "string" },
-          typeCategoryId: { type: "string" },
+          type: { type: "string" },
           description: { type: "string", nullable: true },
           startAt: { type: "string", format: "date-time" },
           endAt: { type: "string", format: "date-time", nullable: true },

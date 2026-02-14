@@ -17,6 +17,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec, swaggerUiOptions } from "./config/swagger.config.js";
 import { env } from "./env.js";
 import { pinoLogger } from "./middlewares/pino-logger.js";
+import { requestBodyLogger } from "./middlewares/request-body-logger.middleware.js";
 
 const app: Application = express();
 
@@ -39,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
+app.use(requestBodyLogger);
 
 app.use(
   "/docs",

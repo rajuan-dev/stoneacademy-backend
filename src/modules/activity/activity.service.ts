@@ -3,7 +3,9 @@
 import { ACTIVITY_STATUS, PARTICIPANT_STATUS } from "@/constants/app.constants";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
+import { Media } from "@/modules/media/media.model";
 import { notificationService } from "@/modules/notification/notification.service";
+import { s3Service, type StorageUploadInput } from "@/services/s3.service";
 import {
   BadRequestException,
   ForbiddenException,
@@ -18,7 +20,7 @@ import { User } from "../user/user.model";
 
 type ListQuery = {
   q?: string;
-  typeCategoryId?: string;
+  type?: string;
   dateFrom?: Date;
   dateTo?: Date;
   lat?: number;
@@ -46,8 +48,8 @@ export class ActivityService {
       filter.$or = [{ title: pattern }, { description: pattern }];
     }
 
-    if (query.typeCategoryId) {
-      filter.typeCategoryId = query.typeCategoryId;
+    if (query.type) {
+      filter.type = new RegExp(query.type, "i");
     }
 
     if (query.dateFrom || query.dateTo) {
@@ -112,27 +114,38 @@ export class ActivityService {
 
   async create(payload: {
     hostId: string;
-    title: string;
-    typeCategoryId: string;
+    title?: string;
+    type?: string;
     description?: string;
-    startAt: Date;
+    startAt?: Date;
     endAt?: Date;
     location?: { label: string; coordinates: [number, number] };
     participantLimit?: number;
     distanceMiles?: number;
     mediaIds?: string[];
+    mediaFiles?: Express.Multer.File[];
     status?: string;
   }) {
-    if (payload.startAt < new Date()) {
+    const startAt = payload.startAt ?? this.getDefaultFutureStartAt();
+    if (startAt < new Date()) {
       throw new BadRequestException("Start time must be in the future");
     }
 
+    const uploadedMediaIds = await this.uploadMediaFiles(
+      payload.hostId,
+      payload.mediaFiles,
+    );
+
+    const mediaIds = Array.from(
+      new Set([...(payload.mediaIds || []), ...uploadedMediaIds]),
+    );
+
     return Activity.create({
       hostId: payload.hostId,
-      title: payload.title,
-      typeCategoryId: payload.typeCategoryId,
+      title: payload.title || "Untitled Activity",
+      type: payload.type || "general",
       description: payload.description,
-      startAt: payload.startAt,
+      startAt,
       endAt: payload.endAt,
       location: payload.location
         ? {
@@ -145,7 +158,7 @@ export class ActivityService {
         : undefined,
       participantLimit: payload.participantLimit,
       distanceMiles: payload.distanceMiles,
-      media: payload.mediaIds || [],
+      media: mediaIds,
       status: payload.status || ACTIVITY_STATUS.PENDING,
       stats: { joinedCount: 0 },
     });
@@ -179,7 +192,7 @@ export class ActivityService {
     userId: string,
     payload: {
       title?: string;
-      typeCategoryId?: string;
+      type?: string;
       description?: string;
       startAt?: Date;
       endAt?: Date;
@@ -197,8 +210,7 @@ export class ActivityService {
     }
 
     if (payload.title !== undefined) activity.title = payload.title;
-    if (payload.typeCategoryId !== undefined)
-      activity.typeCategoryId = payload.typeCategoryId as any;
+    if (payload.type !== undefined) activity.type = payload.type;
     if (payload.description !== undefined)
       activity.description = payload.description;
     if (payload.startAt !== undefined) activity.startAt = payload.startAt;
@@ -407,6 +419,43 @@ export class ActivityService {
       (id) => id.toString() === userId,
     );
     return Boolean(userBlocksOther || otherBlocksUser);
+  }
+
+  private async uploadMediaFiles(
+    ownerId: string,
+    mediaFiles?: Express.Multer.File[],
+  ): Promise<string[]> {
+    if (!mediaFiles?.length) return [];
+
+    const uploadsInput: StorageUploadInput[] = mediaFiles.map((file) => ({
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      originalName: file.originalname,
+    }));
+
+    const uploads = await s3Service.uploadFiles(uploadsInput, {
+      prefix: `activities/${ownerId}`,
+    });
+
+    const mediaDocs = await Media.insertMany(
+      uploads.map((upload, index) => ({
+        ownerId,
+        type: uploadsInput[index].mimeType.startsWith("video/")
+          ? "video"
+          : "image",
+        s3Bucket: env.AWS_S3_BUCKET,
+        s3Key: upload.key,
+        url: upload.url,
+        mimeType: uploadsInput[index].mimeType,
+        sizeBytes: uploadsInput[index].buffer.length,
+      })),
+    );
+
+    return mediaDocs.map((doc) => doc._id.toString());
+  }
+
+  private getDefaultFutureStartAt(): Date {
+    return new Date(Date.now() + 60 * 60 * 1000);
   }
 }
 

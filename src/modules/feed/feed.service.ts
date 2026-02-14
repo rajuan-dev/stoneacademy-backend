@@ -8,7 +8,7 @@ const MILES_TO_METERS = 1609.34;
 export class FeedService {
   async list(query: {
     q?: string;
-    typeCategoryId?: string;
+    type?: string;
     dateFrom?: Date;
     dateTo?: Date;
     lat?: number;
@@ -30,8 +30,8 @@ export class FeedService {
       baseFilter.$or = [{ title: pattern }, { description: pattern }];
     }
 
-    if (query.typeCategoryId) {
-      baseFilter.typeCategoryId = query.typeCategoryId;
+    if (query.type) {
+      baseFilter.type = new RegExp(query.type, "i");
     }
 
     if (query.dateFrom || query.dateTo) {

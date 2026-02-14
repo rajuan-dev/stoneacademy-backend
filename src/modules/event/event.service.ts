@@ -2,9 +2,11 @@ import {
   ACTIVITY_STATUS,
   PARTICIPANT_STATUS,
   PAYMENT_STATUS,
-  ROLES,
 } from "@/constants/app.constants";
+import { env } from "@/env";
+import { Media } from "@/modules/media/media.model";
 import { notificationService } from "@/modules/notification/notification.service";
+import { s3Service, type StorageUploadInput } from "@/services/s3.service";
 import {
   BadRequestException,
   ForbiddenException,
@@ -20,7 +22,7 @@ import { EventQrToken } from "./event-qr-token.model";
 
 type ListQuery = {
   q?: string;
-  typeCategoryId?: string;
+  type?: string;
   dateFrom?: Date;
   dateTo?: Date;
   lat?: number;
@@ -50,8 +52,8 @@ export class EventService {
       filter.$or = [{ title: pattern }, { description: pattern }];
     }
 
-    if (query.typeCategoryId) {
-      filter.typeCategoryId = query.typeCategoryId;
+    if (query.type) {
+      filter.type = new RegExp(query.type, "i");
     }
 
     if (query.dateFrom || query.dateTo) {
@@ -65,9 +67,9 @@ export class EventService {
     }
 
     if (query.paid === "free") {
-      filter.ticketPrice = 0;
+      filter.priceType = "free";
     } else if (query.paid === "paid") {
-      filter.ticketPrice = { $gt: 0 };
+      filter.priceType = "paid";
     }
 
     const hasGeo = query.lat !== undefined && query.lng !== undefined;
@@ -122,19 +124,25 @@ export class EventService {
 
   async create(payload: {
     creatorId: string;
-    title: string;
-    typeCategoryId: string;
+    title?: string;
+    type?: string;
     description?: string;
-    startAt: Date;
+    date?: Date;
+    startAt?: Date;
     endAt?: Date;
-    location?: { label: string; coordinates: [number, number] };
+    location?: { label?: string; coordinates: [number, number] };
     participantLimit?: number;
     mediaIds?: string[];
+    mediaFiles?: Express.Multer.File[];
     status?: string;
-    ticketPrice: number;
+    priceType?: "free" | "paid";
+    ticketPrice?: number;
+    discountPercentage?: number;
+    durationMinutes?: number;
     currency?: string;
   }) {
-    if (payload.startAt < new Date()) {
+    const startAt = payload.startAt ?? this.getDefaultFutureStartAt();
+    if (startAt < new Date()) {
       throw new BadRequestException("Start time must be in the future");
     }
 
@@ -143,26 +151,46 @@ export class EventService {
       throw new NotFoundException("User not found");
     }
 
-    if (!creator.creatorStatus?.subscriptionActive) {
-      throw new ForbiddenException(
-        "Active creator subscription is required to create events",
-      );
+    const normalizedPriceType = payload.priceType || "free";
+    const normalizedTicketPrice =
+      normalizedPriceType === "free"
+        ? 0
+        : this.roundMoney(payload.ticketPrice || 0);
+    const normalizedDiscount = this.roundMoney(payload.discountPercentage || 0);
+    const durationMinutes = payload.durationMinutes || 60;
+    const computedEndAt =
+      payload.endAt
+      ?? new Date(startAt.getTime() + durationMinutes * 60 * 1000);
+
+    if (normalizedPriceType === "paid" && normalizedTicketPrice <= 0) {
+      throw new BadRequestException("Paid event ticket price must be greater than 0");
     }
 
-    if (creator.role !== ROLES.CREATOR) {
-      throw new ForbiddenException("Only event creators can create events");
+    if (normalizedDiscount < 0 || normalizedDiscount > 100) {
+      throw new BadRequestException("Discount percentage must be between 0 and 100");
     }
+
+    const uploadedMediaIds = await this.uploadMediaFiles(
+      payload.creatorId,
+      payload.mediaFiles,
+    );
+
+    const mediaIds = Array.from(
+      new Set([...(payload.mediaIds || []), ...uploadedMediaIds]),
+    );
 
     return Event.create({
       creatorId: payload.creatorId,
-      title: payload.title,
-      typeCategoryId: payload.typeCategoryId,
+      title: payload.title || "Untitled Event",
+      type: payload.type || "general",
       description: payload.description,
-      startAt: payload.startAt,
-      endAt: payload.endAt,
+      startAt,
+      endAt: computedEndAt,
       location: payload.location
         ? {
-            label: payload.location.label,
+            label:
+              payload.location.label
+              || `${payload.location.coordinates[1]},${payload.location.coordinates[0]}`,
             coordinates: {
               type: "Point",
               coordinates: payload.location.coordinates,
@@ -170,9 +198,12 @@ export class EventService {
           }
         : undefined,
       participantLimit: payload.participantLimit,
-      media: payload.mediaIds || [],
+      media: mediaIds,
       status: payload.status || ACTIVITY_STATUS.PENDING,
-      ticketPrice: payload.ticketPrice,
+      priceType: normalizedPriceType,
+      ticketPrice: normalizedTicketPrice,
+      discountPercentage: normalizedDiscount,
+      durationMinutes,
       currency: payload.currency || "USD",
       stats: { joinedCount: 0 },
     });
@@ -206,15 +237,19 @@ export class EventService {
     userId: string,
     payload: {
       title?: string;
-      typeCategoryId?: string;
+      type?: string;
       description?: string;
+      date?: Date;
       startAt?: Date;
       endAt?: Date;
-      location?: { label: string; coordinates: [number, number] };
+      location?: { label?: string; coordinates: [number, number] };
       participantLimit?: number;
       mediaIds?: string[];
       status?: string;
+      priceType?: "free" | "paid";
       ticketPrice?: number;
+      discountPercentage?: number;
+      durationMinutes?: number;
       currency?: string;
     },
   ) {
@@ -225,14 +260,22 @@ export class EventService {
     }
 
     if (payload.title !== undefined) event.title = payload.title;
-    if (payload.typeCategoryId !== undefined)
-      event.typeCategoryId = payload.typeCategoryId as any;
+    if (payload.type !== undefined) event.type = payload.type;
     if (payload.description !== undefined) event.description = payload.description;
-    if (payload.startAt !== undefined) event.startAt = payload.startAt;
+    if (payload.startAt !== undefined) {
+      event.startAt = payload.startAt;
+      if (payload.endAt === undefined && payload.durationMinutes === undefined && event.durationMinutes) {
+        event.endAt = new Date(
+          event.startAt.getTime() + event.durationMinutes * 60 * 1000,
+        );
+      }
+    }
     if (payload.endAt !== undefined) event.endAt = payload.endAt;
     if (payload.location !== undefined) {
       event.location = {
-        label: payload.location.label,
+        label:
+          payload.location.label
+          || `${payload.location.coordinates[1]},${payload.location.coordinates[0]}`,
         coordinates: {
           type: "Point",
           coordinates: payload.location.coordinates,
@@ -244,7 +287,37 @@ export class EventService {
     }
     if (payload.mediaIds !== undefined) event.media = payload.mediaIds as any;
     if (payload.status !== undefined) event.status = payload.status as any;
-    if (payload.ticketPrice !== undefined) event.ticketPrice = payload.ticketPrice;
+
+    const nextPriceType = payload.priceType ?? event.priceType ?? "free";
+    const nextTicketPrice =
+      payload.ticketPrice !== undefined
+        ? this.roundMoney(payload.ticketPrice)
+        : event.ticketPrice;
+    const nextDiscount =
+      payload.discountPercentage !== undefined
+        ? this.roundMoney(payload.discountPercentage)
+        : event.discountPercentage || 0;
+
+    if (nextPriceType === "paid" && nextTicketPrice <= 0) {
+      throw new BadRequestException("Paid event ticket price must be greater than 0");
+    }
+
+    if (nextDiscount < 0 || nextDiscount > 100) {
+      throw new BadRequestException("Discount percentage must be between 0 and 100");
+    }
+
+    event.priceType = nextPriceType;
+    event.ticketPrice = nextPriceType === "free" ? 0 : nextTicketPrice;
+    event.discountPercentage = nextPriceType === "free" ? 0 : nextDiscount;
+
+    if (payload.durationMinutes !== undefined) {
+      event.durationMinutes = payload.durationMinutes;
+      if (payload.endAt === undefined) {
+        event.endAt = new Date(
+          event.startAt.getTime() + payload.durationMinutes * 60 * 1000,
+        );
+      }
+    }
     if (payload.currency !== undefined) event.currency = payload.currency;
 
     await event.save();
@@ -313,8 +386,13 @@ export class EventService {
     }
 
     let paymentTransactionId: string | undefined;
-    if (event.ticketPrice > 0) {
-      const grossAmount = this.roundMoney(event.ticketPrice);
+    const payableTicketPrice = this.calculatePayableTicketPrice(
+      event.ticketPrice,
+      event.discountPercentage || 0,
+    );
+
+    if (payableTicketPrice > 0) {
+      const grossAmount = this.roundMoney(payableTicketPrice);
       const platformFeeAmount = this.roundMoney((grossAmount * PLATFORM_FEE_PERCENT) / 100);
       const creatorShareAmount = this.roundMoney(grossAmount - platformFeeAmount);
 
@@ -431,6 +509,21 @@ export class EventService {
     return Number(value.toFixed(2));
   }
 
+  private calculatePayableTicketPrice(
+    ticketPrice: number,
+    discountPercentage: number,
+  ): number {
+    if (ticketPrice <= 0) return 0;
+    if (discountPercentage <= 0) return this.roundMoney(ticketPrice);
+
+    const discounted = ticketPrice - (ticketPrice * discountPercentage) / 100;
+    return this.roundMoney(Math.max(0, discounted));
+  }
+
+  private getDefaultFutureStartAt(): Date {
+    return new Date(Date.now() + 60 * 60 * 1000);
+  }
+
   private async isBlocked(userId: string, otherUserId: string) {
     if (userId === otherUserId) return false;
     const [user, other] = await Promise.all([
@@ -444,5 +537,38 @@ export class EventService {
       (id) => id.toString() === userId,
     );
     return Boolean(userBlocksOther || otherBlocksUser);
+  }
+
+  private async uploadMediaFiles(
+    ownerId: string,
+    mediaFiles?: Express.Multer.File[],
+  ): Promise<string[]> {
+    if (!mediaFiles?.length) return [];
+
+    const uploadsInput: StorageUploadInput[] = mediaFiles.map((file) => ({
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      originalName: file.originalname,
+    }));
+
+    const uploads = await s3Service.uploadFiles(uploadsInput, {
+      prefix: `events/${ownerId}`,
+    });
+
+    const mediaDocs = await Media.insertMany(
+      uploads.map((upload, index) => ({
+        ownerId,
+        type: uploadsInput[index].mimeType.startsWith("video/")
+          ? "video"
+          : "image",
+        s3Bucket: env.AWS_S3_BUCKET,
+        s3Key: upload.key,
+        url: upload.url,
+        mimeType: uploadsInput[index].mimeType,
+        sizeBytes: uploadsInput[index].buffer.length,
+      })),
+    );
+
+    return mediaDocs.map((doc) => doc._id.toString());
   }
 }

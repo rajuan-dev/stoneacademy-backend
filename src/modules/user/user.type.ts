@@ -12,7 +12,8 @@ export type UserResponse = {
   _id: string;
   email: string;
   fullName: string;
-  phone?: string;
+  phone?: string | null;
+  phoneNumber?: string | null;
   dob?: Date;
   gender?: (typeof GENDERS)[keyof typeof GENDERS];
   location?: {
