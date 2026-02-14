@@ -1,0 +1,294 @@
+{
+  "info": {
+    "name": "StoneAcademy - Profile & Account APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Focused collection for My Profile, Edit Profile, Account Settings, My Earnings, Subscriptions, and Admin Support Chat."
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5191/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "conversationId", "value": "" },
+    { "key": "mediaId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/auth/change-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password123!\",\n  \"newPassword\": \"Password123!1\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "My Profile",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "Edit Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Smith\",\n  \"dob\": \"1997-11-28\",\n  \"gender\": \"female\",\n  \"location\": {\n    \"label\": \"San Francisco, CA\"\n  },\n  \"phoneNumber\": \"+1234567890\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Upload Profile Avatar",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me/profile-photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "photo", "type": "file" }]
+            }
+          }
+        },
+        {
+          "name": "Get My Gallery (Event+Activity)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me/gallery?source=created"
+          }
+        },
+        {
+          "name": "Upload Gallery Item (Manual)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me/gallery",
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "media", "type": "file" }]
+            }
+          }
+        },
+        {
+          "name": "Remove Gallery Item",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me/gallery/{{mediaId}}"
+          }
+        },
+        {
+          "name": "Get My Ratings",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me/ratings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account Settings",
+      "item": [
+        {
+          "name": "Terms of Service",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cms/pages/terms-of-service"
+          }
+        },
+        {
+          "name": "Privacy Policy",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cms/pages/privacy-policy"
+          }
+        },
+        {
+          "name": "About Us",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cms/pages/about-us"
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/users/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "My Earnings",
+      "item": [
+        {
+          "name": "Get My Earnings",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/billing/earnings/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Get My Subscription",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/subscriptions/me"
+          }
+        },
+        {
+          "name": "Activate Subscription",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/subscriptions/activate",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"monthly\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/subscriptions/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Support Chat",
+      "item": [
+        {
+          "name": "Create Support Conversation",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/messages/conversations/support"
+          }
+        },
+        {
+          "name": "List Conversations",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/messages/conversations"
+          }
+        },
+        {
+          "name": "List Support Messages",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/messages/conversations/{{conversationId}}/messages"
+          }
+        },
+        {
+          "name": "Send Support Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "url": "{{baseUrl}}/messages",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversationId\": \"{{conversationId}}\",\n  \"text\": \"Hello admin support\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

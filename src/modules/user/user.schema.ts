@@ -59,6 +59,7 @@ export const updateProfileSchema = z.object({
       fullName: z.string().trim().min(1).max(200).optional(),
       email: z.string().email().optional(),
       phone: z.string().trim().min(3).max(20).optional(),
+      phoneNumber: z.string().trim().min(3).max(20).optional(),
       dob: z.coerce.date().optional(),
       gender: z
         .enum(Object.values(GENDERS) as [string, ...string[]])
@@ -80,6 +81,7 @@ export const updateProfileSchema = z.object({
         data.fullName ||
         data.email ||
         data.phone ||
+        data.phoneNumber ||
         data.dob ||
         data.gender ||
         data.location,

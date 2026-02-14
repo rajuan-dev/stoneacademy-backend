@@ -507,6 +507,7 @@ export class UserService {
       fullName?: string;
       email?: string;
       phone?: string;
+      phoneNumber?: string;
       dob?: Date;
       gender?: string;
       location?: {
@@ -541,9 +542,10 @@ export class UserService {
       user.fullName = payload.fullName.trim();
     }
 
-    if (payload.phone !== undefined) {
-      user.phoneNumber = payload.phone;
-      user.phone = payload.phone;
+    const resolvedPhone = payload.phone ?? payload.phoneNumber;
+    if (resolvedPhone !== undefined) {
+      user.phoneNumber = resolvedPhone;
+      user.phone = resolvedPhone;
     }
 
     if (payload.dob !== undefined) {
