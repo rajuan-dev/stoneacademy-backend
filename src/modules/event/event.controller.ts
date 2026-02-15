@@ -7,6 +7,7 @@ import {
   eventIdSchema,
   joinEventSchema,
   listEventsSchema,
+  messageEventHostSchema,
   updateEventSchema,
 } from "./event.schema";
 import { EventService } from "./event.service";
@@ -118,5 +119,16 @@ export class EventController {
     const userId = req.user?.userId as string;
     const pass = await this.service.pass(validated.params.id, userId);
     ApiResponse.success(res, pass, "Event pass generated");
+  });
+
+  messageHost = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(messageEventHostSchema, req);
+    const userId = req.user?.userId as string;
+    const result = await this.service.messageHost(
+      validated.params.id,
+      userId,
+      validated.body,
+    );
+    ApiResponse.success(res, result, "Host conversation ready");
   });
 }

@@ -17,6 +17,7 @@ import { Activity } from "./activity.model";
 import { ActivityParticipant } from "./activity-participant.model";
 import { QrToken } from "./qr-token.model";
 import { User } from "../user/user.model";
+import { ChatService } from "../chat/chat.service";
 
 type ListQuery = {
   q?: string;
@@ -35,6 +36,12 @@ const MILES_TO_METERS = 1609.34;
 const EARTH_RADIUS_MILES = 3958.8;
 
 export class ActivityService {
+  private chatService: ChatService;
+
+  constructor() {
+    this.chatService = new ChatService();
+  }
+
   async list(query: ListQuery) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
@@ -211,15 +218,69 @@ export class ActivityService {
   }
 
   async getByIdForUser(activityId: string, userId?: string) {
-    const activity = await Activity.findById(activityId).exec();
+    const activity = await Activity.findById(activityId)
+      .populate("hostId", "fullName email profileImageUrl rating")
+      .populate("media", "url type mimeType")
+      .exec();
     if (!activity) {
       throw new NotFoundException("Activity not found");
     }
-    const isHost = userId && activity.hostId.toString() === userId;
+    const isHost = userId && activity.hostId?._id?.toString?.() === userId;
     if (!isHost && activity.status !== ACTIVITY_STATUS.APPROVED) {
       throw new NotFoundException("Activity not found");
     }
-    return activity;
+
+    const joinedCount = await ActivityParticipant.countDocuments({
+      activityId: activity._id,
+      status: PARTICIPANT_STATUS.JOINED,
+    });
+
+    let isJoined = false;
+    if (userId) {
+      const participant = await ActivityParticipant.findOne({
+        activityId: activity._id,
+        userId,
+        status: PARTICIPANT_STATUS.JOINED,
+      }).select("_id").lean();
+      isJoined = Boolean(participant);
+    }
+
+    const host = activity.hostId as any;
+    const mediaList = Array.isArray(activity.media) ? (activity.media as any[]) : [];
+
+    return {
+      kind: "activity",
+      id: activity._id.toString(),
+      name: activity.title,
+      type: activity.type,
+      description: activity.description || null,
+      startAt: activity.startAt,
+      endAt: activity.endAt || null,
+      createdAt: activity.createdAt,
+      location: activity.location?.label || null,
+      locationCoordinates: activity.location?.coordinates?.coordinates || null,
+      participantLimit: activity.participantLimit ?? null,
+      joinedCount,
+      isJoined,
+      distanceMiles: activity.distanceMiles ?? null,
+      host: host
+        ? {
+            id: host._id?.toString?.() || null,
+            fullName: host.fullName || null,
+            username: host.email ? String(host.email).split("@")[0] : null,
+            profileImageUrl: host.profileImageUrl || null,
+            rating: host.rating || { avg: 0, count: 0 },
+          }
+        : null,
+      gallery: mediaList.map((media) => ({
+        id: media._id?.toString?.() || null,
+        url: media.url || null,
+        type: media.type || null,
+        mimeType: media.mimeType || null,
+      })),
+      status: activity.status,
+      isFree: true,
+    };
   }
 
   async update(
@@ -298,10 +359,6 @@ export class ActivityService {
     const blocked = await this.isBlocked(userId, activity.hostId.toString());
     if (blocked) {
       throw new ForbiddenException("You cannot join this activity");
-    }
-
-    if (activity.status === ACTIVITY_STATUS.CANCELLED) {
-      throw new BadRequestException("Activity is cancelled");
     }
 
     if (activity.startAt < new Date()) {
@@ -426,6 +483,36 @@ export class ActivityService {
 
   async cancel(activityId: string, userId: string) {
     return this.remove(activityId, userId);
+  }
+
+  async messageHost(
+    activityId: string,
+    userId: string,
+    payload?: { text?: string },
+  ) {
+    const activity = await this.getById(activityId, { allowUnapproved: true });
+    const hostId = activity.hostId.toString();
+    if (hostId === userId) {
+      throw new BadRequestException("Host cannot message self");
+    }
+
+    const thread = await this.chatService.ensureDirectThread(userId, hostId);
+
+    let message: any = null;
+    if (payload?.text && payload.text.trim()) {
+      const sent = await this.chatService.sendMessageToThread(userId, {
+        threadId: thread._id,
+        type: "text",
+        text: payload.text.trim(),
+      });
+      message = sent.message || null;
+    }
+
+    return {
+      threadId: thread._id,
+      hostId,
+      message,
+    };
   }
 
   private generateQrPayload(participantId: string): string {

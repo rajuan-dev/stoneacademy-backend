@@ -8,6 +8,7 @@ import {
   activityIdSchema,
   createActivitySchema,
   listActivitiesSchema,
+  messageHostSchema,
   updateActivitySchema,
 } from "./activity.schema";
 import { ActivityService } from "./activity.service";
@@ -110,5 +111,20 @@ export class ActivityController {
     const userId = req.user?.userId as string;
     const activity = await this.service.cancel(validated.params.id, userId);
     ApiResponse.success(res, activity, "Activity cancelled successfully");
+  });
+
+  messageHost = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(messageHostSchema, req);
+    const userId = req.user?.userId as string;
+    const result = await this.service.messageHost(
+      validated.params.id,
+      userId,
+      validated.body,
+    );
+    ApiResponse.success(
+      res,
+      result,
+      "Host conversation ready",
+    );
   });
 }

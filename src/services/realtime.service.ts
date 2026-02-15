@@ -5,6 +5,7 @@ import { env } from "@/env";
 import { AuthUtil } from "@/modules/auth/auth.utils";
 import type { JWTPayload } from "@/modules/user/user.type";
 import { Conversation } from "@/modules/message/conversation.model";
+import { ChatThread } from "@/modules/chat/chat.model";
 import type { Server as HttpServer } from "node:http";
 import { Server, type Socket } from "socket.io";
 
@@ -42,6 +43,12 @@ export type TypingEvent = {
   conversationId: string;
   userId: string;
   isTyping: boolean;
+};
+
+export type ChatThreadMessageCreatedEvent = {
+  threadId: string;
+  participantIds: string[];
+  message: Record<string, unknown>;
 };
 
 class RealtimeService {
@@ -104,6 +111,21 @@ class RealtimeService {
           socket.join(this.conversationRoom(conversationId));
         } catch (error) {
           logger.warn({ error, conversationId }, "Failed to join chat conversation room");
+        }
+      });
+
+      socket.on("chat:thread:join", async (threadId: string) => {
+        try {
+          if (!socket.data.userId || !threadId) return;
+          const isParticipant = await this.isThreadParticipant(
+            threadId,
+            socket.data.userId,
+          );
+          if (!isParticipant) return;
+
+          socket.join(this.threadRoom(threadId));
+        } catch (error) {
+          logger.warn({ error, threadId }, "Failed to join chat thread room");
         }
       });
 
@@ -186,12 +208,27 @@ class RealtimeService {
     });
   }
 
+  emitThreadMessageCreated(event: ChatThreadMessageCreatedEvent): void {
+    if (!this.io) {
+      return;
+    }
+
+    this.io.to(this.threadRoom(event.threadId)).emit("chat:thread:message:new", event.message);
+    event.participantIds.forEach((participantId) => {
+      this.io!.to(this.userRoom(participantId)).emit("chat:thread:message:new", event.message);
+    });
+  }
+
   private userRoom(userId: string): string {
     return `user:${userId}`;
   }
 
   private conversationRoom(conversationId: string): string {
     return `conversation:${conversationId}`;
+  }
+
+  private threadRoom(threadId: string): string {
+    return `thread:${threadId}`;
   }
 
   private extractToken(socket: AuthenticatedSocket): string | undefined {
@@ -233,6 +270,15 @@ class RealtimeService {
     }).select("_id").exec();
 
     return Boolean(conversation);
+  }
+
+  private async isThreadParticipant(threadId: string, userId: string) {
+    const thread = await ChatThread.findOne({
+      _id: threadId,
+      memberUserIds: userId,
+    }).select("_id").exec();
+
+    return Boolean(thread);
   }
 }
 

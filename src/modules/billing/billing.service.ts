@@ -166,6 +166,11 @@ export class BillingService {
         event.discountPercentage || 0,
       ).toFixed(2),
     );
+
+    if (grossAmount <= 0) {
+      throw new BadRequestException("This event is free. No payment is required.");
+    }
+
     const platformFeeAmount = Number(((grossAmount * 10) / 100).toFixed(2));
     const creatorShareAmount = Number((grossAmount - platformFeeAmount).toFixed(2));
 

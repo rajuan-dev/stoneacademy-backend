@@ -110,6 +110,16 @@ export const userIdSchema = z.object({
   }),
 });
 
+export const hostProfileSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  query: z.object({
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+  }),
+});
+
 export const galleryRemoveSchema = z.object({
   params: z.object({
     mediaId: z.string().trim().min(1),

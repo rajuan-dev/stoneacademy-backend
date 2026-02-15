@@ -146,6 +146,17 @@ export const activityIdSchema = z.object({
   }),
 });
 
+export const messageHostSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z
+    .object({
+      text: z.string().trim().max(4000).optional(),
+    })
+    .default({}),
+});
+
 export const listActivitiesSchema = z.object({
   query: z.object({
     q: z.string().trim().max(200).optional(),

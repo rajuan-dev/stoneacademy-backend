@@ -258,3 +258,14 @@ export const joinEventSchema = z.object({
     })
     .default({}),
 });
+
+export const messageEventHostSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z
+    .object({
+      text: z.string().trim().max(4000).optional(),
+    })
+    .default({}),
+});

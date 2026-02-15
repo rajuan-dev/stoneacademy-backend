@@ -584,6 +584,89 @@ export class UserService {
     return this.toPublicProfile(user);
   }
 
+  async getHostProfile(
+    userId: string,
+    query?: { page?: number; limit?: number },
+  ) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+    }
+
+    const page = query?.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query?.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const [profilePhoto, activityMediaIds, eventMediaIds, reviewRows, totalReviews] =
+      await Promise.all([
+        user.profilePhoto ? Media.findById(user.profilePhoto).lean() : Promise.resolve(null),
+        Activity.distinct("media", { hostId: userId }),
+        Event.distinct("media", { creatorId: userId }),
+        Review.find({ targetUserId: userId })
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .populate("reviewerId", "fullName profileImageUrl")
+          .lean(),
+        Review.countDocuments({ targetUserId: userId }),
+      ]);
+
+    const mediaIdSet = new Set<string>();
+    (user.gallery || []).forEach((id) => mediaIdSet.add(id.toString()));
+    (activityMediaIds || []).forEach((id: any) => mediaIdSet.add(id.toString()));
+    (eventMediaIds || []).forEach((id: any) => mediaIdSet.add(id.toString()));
+
+    const galleryItems = mediaIdSet.size
+      ? await Media.find({ _id: { $in: Array.from(mediaIdSet) } })
+          .sort({ createdAt: -1 })
+          .lean()
+      : [];
+
+    return {
+      profile: {
+        _id: user._id.toString(),
+        fullName: user.fullName,
+        username: user.email ? String(user.email).split("@")[0] : null,
+        profilePhotoUrl: user.profileImageUrl || profilePhoto?.url || null,
+        rating: {
+          avg: user.rating?.avg || 0,
+          count: user.rating?.count || 0,
+        },
+      },
+      gallery: galleryItems.map((item) => ({
+        _id: item._id.toString(),
+        url: item.url,
+        type: item.type,
+        mimeType: item.mimeType,
+        createdAt: item.createdAt,
+      })),
+      comments: reviewRows.map((review: any) => ({
+        _id: review._id.toString(),
+        rating: review.rating,
+        tags: review.tags || [],
+        comment: review.comment || null,
+        targetType: review.targetType,
+        targetId: review.targetId?.toString?.() || review.targetId,
+        reviewer: review.reviewerId
+          ? {
+              _id: review.reviewerId._id?.toString?.() || null,
+              fullName: review.reviewerId.fullName || null,
+              profileImageUrl: review.reviewerId.profileImageUrl || null,
+            }
+          : null,
+        createdAt: review.createdAt,
+      })),
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems: totalReviews,
+        pageCount: Math.ceil(totalReviews / limit),
+        hasNext: page * limit < totalReviews,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
   async blockUser(userId: string, targetId: string): Promise<UserResponse> {
     const user = await this.userRepository.findById(userId);
     if (!user) {

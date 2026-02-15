@@ -17,6 +17,7 @@ import {
   listCleanersSchema,
   listMyGallerySchema,
   listMyRatingsSchema,
+  hostProfileSchema,
   userIdSchema,
   updateCleanerSchema,
   updateProfileSchema,
@@ -226,6 +227,15 @@ export class UserController {
       validated.params.id,
     );
     ApiResponse.success(res, profile, "Profile fetched successfully");
+  });
+
+  getHostProfile = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(hostProfileSchema, req);
+    const result = await this.userService.getHostProfile(
+      validated.params.id,
+      validated.query,
+    );
+    ApiResponse.success(res, result, "Host profile fetched successfully");
   });
 
   blockUser = asyncHandler(async (req: Request, res: Response) => {

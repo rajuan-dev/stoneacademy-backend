@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Module Tester</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+      background: #f5f6f8;
+      color: #111827;
+    }
+    h1, h2 {
+      margin: 8px 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    label {
+      font-size: 12px;
+      display: block;
+      margin: 8px 0 4px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+    }
+    button {
+      cursor: pointer;
+      background: #111827;
+      color: #fff;
+      border: 0;
+    }
+    button.secondary {
+      background: #374151;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0b1020;
+      color: #cde3ff;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 180px;
+      max-height: 420px;
+      overflow: auto;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+    .row > * {
+      flex: 1;
+    }
+    .status {
+      font-size: 12px;
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat Module Tester</h1>
+  <div class="status" id="socketStatus">Socket: disconnected</div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Config</h2>
+      <label>API Base URL</label>
+      <input id="apiBase" value="http://localhost:5191/api/v1" />
+
+      <label>Socket Base URL</label>
+      <input id="socketBase" value="http://localhost:5191" />
+
+      <label>Bearer Token</label>
+      <textarea id="token" rows="4" placeholder="Paste access token"></textarea>
+
+      <div class="row">
+        <button id="connectSocketBtn">Connect Socket</button>
+        <button id="disconnectSocketBtn" class="secondary">Disconnect Socket</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Create Threads</h2>
+      <label>Target ID (activity or event)</label>
+      <input id="hostTargetId" placeholder="activity/event id" />
+      <label>OR Host User ID (direct)</label>
+      <input id="hostUserId" placeholder="host user id" />
+      <button id="createHostThreadBtn">POST /chat/threads/host</button>
+
+      <button id="createAdminThreadBtn">POST /chat/threads/admin</button>
+    </div>
+
+    <div class="card">
+      <h2>Threads & Messages</h2>
+      <button id="listThreadsBtn">GET /chat/threads</button>
+
+      <label>Thread ID</label>
+      <input id="threadId" placeholder="thread id" />
+      <div class="row">
+        <button id="joinThreadSocketBtn">Socket Join Thread</button>
+        <button id="listMessagesBtn" class="secondary">GET /chat/threads/:id/messages</button>
+      </div>
+
+      <label>Message Type</label>
+      <select id="messageType">
+        <option value="text">text</option>
+        <option value="image">image</option>
+      </select>
+      <label>Message Text</label>
+      <input id="messageText" placeholder="text message" />
+      <label>Image URL</label>
+      <input id="imageUrl" placeholder="https://..." />
+      <button id="sendMessageBtn">POST /chat/threads/:id/messages</button>
+      <button id="markSeenBtn" class="secondary">POST /chat/threads/:id/seen</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 12px;">
+    <h2>Output</h2>
+    <pre id="output"></pre>
+  </div>
+
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script>
+    let socket = null;
+
+    const apiBaseEl = document.getElementById("apiBase");
+    const socketBaseEl = document.getElementById("socketBase");
+    const tokenEl = document.getElementById("token");
+    const outputEl = document.getElementById("output");
+    const socketStatusEl = document.getElementById("socketStatus");
+
+    function log(title, data) {
+      const line = "=== " + title + " ===\n" + JSON.stringify(data, null, 2) + "\n\n";
+      outputEl.textContent = line + outputEl.textContent;
+    }
+
+    async function api(path, method, body) {
+      const token = tokenEl.value.trim();
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = "Bearer " + token;
+
+      const res = await fetch(apiBaseEl.value.replace(/\/+$/, "") + path, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+
+      let json = null;
+      try {
+        json = await res.json();
+      } catch {
+        json = { raw: await res.text() };
+      }
+
+      if (!res.ok) throw { status: res.status, data: json };
+      return json;
+    }
+
+    function connectSocket() {
+      if (socket) socket.disconnect();
+      const token = tokenEl.value.trim();
+      socket = io(socketBaseEl.value.replace(/\/+$/, ""), {
+        path: "/ws",
+        auth: { token },
+        transports: ["websocket"],
+      });
+
+      socket.on("connect", () => {
+        socketStatusEl.textContent = "Socket: connected (" + socket.id + ")";
+        log("socket connect", { socketId: socket.id });
+      });
+
+      socket.on("disconnect", (reason) => {
+        socketStatusEl.textContent = "Socket: disconnected";
+        log("socket disconnect", { reason });
+      });
+
+      socket.on("chat:thread:message:new", (payload) => {
+        log("socket chat:thread:message:new", payload);
+      });
+
+      socket.on("chat:message:new", (payload) => {
+        log("socket chat:message:new", payload);
+      });
+    }
+
+    function disconnectSocket() {
+      if (socket) socket.disconnect();
+      socket = null;
+      socketStatusEl.textContent = "Socket: disconnected";
+    }
+
+    document.getElementById("connectSocketBtn").onclick = connectSocket;
+    document.getElementById("disconnectSocketBtn").onclick = disconnectSocket;
+
+    document.getElementById("createHostThreadBtn").onclick = async () => {
+      try {
+        const targetId = document.getElementById("hostTargetId").value.trim();
+        const hostUserId = document.getElementById("hostUserId").value.trim();
+        const body = {};
+        if (targetId) body.targetId = targetId;
+        if (hostUserId) body.hostUserId = hostUserId;
+        const data = await api("/chat/threads/host", "POST", {
+          ...body,
+        });
+        log("create host thread", data);
+      } catch (e) { log("error create host thread", e); }
+    };
+
+    document.getElementById("createAdminThreadBtn").onclick = async () => {
+      try {
+        const data = await api("/chat/threads/admin", "POST");
+        log("create admin thread", data);
+      } catch (e) { log("error create admin thread", e); }
+    };
+
+    document.getElementById("listThreadsBtn").onclick = async () => {
+      try {
+        const data = await api("/chat/threads", "GET");
+        log("list threads", data);
+      } catch (e) { log("error list threads", e); }
+    };
+
+    document.getElementById("joinThreadSocketBtn").onclick = () => {
+      try {
+        if (!socket || !socket.connected) {
+          throw new Error("Socket not connected");
+        }
+        const threadId = document.getElementById("threadId").value.trim();
+        socket.emit("chat:thread:join", threadId);
+        log("socket join thread", { threadId });
+      } catch (e) { log("error join thread socket", e.message || e); }
+    };
+
+    document.getElementById("listMessagesBtn").onclick = async () => {
+      try {
+        const threadId = document.getElementById("threadId").value.trim();
+        const data = await api("/chat/threads/" + encodeURIComponent(threadId) + "/messages", "GET");
+        log("list messages", data);
+      } catch (e) { log("error list messages", e); }
+    };
+
+    document.getElementById("sendMessageBtn").onclick = async () => {
+      try {
+        const threadId = document.getElementById("threadId").value.trim();
+        const type = document.getElementById("messageType").value;
+        const body = { type };
+        if (type === "text") body.text = document.getElementById("messageText").value.trim();
+        if (type === "image") body.imageUrl = document.getElementById("imageUrl").value.trim();
+        const data = await api("/chat/threads/" + encodeURIComponent(threadId) + "/messages", "POST", body);
+        log("send message", data);
+      } catch (e) { log("error send message", e); }
+    };
+
+    document.getElementById("markSeenBtn").onclick = async () => {
+      try {
+        const threadId = document.getElementById("threadId").value.trim();
+        const data = await api("/chat/threads/" + encodeURIComponent(threadId) + "/seen", "POST");
+        log("mark seen", data);
+      } catch (e) { log("error mark seen", e); }
+    };
+  </script>
+</body>
+</html>

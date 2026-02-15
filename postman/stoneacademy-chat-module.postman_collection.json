@@ -1,0 +1,313 @@
+{
+  "info": {
+    "_postman_id": "0f31e8d1-79df-42c7-9a45-c130d85d9d98",
+    "name": "StoneAcademy - Chat Module (Host/Admin Flow)",
+    "description": "Minimal chat flow: host/admin thread, send messages, list messages, seen/unseen.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5191/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "activityId",
+      "value": ""
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    },
+    {
+      "key": "hostUserId",
+      "value": ""
+    },
+    {
+      "key": "threadId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Host Thread (Auto detect by targetId)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const res = pm.response.json();",
+              "const id = res?.data?._id;",
+              "if (id) pm.collectionVariables.set('threadId', id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"targetId\": \"{{activityId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/host",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "host"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Host Thread (Auto detect by eventId)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const res = pm.response.json();",
+              "const id = res?.data?._id;",
+              "if (id) pm.collectionVariables.set('threadId', id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"targetId\": \"{{eventId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/host",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "host"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Host Thread (Direct by hostUserId)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const res = pm.response.json();",
+              "const id = res?.data?._id;",
+              "if (id) pm.collectionVariables.set('threadId', id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hostUserId\": \"{{hostUserId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/host",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "host"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Admin Thread",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const res = pm.response.json();",
+              "const id = res?.data?._id;",
+              "if (id) pm.collectionVariables.set('threadId', id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/admin",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "admin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List My Threads",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Thread Messages",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/{{threadId}}/messages",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "{{threadId}}",
+            "messages"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Send Text Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"text\",\n  \"text\": \"Hello from Postman\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/{{threadId}}/messages",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "{{threadId}}",
+            "messages"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Send Image Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"image\",\n  \"imageUrl\": \"https://images.unsplash.com/photo-1520975922323-47f564f2e4a5\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/{{threadId}}/messages",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "{{threadId}}",
+            "messages"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Mark Thread Seen",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/chat/threads/{{threadId}}/seen",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat",
+            "threads",
+            "{{threadId}}",
+            "seen"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

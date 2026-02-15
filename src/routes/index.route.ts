@@ -19,6 +19,7 @@ import adminNotificationRouter from "@/modules/admin-notification/admin-notifica
 import cmsRouter from "@/modules/cms/cms.route";
 import adsRouter from "@/modules/ads/ads.route";
 import feedRouter from "@/modules/feed/feed.route";
+import chatRouter from "@/modules/chat/chat.route";
 
 import { Router } from "express";
 
@@ -108,6 +109,10 @@ const moduleRoutes = [
   {
     path: "/feed",
     route: feedRouter,
+  },
+  {
+    path: "/chat",
+    route: chatRouter,
   },
   {
     path: "/shop",

@@ -19,6 +19,7 @@ import { Event } from "./event.model";
 import { EventParticipant } from "./event-participant.model";
 import { PaymentTransaction } from "./payment-transaction.model";
 import { EventQrToken } from "./event-qr-token.model";
+import { ChatService } from "../chat/chat.service";
 
 type ListQuery = {
   q?: string;
@@ -36,9 +37,14 @@ type ListQuery = {
 
 const MILES_TO_METERS = 1609.34;
 const EARTH_RADIUS_MILES = 3958.8;
-const PLATFORM_FEE_PERCENT = 10;
 
 export class EventService {
+  private chatService: ChatService;
+
+  constructor() {
+    this.chatService = new ChatService();
+  }
+
   async list(query: ListQuery) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
@@ -140,6 +146,13 @@ export class EventService {
         participantLimit: item.participantLimit ?? null,
         joinedCount: item.stats?.joinedCount ?? 0,
         imageUrl: firstImageUrl,
+        priceType: item.priceType || "free",
+        ticketPrice: item.ticketPrice ?? 0,
+        discountPercentage: item.discountPercentage ?? 0,
+        payableTicketPrice: this.calculatePayableTicketPrice(
+          item.ticketPrice ?? 0,
+          item.discountPercentage ?? 0,
+        ),
         status: item.status,
       };
     });
@@ -262,15 +275,76 @@ export class EventService {
   }
 
   async getByIdForUser(eventId: string, userId?: string) {
-    const event = await Event.findById(eventId).exec();
+    const event = await Event.findById(eventId)
+      .populate("creatorId", "fullName email profileImageUrl rating")
+      .populate("media", "url type mimeType")
+      .exec();
     if (!event) {
       throw new NotFoundException("Event not found");
     }
-    const isCreator = userId && event.creatorId.toString() === userId;
+    const isCreator = userId && (event.creatorId as any)?._id?.toString?.() === userId;
     if (!isCreator && event.status !== ACTIVITY_STATUS.APPROVED) {
       throw new NotFoundException("Event not found");
     }
-    return event;
+
+    const joinedCount = await EventParticipant.countDocuments({
+      eventId: event._id,
+      status: PARTICIPANT_STATUS.JOINED,
+    });
+
+    let isJoined = false;
+    if (userId) {
+      const participant = await EventParticipant.findOne({
+        eventId: event._id,
+        userId,
+        status: PARTICIPANT_STATUS.JOINED,
+      }).select("_id").lean();
+      isJoined = Boolean(participant);
+    }
+
+    const creator = event.creatorId as any;
+    const mediaList = Array.isArray(event.media) ? (event.media as any[]) : [];
+    const payableTicketPrice = this.calculatePayableTicketPrice(
+      event.ticketPrice,
+      event.discountPercentage || 0,
+    );
+
+    return {
+      kind: "event",
+      id: event._id.toString(),
+      name: event.title,
+      type: event.type,
+      description: event.description || null,
+      startAt: event.startAt,
+      endAt: event.endAt || null,
+      createdAt: event.createdAt,
+      location: event.location?.label || null,
+      locationCoordinates: event.location?.coordinates?.coordinates || null,
+      participantLimit: event.participantLimit ?? null,
+      joinedCount,
+      isJoined,
+      priceType: event.priceType,
+      ticketPrice: event.ticketPrice,
+      discountPercentage: event.discountPercentage || 0,
+      payableTicketPrice,
+      currency: event.currency || "USD",
+      host: creator
+        ? {
+            id: creator._id?.toString?.() || null,
+            fullName: creator.fullName || null,
+            username: creator.email ? String(creator.email).split("@")[0] : null,
+            profileImageUrl: creator.profileImageUrl || null,
+            rating: creator.rating || { avg: 0, count: 0 },
+          }
+        : null,
+      gallery: mediaList.map((media) => ({
+        id: media._id?.toString?.() || null,
+        url: media.url || null,
+        type: media.type || null,
+        mimeType: media.mimeType || null,
+      })),
+      status: event.status,
+    };
   }
 
   async update(
@@ -437,22 +511,20 @@ export class EventService {
         throw new BadRequestException("Payment is required to join this event");
       }
 
-      const grossAmount = this.roundMoney(payableTicketPrice);
-      const platformFeeAmount = this.roundMoney((grossAmount * PLATFORM_FEE_PERCENT) / 100);
-      const creatorShareAmount = this.roundMoney(grossAmount - platformFeeAmount);
-
-      const transaction = await PaymentTransaction.create({
-        payerId: userId,
+      const transaction = await PaymentTransaction.findOne({
         eventId: event._id,
-        grossAmount,
-        currency: event.currency || "USD",
-        platformFeeAmount,
-        creatorShareAmount,
-        platformFeePercent: PLATFORM_FEE_PERCENT,
+        payerId: userId,
+        providerReference: payload.providerReference,
         status: PAYMENT_STATUS.SUCCEEDED,
-        provider: "manual",
-        providerReference: payload?.providerReference,
-      });
+      })
+        .sort({ createdAt: -1 })
+        .exec();
+
+      if (!transaction) {
+        throw new BadRequestException(
+          "Payment not verified. Complete Stripe payment first.",
+        );
+      }
 
       paymentTransactionId = transaction._id.toString();
     }
@@ -634,5 +706,35 @@ export class EventService {
     );
 
     return mediaDocs.map((doc) => doc._id.toString());
+  }
+
+  async messageHost(
+    eventId: string,
+    userId: string,
+    payload?: { text?: string },
+  ) {
+    const event = await this.getById(eventId, { allowUnapproved: true });
+    const hostId = event.creatorId.toString();
+    if (hostId === userId) {
+      throw new BadRequestException("Creator cannot message self");
+    }
+
+    const thread = await this.chatService.ensureDirectThread(userId, hostId);
+
+    let message: any = null;
+    if (payload?.text && payload.text.trim()) {
+      const sent = await this.chatService.sendMessageToThread(userId, {
+        threadId: thread._id,
+        type: "text",
+        text: payload.text.trim(),
+      });
+      message = sent.message || null;
+    }
+
+    return {
+      threadId: thread._id,
+      hostId,
+      message,
+    };
   }
 }

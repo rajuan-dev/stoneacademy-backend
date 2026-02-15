@@ -239,6 +239,11 @@ router.post("/:id/leave", authMiddleware.verifyToken, controller.leave);
  *         description: Pass payload
  */
 router.get("/:id/pass", authMiddleware.verifyToken, controller.pass);
+router.post(
+  "/:id/message-host",
+  authMiddleware.verifyToken,
+  controller.messageHost,
+);
 /**
  * @openapi
  * /activities/{id}/cancel:
