@@ -1,5 +1,4 @@
 import { ROLES, USER_STATUS } from "@/constants/app.constants";
-import { notificationService } from "@/modules/notification/notification.service";
 import {
   BadRequestException,
   ForbiddenException,
@@ -136,20 +135,6 @@ export class ChatService {
     } as any);
 
     await this.threadRepo.touch((thread._id as any).toString());
-
-    if (peerId) {
-      await notificationService.create({
-        userId: peerId,
-        type: "chat_message",
-        title: "New message",
-        body: message.text || "You received a new image message",
-        payload: {
-          threadId: (thread._id as any).toString(),
-          messageId: (message._id as any).toString(),
-          senderUserId,
-        },
-      });
-    }
 
     return {
       thread: await this.toThreadSummary(thread, message, senderUserId),

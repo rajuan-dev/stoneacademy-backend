@@ -62,7 +62,7 @@ const chatMessageSchema = new Schema<IChatMessage>(
       index: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "messages" }
 );
 
 chatMessageSchema.index({ threadId: 1, createdAt: -1 });
