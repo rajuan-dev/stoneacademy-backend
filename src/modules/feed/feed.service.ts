@@ -43,6 +43,7 @@ export class FeedService {
       ...activities.map((item: any) => ({
         kind: "activity",
         id: item._id.toString(),
+        hostId: item.hostId?.toString?.() || item.hostId?._id?.toString?.() || null,
         name: item.title,
         type: item.type,
         createdAt: item.createdAt,
@@ -50,6 +51,8 @@ export class FeedService {
       ...events.map((item: any) => ({
         kind: "event",
         id: item._id.toString(),
+        hostId: item.creatorId?.toString?.() || item.creatorId?._id?.toString?.() || null,
+        creatorId: item.creatorId?.toString?.() || item.creatorId?._id?.toString?.() || null,
         name: item.title,
         type: item.type,
         createdAt: item.createdAt,
@@ -173,6 +176,7 @@ export class FeedService {
     return {
       kind: "activity",
       id: item._id.toString(),
+      hostId: item.hostId?._id?.toString?.() || item.hostId?.toString?.() || null,
       name: item.title,
       type: item.type,
       creatorName: item.hostId?.fullName || null,
@@ -196,6 +200,8 @@ export class FeedService {
     return {
       kind: "event",
       id: item._id.toString(),
+      hostId: item.creatorId?._id?.toString?.() || item.creatorId?.toString?.() || null,
+      creatorId: item.creatorId?._id?.toString?.() || item.creatorId?.toString?.() || null,
       name: item.title,
       type: item.type,
       creatorName: item.creatorId?.fullName || null,

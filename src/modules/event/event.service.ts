@@ -133,6 +133,8 @@ export class EventService {
       return {
         kind: "event",
         id: item._id.toString(),
+        hostId: item.creatorId?._id?.toString?.() || item.creatorId?.toString?.() || null,
+        creatorId: item.creatorId?._id?.toString?.() || item.creatorId?.toString?.() || null,
         name: item.title,
         type: item.type,
         creatorName: item.creatorId?.fullName || null,

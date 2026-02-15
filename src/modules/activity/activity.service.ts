@@ -124,6 +124,7 @@ export class ActivityService {
       return {
         kind: "activity",
         id: item._id.toString(),
+        hostId: item.hostId?._id?.toString?.() || item.hostId?.toString?.() || null,
         name: item.title,
         type: item.type,
         creatorName: item.hostId?.fullName || null,
