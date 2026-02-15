@@ -256,5 +256,5 @@ export const joinEventSchema = z.object({
     .object({
       providerReference: z.string().trim().min(1).max(200).optional(),
     })
-    .optional(),
+    .default({}),
 });

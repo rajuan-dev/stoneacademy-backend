@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "d60a97a7-b6f3-4a5f-8db6-a9fd4a6dd8c8",
     "name": "StoneAcademy - Activities & Events",
-    "description": "Create/list/join/leave/pass/cancel activity and event APIs. Event create supports frontend multipart fields including mediaFiles and location with latitude/longitude.",
+    "description": "Updated collection for activities/events create/list/join/leave/pass/cancel + feed search. Event create requires active subscription. Paid-event join requires providerReference.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -31,6 +31,14 @@
     {
       "key": "eventId",
       "value": ""
+    },
+    {
+      "key": "email",
+      "value": "john@example.com"
+    },
+    {
+      "key": "password",
+      "value": "Password123!"
     }
   ],
   "item": [
@@ -62,7 +70,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123!\"\n}"
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -72,6 +80,38 @@
               "path": [
                 "auth",
                 "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subscription (Required For Event Create)",
+      "item": [
+        {
+          "name": "Activate Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"monthly\",\n  \"paymentProvider\": \"manual\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/activate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "activate"
               ]
             }
           },
@@ -93,6 +133,40 @@
               ],
               "path": [
                 "activities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Activities (Filter Type + Distance)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/activities?type=walking&lat=23.7643863&lng=90.3890144&radiusMiles=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "activities"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "walking"
+                },
+                {
+                  "key": "lat",
+                  "value": "23.7643863"
+                },
+                {
+                  "key": "lng",
+                  "value": "90.3890144"
+                },
+                {
+                  "key": "radiusMiles",
+                  "value": "10"
+                }
               ]
             }
           },
@@ -130,7 +204,7 @@
                 },
                 {
                   "key": "description",
-                  "value": "Community activity",
+                  "value": "Community walk activity",
                   "type": "text"
                 },
                 {
@@ -150,7 +224,7 @@
                 },
                 {
                   "key": "location",
-                  "value": "{\"latitude\":23.7643863,\"longitude\":90.3890144}",
+                  "value": "{\"label\":\"Dhaka\",\"coordinates\":[90.3890144,23.7643863]}",
                   "type": "text"
                 },
                 {
@@ -265,7 +339,41 @@
           "response": []
         },
         {
-          "name": "Create Event (Frontend Payload)",
+          "name": "List Events (Filter Type + Distance)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/events?type=running&lat=23.7643863&lng=90.3890144&radiusMiles=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "running"
+                },
+                {
+                  "key": "lat",
+                  "value": "23.7643863"
+                },
+                {
+                  "key": "lng",
+                  "value": "90.3890144"
+                },
+                {
+                  "key": "radiusMiles",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Event (Single API: Free/Paid)",
           "event": [
             {
               "listen": "test",
@@ -285,8 +393,8 @@
               "mode": "formdata",
               "formdata": [
                 {
-                  "key": "date",
-                  "value": "2026-02-16",
+                  "key": "title",
+                  "value": "Test Event",
                   "type": "text"
                 },
                 {
@@ -295,28 +403,13 @@
                   "type": "text"
                 },
                 {
-                  "key": "discountPercentage",
-                  "value": "null",
+                  "key": "type",
+                  "value": "walking",
                   "type": "text"
                 },
                 {
-                  "key": "durationMinutes",
-                  "value": "20",
-                  "type": "text"
-                },
-                {
-                  "key": "location",
-                  "value": "{\"latitude\":23.7643863,\"longitude\":90.3890144}",
-                  "type": "text"
-                },
-                {
-                  "key": "participantLimit",
-                  "value": "25",
-                  "type": "text"
-                },
-                {
-                  "key": "priceType",
-                  "value": "free",
+                  "key": "date",
+                  "value": "2026-02-16",
                   "type": "text"
                 },
                 {
@@ -325,18 +418,38 @@
                   "type": "text"
                 },
                 {
+                  "key": "durationMinutes",
+                  "value": "20",
+                  "type": "text"
+                },
+                {
+                  "key": "participantLimit",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "{\"latitude\":23.7643863,\"longitude\":90.3890144}",
+                  "type": "text"
+                },
+                {
+                  "key": "priceType",
+                  "value": "free",
+                  "type": "text"
+                },
+                {
                   "key": "ticketPrice",
                   "value": "0",
                   "type": "text"
                 },
                 {
-                  "key": "title",
-                  "value": "Test",
+                  "key": "discountPercentage",
+                  "value": "0",
                   "type": "text"
                 },
                 {
-                  "key": "type",
-                  "value": "I'd",
+                  "key": "currency",
+                  "value": "USD",
                   "type": "text"
                 },
                 {
@@ -358,9 +471,37 @@
           "response": []
         },
         {
-          "name": "Join Event",
+          "name": "Join Event (Free Event)",
           "request": {
             "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "join"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Join Event (Paid Event)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerReference\": \"PAYMENT_REF_123\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/events/{{eventId}}/join",
               "host": [
@@ -423,6 +564,55 @@
               "path": [
                 "events",
                 "{{eventId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Feed Search",
+      "item": [
+        {
+          "name": "Search All (Activities + Events + Users)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/feed?q=test",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feed"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "test"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search By User Name",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/feed?q=rajuan",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feed"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "rajuan"
+                }
               ]
             }
           },

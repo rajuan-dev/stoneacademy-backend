@@ -12,6 +12,87 @@ const parseObject = (value: unknown) => {
   }
 };
 
+const normalizeLocationInput = (value: unknown) => {
+  if (value === null || value === undefined || value === "" || value === "null") {
+    return undefined;
+  }
+
+  const parsed = parseObject(value) as any;
+  if (!parsed || typeof parsed !== "object") {
+    return undefined;
+  }
+
+  if (parsed.latitude !== undefined && parsed.longitude !== undefined) {
+    return {
+      label: parsed.label,
+      latitude: parsed.latitude,
+      longitude: parsed.longitude,
+    };
+  }
+
+  if (parsed.lat !== undefined && parsed.lng !== undefined) {
+    return {
+      label: parsed.label,
+      latitude: parsed.lat,
+      longitude: parsed.lng,
+    };
+  }
+
+  if (
+    parsed.coordinates
+    && typeof parsed.coordinates === "object"
+    && parsed.coordinates.latitude !== undefined
+    && parsed.coordinates.longitude !== undefined
+  ) {
+    return {
+      label: parsed.label,
+      latitude: parsed.coordinates.latitude,
+      longitude: parsed.coordinates.longitude,
+    };
+  }
+
+  if (Array.isArray(parsed.coordinates) && parsed.coordinates.length === 2) {
+    return {
+      label: parsed.label,
+      coordinates: [parsed.coordinates[0], parsed.coordinates[1]],
+    };
+  }
+
+  return undefined;
+};
+
+const locationSchema = z
+  .preprocess(normalizeLocationInput, z.any().optional())
+  .transform((value) => {
+    if (!value || typeof value !== "object") return undefined;
+
+    const obj = value as any;
+    if (Array.isArray(obj.coordinates) && obj.coordinates.length === 2) {
+      const lng = Number(obj.coordinates[0]);
+      const lat = Number(obj.coordinates[1]);
+      if (Number.isFinite(lng) && Number.isFinite(lat)) {
+        return {
+          label: obj.label ? String(obj.label) : `${lat},${lng}`,
+          coordinates: [lng, lat] as [number, number],
+        };
+      }
+      return undefined;
+    }
+
+    if (obj.longitude !== undefined && obj.latitude !== undefined) {
+      const lng = Number(obj.longitude);
+      const lat = Number(obj.latitude);
+      if (Number.isFinite(lng) && Number.isFinite(lat)) {
+        return {
+          label: obj.label ? String(obj.label) : `${lat},${lng}`,
+          coordinates: [lng, lat] as [number, number],
+        };
+      }
+    }
+
+    return undefined;
+  });
+
 export const createActivitySchema = z.object({
   body: z.object({
     title: z.string().trim().min(1).max(200).optional(),
@@ -19,15 +100,7 @@ export const createActivitySchema = z.object({
     description: z.string().trim().max(2000).optional(),
     startAt: z.coerce.date().optional(),
     endAt: z.coerce.date().optional(),
-    location: z.preprocess(
-      parseObject,
-      z
-        .object({
-          label: z.string().trim().min(1).max(200),
-          coordinates: z.tuple([z.coerce.number(), z.coerce.number()]),
-        })
-        .optional(),
-    ),
+    location: locationSchema,
     participantLimit: z.coerce.number().min(1).optional(),
     distanceMiles: z.coerce.number().min(0).optional(),
     mediaIds: z.preprocess(
@@ -51,15 +124,7 @@ export const updateActivitySchema = z.object({
       description: z.string().trim().max(2000).optional(),
       startAt: z.coerce.date().optional(),
       endAt: z.coerce.date().optional(),
-      location: z.preprocess(
-        parseObject,
-        z
-          .object({
-            label: z.string().trim().min(1).max(200),
-            coordinates: z.tuple([z.coerce.number(), z.coerce.number()]),
-          })
-          .optional(),
-      ),
+      location: locationSchema,
       participantLimit: z.coerce.number().min(1).optional(),
       distanceMiles: z.coerce.number().min(0).optional(),
       mediaIds: z.preprocess(

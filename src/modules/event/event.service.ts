@@ -35,6 +35,7 @@ type ListQuery = {
 };
 
 const MILES_TO_METERS = 1609.34;
+const EARTH_RADIUS_MILES = 3958.8;
 const PLATFORM_FEE_PERCENT = 10;
 
 export class EventService {
@@ -52,7 +53,7 @@ export class EventService {
       filter.$or = [{ title: pattern }, { description: pattern }];
     }
 
-    if (query.type) {
+    if (query.type && query.type.toLowerCase() !== "all") {
       filter.type = new RegExp(query.type, "i");
     }
 
@@ -99,7 +100,9 @@ export class EventService {
       sort = undefined;
     }
 
-    const queryBuilder = Event.find(filter);
+    const queryBuilder = Event.find(filter)
+      .populate("creatorId", "fullName email")
+      .populate("media", "url");
     if (sort) {
       queryBuilder.sort(sort);
     }
@@ -109,8 +112,40 @@ export class EventService {
       Event.countDocuments(filter),
     ]);
 
+    const mapped = data.map((item: any) => {
+      const coordinates = item.location?.coordinates?.coordinates as
+        | [number, number]
+        | undefined;
+      const distanceMilesAway = hasGeo && coordinates
+        ? this.getDistanceMiles(query.lat!, query.lng!, coordinates[1], coordinates[0])
+        : null;
+
+      const firstImageUrl = Array.isArray(item.media) && item.media.length > 0
+        ? item.media[0]?.url || null
+        : null;
+
+      return {
+        kind: "event",
+        id: item._id.toString(),
+        name: item.title,
+        type: item.type,
+        creatorName: item.creatorId?.fullName || null,
+        creatorUsername: item.creatorId?.email
+          ? String(item.creatorId.email).split("@")[0]
+          : null,
+        startAt: item.startAt,
+        createdAt: item.createdAt,
+        location: item.location?.label || null,
+        distanceMilesAway,
+        participantLimit: item.participantLimit ?? null,
+        joinedCount: item.stats?.joinedCount ?? 0,
+        imageUrl: firstImageUrl,
+        status: item.status,
+      };
+    });
+
     return {
-      data,
+      data: mapped,
       pagination: {
         currentPage: page,
         itemsPerPage: limit,
@@ -149,6 +184,12 @@ export class EventService {
     const creator = await User.findById(payload.creatorId).exec();
     if (!creator) {
       throw new NotFoundException("User not found");
+    }
+
+    if (!creator.creatorStatus?.subscriptionActive) {
+      throw new ForbiddenException(
+        "Active subscription is required to create events",
+      );
     }
 
     const normalizedPriceType = payload.priceType || "free";
@@ -199,7 +240,7 @@ export class EventService {
         : undefined,
       participantLimit: payload.participantLimit,
       media: mediaIds,
-      status: payload.status || ACTIVITY_STATUS.PENDING,
+      status: payload.status || ACTIVITY_STATUS.APPROVED,
       priceType: normalizedPriceType,
       ticketPrice: normalizedTicketPrice,
       discountPercentage: normalizedDiscount,
@@ -392,6 +433,10 @@ export class EventService {
     );
 
     if (payableTicketPrice > 0) {
+      if (!payload?.providerReference) {
+        throw new BadRequestException("Payment is required to join this event");
+      }
+
       const grossAmount = this.roundMoney(payableTicketPrice);
       const platformFeeAmount = this.roundMoney((grossAmount * PLATFORM_FEE_PERCENT) / 100);
       const creatorShareAmount = this.roundMoney(grossAmount - platformFeeAmount);
@@ -522,6 +567,25 @@ export class EventService {
 
   private getDefaultFutureStartAt(): Date {
     return new Date(Date.now() + 60 * 60 * 1000);
+  }
+
+  private getDistanceMiles(
+    fromLat: number,
+    fromLng: number,
+    toLat: number,
+    toLng: number,
+  ): number {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const dLat = toRad(toLat - fromLat);
+    const dLng = toRad(toLng - fromLng);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2)
+      + Math.cos(toRad(fromLat))
+      * Math.cos(toRad(toLat))
+      * Math.sin(dLng / 2)
+      * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Number((EARTH_RADIUS_MILES * c).toFixed(2));
   }
 
   private async isBlocked(userId: string, otherUserId: string) {

@@ -31,6 +31,23 @@ export class ActivityController {
   });
 
   create = asyncHandler(async (req: Request, res: Response) => {
+    const locationLatitude = (req.body as any)?.["location[latitude]"];
+    const locationLongitude = (req.body as any)?.["location[longitude]"];
+    const locationLabel = (req.body as any)?.["location[label]"];
+
+    if (
+      req.body
+      && !req.body.location
+      && locationLatitude !== undefined
+      && locationLongitude !== undefined
+    ) {
+      req.body.location = {
+        latitude: locationLatitude,
+        longitude: locationLongitude,
+        ...(locationLabel !== undefined ? { label: locationLabel } : {}),
+      };
+    }
+
     const validated = await zParse(createActivitySchema, req);
     const userId = req.user?.userId as string;
     const mediaFiles = ((req.files as Express.Multer.File[]) || []).filter(Boolean);

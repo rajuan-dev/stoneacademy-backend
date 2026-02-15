@@ -1,0 +1,108 @@
+{
+  "info": {
+    "_postman_id": "9a2ca9dd-c2b4-4405-b5b4-6f57fdfdfdfa",
+    "name": "StoneAcademy - Search Filter API Only",
+    "description": "Dedicated collection for activity/event filter search API using only kind, type, date, and paid/free.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Search Filter - All",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/feed/search-filter?kind=all&type=Running&date=2026-02-20&paid=all",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feed",
+            "search-filter"
+          ],
+          "query": [
+            { "key": "kind", "value": "all" },
+            { "key": "type", "value": "Running" },
+            { "key": "date", "value": "2026-02-20" },
+            { "key": "paid", "value": "all" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search Filter - Activities Only",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/feed/search-filter?kind=activity&type=Cycling&date=2026-02-20&paid=all",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feed",
+            "search-filter"
+          ],
+          "query": [
+            { "key": "kind", "value": "activity" },
+            { "key": "type", "value": "Cycling" },
+            { "key": "date", "value": "2026-02-20" },
+            { "key": "paid", "value": "all" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search Filter - Events Free Only",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Yoga&date=2026-02-20&paid=free",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feed",
+            "search-filter"
+          ],
+          "query": [
+            { "key": "kind", "value": "event" },
+            { "key": "type", "value": "Yoga" },
+            { "key": "date", "value": "2026-02-20" },
+            { "key": "paid", "value": "free" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search Filter - Events Paid Only",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Swimming&date=2026-02-20&paid=paid",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "feed",
+            "search-filter"
+          ],
+          "query": [
+            { "key": "kind", "value": "event" },
+            { "key": "type", "value": "Swimming" },
+            { "key": "date", "value": "2026-02-20" },
+            { "key": "paid", "value": "paid" }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
