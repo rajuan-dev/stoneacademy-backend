@@ -26,16 +26,15 @@ reportRouter.post(
   }),
 );
 
-reportRouter.get(
-  "/mine",
-  authMiddleware.verifyToken,
-  asyncHandler(async (req: Request, res: Response) => {
-    const validated = await zParse(listReportSchema, req);
-    const userId = req.user?.userId as string;
-    const result = await service.listMine(userId, validated.query);
-    ApiResponse.paginated(res, result.data, result.pagination, "Reports fetched");
-  }),
-);
+const listMineHandler = asyncHandler(async (req: Request, res: Response) => {
+  const validated = await zParse(listReportSchema, req);
+  const userId = req.user?.userId as string;
+  const result = await service.listMine(userId, validated.query);
+  ApiResponse.paginated(res, result.data, result.pagination, "Reports fetched");
+});
+
+reportRouter.get("/mine", authMiddleware.verifyToken, listMineHandler);
+reportRouter.get("/me", authMiddleware.verifyToken, listMineHandler);
 
 reportRouter.get(
   "/admin",

@@ -2,7 +2,10 @@ import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
 import type { Request, Response } from "express";
-import { activateSubscriptionSchema } from "./subscription.schema";
+import {
+  confirmSubscriptionPaymentSchema,
+  createSubscriptionCheckoutIntentSchema,
+} from "./subscription.schema";
 import { SubscriptionService } from "./subscription.service";
 
 export class SubscriptionController {
@@ -22,11 +25,21 @@ export class SubscriptionController {
     );
   });
 
-  activate = asyncHandler(async (req: Request, res: Response) => {
-    const validated = await zParse(activateSubscriptionSchema, req);
+  createCheckoutIntent = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(createSubscriptionCheckoutIntentSchema, req);
     const userId = req.user?.userId as string;
-    const subscription = await this.service.activate(userId, validated.body);
-    ApiResponse.created(res, subscription, "Subscription activated successfully");
+    const intent = await this.service.createCheckoutIntent(userId, validated.body);
+    ApiResponse.success(res, intent, "Subscription checkout intent created");
+  });
+
+  confirmPayment = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(confirmSubscriptionPaymentSchema, req);
+    const userId = req.user?.userId as string;
+    const result = await this.service.confirmPayment(
+      userId,
+      validated.body.paymentIntentId,
+    );
+    ApiResponse.success(res, result, "Subscription activated successfully");
   });
 
   cancel = asyncHandler(async (req: Request, res: Response) => {

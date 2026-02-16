@@ -4,6 +4,7 @@ import { model, Schema, type Types } from "mongoose";
 export interface IReport {
   _id: Types.ObjectId;
   reporterId: Types.ObjectId;
+  reportedUserId?: Types.ObjectId | null;
   entityType: "user" | "activity" | "event" | "message";
   entityId: Types.ObjectId;
   reason: string;
@@ -21,6 +22,12 @@ const reportSchema = BaseSchemaUtil.createSchema<IReport>({
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
+  },
+  reportedUserId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
     index: true,
   },
   entityType: {
@@ -66,5 +73,7 @@ const reportSchema = BaseSchemaUtil.createSchema<IReport>({
 });
 
 reportSchema.index({ status: 1, createdAt: -1 });
+reportSchema.index({ entityType: 1, entityId: 1, createdAt: -1 });
+reportSchema.index({ reporterId: 1, entityType: 1, entityId: 1 });
 
 export const Report = model<IReport>("Report", reportSchema);

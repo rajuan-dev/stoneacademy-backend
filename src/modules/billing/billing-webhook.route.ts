@@ -2,9 +2,11 @@ import { Router } from "express";
 import { stripeService } from "@/services/stripe.service";
 import { env } from "@/env";
 import { BillingService } from "./billing.service";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 const router = Router();
 const billingService = new BillingService();
+const subscriptionService = new SubscriptionService();
 
 router.post("/", async (req, res) => {
   try {
@@ -28,10 +30,21 @@ router.post("/", async (req, res) => {
 
     if (event.type === "payment_intent.succeeded") {
       const paymentIntent = event.data.object;
-      await billingService.markTransactionSucceededByProviderRef(
-        paymentIntent.id,
-        "stripe",
-      );
+      const paymentType = paymentIntent.metadata?.paymentType;
+
+      if (paymentType === "subscription") {
+        const subscriptionPaymentId = paymentIntent.metadata?.subscriptionPaymentId;
+        if (subscriptionPaymentId) {
+          await subscriptionService.markPaymentSucceededAndActivate(
+            subscriptionPaymentId,
+          );
+        }
+      } else {
+        await billingService.markTransactionSucceededByProviderRef(
+          paymentIntent.id,
+          "stripe",
+        );
+      }
     }
 
     return res.status(200).json({ success: true });

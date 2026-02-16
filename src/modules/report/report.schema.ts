@@ -1,10 +1,18 @@
 import { z } from "zod";
 
+const reasonEnum = z.enum([
+  "spam",
+  "unprofessional_behavior",
+  "harassment",
+  "inappropriate_content",
+  "other",
+]);
+
 export const createReportSchema = z.object({
   body: z.object({
     entityType: z.enum(["user", "activity", "event", "message"]),
     entityId: z.string().trim().min(1),
-    reason: z.string().trim().min(3).max(250),
+    reason: z.union([reasonEnum, z.string().trim().min(3).max(250)]),
     details: z.string().trim().max(3000).optional(),
   }),
 });

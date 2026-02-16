@@ -85,3 +85,39 @@ export const listSubscriptionsSchema = z.object({
     search: z.string().trim().max(200).optional(),
   }),
 });
+
+export const updateSubscriptionFeesSchema = z.object({
+  body: z.object({
+    subscriptionMonthlyPrice: z.coerce.number().min(0).optional(),
+    subscriptionYearlyPrice: z.coerce.number().min(0).optional(),
+  }),
+});
+
+export const listPremiumCreatorsSchema = z.object({
+  query: z.object({
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+    q: z.string().trim().max(200).optional(),
+    paymentStatus: z.enum(["pending", "complete", "all"]).optional(),
+  }),
+});
+
+export const updateAdminProfileSchema = z.object({
+  body: z
+    .object({
+      fullName: z.string().trim().min(1).max(200).optional(),
+      email: z.string().email().optional(),
+      phone: z.string().trim().min(3).max(20).optional(),
+      contactNo: z.string().trim().min(3).max(20).optional(),
+      phoneNumber: z.string().trim().min(3).max(20).optional(),
+    })
+    .refine(
+      (data) =>
+        data.fullName
+        || data.email
+        || data.phone
+        || data.contactNo
+        || data.phoneNumber,
+      { message: "At least one field must be provided for update" },
+    ),
+});

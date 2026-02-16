@@ -6,6 +6,7 @@ import {
   cmsSlugSchema,
   createCmsPageSchema,
   listCmsPagesSchema,
+  upsertStaticCmsContentSchema,
   updateCmsPageSchema,
 } from "./cms.schema";
 import { CmsService } from "./cms.service";
@@ -51,5 +52,47 @@ export class CmsController {
     const validated = await zParse(cmsSlugSchema, req);
     const result = await this.service.remove(validated.params.slug);
     ApiResponse.success(res, result, "Page deleted");
+  });
+
+  getAboutUs = asyncHandler(async (_req: Request, res: Response) => {
+    const page = await this.service.getAboutUsPage();
+    ApiResponse.success(res, page, "About Us fetched");
+  });
+
+  getPrivacyPolicy = asyncHandler(async (_req: Request, res: Response) => {
+    const page = await this.service.getPrivacyPolicyPage();
+    ApiResponse.success(res, page, "Privacy Policy fetched");
+  });
+
+  getTermsAndConditions = asyncHandler(async (_req: Request, res: Response) => {
+    const page = await this.service.getTermsAndConditionsPage();
+    ApiResponse.success(res, page, "Terms and Conditions fetched");
+  });
+
+  upsertAboutUs = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(upsertStaticCmsContentSchema, req);
+    const adminId = req.user?.userId as string;
+    const page = await this.service.upsertAboutUsPage(validated.body.content, adminId);
+    ApiResponse.success(res, page, "About Us updated");
+  });
+
+  upsertPrivacyPolicy = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(upsertStaticCmsContentSchema, req);
+    const adminId = req.user?.userId as string;
+    const page = await this.service.upsertPrivacyPolicyPage(
+      validated.body.content,
+      adminId,
+    );
+    ApiResponse.success(res, page, "Privacy Policy updated");
+  });
+
+  upsertTermsAndConditions = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(upsertStaticCmsContentSchema, req);
+    const adminId = req.user?.userId as string;
+    const page = await this.service.upsertTermsAndConditionsPage(
+      validated.body.content,
+      adminId,
+    );
+    ApiResponse.success(res, page, "Terms and Conditions updated");
   });
 }

@@ -100,6 +100,15 @@ export class AuthService {
     };
   }
 
+  async adminLogin(payload: LoginPayload): Promise<AuthServiceResponse> {
+    const result = await this.login(payload);
+    const role = result.user.role;
+    if (role !== ROLES.ADMIN && role !== ROLES.SUPER_ADMIN) {
+      throw new UnauthorizedException("Only admin can login from this endpoint");
+    }
+    return result;
+  }
+
   async loginWithGoogle(payload: {
     idToken: string;
     fullName?: string;

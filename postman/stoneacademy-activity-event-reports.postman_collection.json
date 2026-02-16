@@ -1,0 +1,113 @@
+{
+  "info": {
+    "_postman_id": "7f32e267-49f0-4eec-ad60-ccfe329f2d3a",
+    "name": "StoneAcademy Activity Event Report APIs",
+    "description": "Report APIs for activity/event abuse reporting and admin moderation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "User - Report Activity",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{userToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"entityType\": \"activity\",\n  \"entityId\": \"{{activityId}}\",\n  \"reason\": \"unprofessional_behavior\",\n  \"details\": \"Host used abusive language in this activity\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/reports",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports"]
+        }
+      }
+    },
+    {
+      "name": "User - Report Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{userToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"entityType\": \"event\",\n  \"entityId\": \"{{eventId}}\",\n  \"reason\": \"spam\",\n  \"details\": \"Fake event details and misleading content\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/reports",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports"]
+        }
+      }
+    },
+    {
+      "name": "User - My Reports",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{userToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/reports/me?page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "me"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - List Reports (Activity/Event)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/reports/admin?page=1&limit=10&entityType=activity&status=open",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "admin"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" },
+            { "key": "entityType", "value": "activity" },
+            { "key": "status", "value": "open" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Update Report Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"resolved\",\n  \"adminNote\": \"Action taken against host account\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/reports/admin/{{reportId}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "admin", "{{reportId}}", "status"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+    { "key": "userToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "activityId", "value": "" },
+    { "key": "eventId", "value": "" },
+    { "key": "reportId", "value": "" }
+  ]
+}

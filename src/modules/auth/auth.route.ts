@@ -1,5 +1,6 @@
 // file: src/modules/auth/auth.route.ts
 
+import { ROLES } from "@/constants/app.constants";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { authLimiter } from "@/middlewares/rate-limit.middleware";
 import { Router } from "express";
@@ -51,6 +52,7 @@ router.post("/register", authController.register);
  *               $ref: '#/components/schemas/AuthLoginResponse'
  */
 router.post("/login", authController.login);
+router.post("/admin/login", authController.adminLogin);
 
 /**
  * @openapi
@@ -211,6 +213,12 @@ router.put(
   "/change-password",
   authMiddleware.verifyToken,
   authController.changePassword
+);
+router.put(
+  "/admin/change-password",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  authController.adminChangePassword,
 );
 
 /**

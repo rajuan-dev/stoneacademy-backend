@@ -34,3 +34,9 @@ export const updateCmsPageSchema = z.object({
       message: "At least one field must be provided",
     }),
 });
+
+export const upsertStaticCmsContentSchema = z.object({
+  body: z.object({
+    content: z.string().trim().min(1).max(20000),
+  }),
+});

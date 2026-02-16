@@ -6,7 +6,12 @@ const router = Router();
 const controller = new SubscriptionController();
 
 router.get("/me", authMiddleware.verifyToken, controller.getMySubscription);
-router.post("/activate", authMiddleware.verifyToken, controller.activate);
+router.post(
+  "/checkout-intent",
+  authMiddleware.verifyToken,
+  controller.createCheckoutIntent,
+);
+router.post("/confirm-payment", authMiddleware.verifyToken, controller.confirmPayment);
 router.post("/cancel", authMiddleware.verifyToken, controller.cancel);
 
 export default router;

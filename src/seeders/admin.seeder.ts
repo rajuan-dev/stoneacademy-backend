@@ -11,8 +11,8 @@ import { hashPassword } from "@/utils/password.utils";
  */
 export class AdminSeeder {
   private static readonly DEFAULT_ADMIN = {
-    email: "admin@rentalpennymore.com",
-    password: "Admin@12345",
+    email: "admin@stoneacademy.com",
+    password: "admin@123",
     fullName: "Admin User",
     phoneNumber: "+1234567890",
     address: "Admin Office",

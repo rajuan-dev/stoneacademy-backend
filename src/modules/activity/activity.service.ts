@@ -18,6 +18,7 @@ import { ActivityParticipant } from "./activity-participant.model";
 import { QrToken } from "./qr-token.model";
 import { User } from "../user/user.model";
 import { ChatService } from "../chat/chat.service";
+import { SubscriptionService } from "../subscription/subscription.service";
 
 type ListQuery = {
   q?: string;
@@ -34,12 +35,15 @@ type ListQuery = {
 
 const MILES_TO_METERS = 1609.34;
 const EARTH_RADIUS_MILES = 3958.8;
+const FREE_ACTIVITY_POST_LIMIT = 100;
 
 export class ActivityService {
   private chatService: ChatService;
+  private subscriptionService: SubscriptionService;
 
   constructor() {
     this.chatService = new ChatService();
+    this.subscriptionService = new SubscriptionService();
   }
 
   async list(query: ListQuery) {
@@ -172,6 +176,22 @@ export class ActivityService {
     const startAt = payload.startAt ?? this.getDefaultFutureStartAt();
     if (startAt < new Date()) {
       throw new BadRequestException("Start time must be in the future");
+    }
+
+    const hasSubscription = await this.subscriptionService.hasActiveSubscription(
+      payload.hostId,
+    );
+
+    if (!hasSubscription) {
+      const totalCreatedActivities = await Activity.countDocuments({
+        hostId: payload.hostId,
+      }).exec();
+
+      if (totalCreatedActivities >= FREE_ACTIVITY_POST_LIMIT) {
+        throw new ForbiddenException(
+          `Without subscription you can create up to ${FREE_ACTIVITY_POST_LIMIT} activity posts. Subscribe to unlock unlimited posts.`,
+        );
+      }
     }
 
     const uploadedMediaIds = await this.uploadMediaFiles(

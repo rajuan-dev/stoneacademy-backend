@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stripe Test - Subscription and Event</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; background: #f4f7fb; color: #1f2a37; }
+    .container { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    .card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); margin-bottom: 16px; }
+    h1, h2 { margin: 0 0 12px; }
+    .row { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+    .row-1 { display: grid; gap: 10px; grid-template-columns: 1fr; }
+    label { display: block; font-size: 13px; margin-bottom: 4px; color: #4b5563; }
+    input, select, button { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; }
+    button { background: #1d4ed8; color: #fff; border: 0; cursor: pointer; font-weight: 600; }
+    button:disabled { background: #93c5fd; cursor: not-allowed; }
+    .muted { color: #6b7280; font-size: 13px; }
+    .status { white-space: pre-wrap; background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 10px; min-height: 90px; font-size: 12px; }
+    @media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Stripe Test Console</h1>
+      <div class="row">
+        <div>
+          <label>API Base URL</label>
+          <input id="baseUrl" value="http://localhost:3000/api/v1" />
+        </div>
+        <div>
+          <label>Stripe Publishable Key</label>
+          <input id="publishableKey" placeholder="pk_test_..." />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Bearer Token (user JWT)</label>
+          <input id="token" placeholder="Paste JWT access token" />
+        </div>
+        <div>
+          <label>User Email (optional)</label>
+          <input id="email" placeholder="user@email.com" />
+        </div>
+      </div>
+      <p class="muted">Use Stripe test card: 4242 4242 4242 4242, any future date, any CVC.</p>
+    </div>
+
+    <div class="card">
+      <h2>1) Subscription Payment</h2>
+      <div class="row">
+        <div>
+          <label>Plan</label>
+          <select id="subPlan">
+            <option value="monthly">monthly</option>
+            <option value="yearly">yearly</option>
+          </select>
+        </div>
+      </div>
+      <div id="subscriptionCardElement" style="margin:10px 0;"></div>
+      <button id="paySubscriptionBtn">Pay Subscription and Activate</button>
+    </div>
+
+    <div class="card">
+      <h2>2) Event Ticket Payment + Join</h2>
+      <div class="row-1">
+        <div>
+          <label>Event ID</label>
+          <input id="eventId" placeholder="Mongo event id" />
+        </div>
+      </div>
+      <div id="eventCardElement" style="margin:10px 0;"></div>
+      <button id="payEventBtn">Pay Event Ticket and Join</button>
+    </div>
+
+    <div class="card">
+      <h2>Status</h2>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    let stripe;
+    let subscriptionCard;
+    let eventCard;
+
+    const statusEl = document.getElementById("status");
+    const setStatus = (msg) => {
+      const time = new Date().toISOString();
+      statusEl.textContent = `[${time}] ${msg}\n` + statusEl.textContent;
+    };
+
+    const getHeaders = () => ({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${document.getElementById("token").value.trim()}`,
+    });
+
+    const ensureStripe = () => {
+      const key = document.getElementById("publishableKey").value.trim();
+      if (!key) throw new Error("Stripe publishable key is required");
+      if (!stripe) {
+        stripe = Stripe(key);
+        const elementsA = stripe.elements();
+        subscriptionCard = elementsA.create("card");
+        subscriptionCard.mount("#subscriptionCardElement");
+
+        const elementsB = stripe.elements();
+        eventCard = elementsB.create("card");
+        eventCard.mount("#eventCardElement");
+      }
+      return stripe;
+    };
+
+    async function post(path, body) {
+      const baseUrl = document.getElementById("baseUrl").value.trim();
+      const response = await fetch(`${baseUrl}${path}`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(body || {}),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.success) {
+        throw new Error(json.message || `Request failed: ${response.status}`);
+      }
+      return json.data;
+    }
+
+    document.getElementById("paySubscriptionBtn").addEventListener("click", async () => {
+      const button = document.getElementById("paySubscriptionBtn");
+      try {
+        button.disabled = true;
+        ensureStripe();
+        const plan = document.getElementById("subPlan").value;
+        setStatus("Creating subscription checkout intent...");
+
+        const checkout = await post("/subscriptions/checkout-intent", { plan });
+        const clientSecret = checkout.paymentIntentClientSecret;
+        if (!clientSecret) throw new Error("No subscription client secret returned");
+
+        setStatus("Confirming Stripe payment for subscription...");
+        const email = document.getElementById("email").value.trim();
+        const result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: subscriptionCard,
+            billing_details: email ? { email } : {},
+          },
+        });
+
+        if (result.error) throw new Error(result.error.message);
+        if (!result.paymentIntent || result.paymentIntent.status !== "succeeded") {
+          throw new Error("Subscription payment did not succeed");
+        }
+
+        setStatus("Confirming subscription activation in backend...");
+        await post("/subscriptions/confirm-payment", {
+          paymentIntentId: result.paymentIntent.id,
+        });
+        setStatus("Subscription activated successfully.");
+      } catch (error) {
+        setStatus(`Subscription flow failed: ${error.message}`);
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById("payEventBtn").addEventListener("click", async () => {
+      const button = document.getElementById("payEventBtn");
+      try {
+        button.disabled = true;
+        ensureStripe();
+        const eventId = document.getElementById("eventId").value.trim();
+        if (!eventId) throw new Error("Event ID is required");
+
+        setStatus("Creating event checkout intent...");
+        const checkout = await post(`/billing/events/${eventId}/checkout-intent`, {});
+        const clientSecret = checkout.paymentIntentClientSecret;
+        if (!clientSecret) throw new Error("No event client secret returned");
+
+        setStatus("Confirming Stripe payment for event...");
+        const email = document.getElementById("email").value.trim();
+        const result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: eventCard,
+            billing_details: email ? { email } : {},
+          },
+        });
+
+        if (result.error) throw new Error(result.error.message);
+        if (!result.paymentIntent || result.paymentIntent.status !== "succeeded") {
+          throw new Error("Event payment did not succeed");
+        }
+
+        setStatus("Joining paid event in backend...");
+        await post(`/events/${eventId}/join`, {
+          providerReference: result.paymentIntent.id,
+        });
+        setStatus("Event joined successfully.");
+      } catch (error) {
+        setStatus(`Event flow failed: ${error.message}`);
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

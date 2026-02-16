@@ -1,0 +1,302 @@
+{
+  "info": {
+    "_postman_id": "d2efdb87-f5b0-4f4f-a99f-c31b3fe4ec13",
+    "name": "StoneAcademy Admin Auth + CMS Pages",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Admin login, admin change password, and About Us / Privacy Policy / Terms & Conditions management."
+  },
+  "item": [
+    {
+      "name": "Auth - Admin Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@12345\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/admin/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "admin",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();",
+              "if (res && res.data && res.data.accessToken) {",
+              "  pm.collectionVariables.set('admin_token', res.data.accessToken);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth - Admin Change Password",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"currentPassword\": \"Admin@12345\",\n  \"newPassword\": \"Admin@123456\",\n  \"confirmNewPassword\": \"Admin@123456\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/admin/change-password",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "admin",
+            "change-password"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Get My Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/profile",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "profile"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Update My Profile (Text + Optional Photo)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "fullName",
+              "value": "Admin Updated Name",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "admin.updated@example.com",
+              "type": "text"
+            },
+            {
+              "key": "contactNo",
+              "value": "+1-555-0102",
+              "type": "text"
+            },
+            {
+              "key": "photo",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/profile",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "profile"
+          ]
+        }
+      }
+    },
+    {
+      "name": "CMS Admin - Upsert About Us",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"StoneAcademy helps people discover and create high-quality fitness activities and events.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/cms/admin/about-us",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cms",
+            "admin",
+            "about-us"
+          ]
+        }
+      }
+    },
+    {
+      "name": "CMS Public - Get About Us",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/cms/about-us",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cms",
+            "about-us"
+          ]
+        }
+      }
+    },
+    {
+      "name": "CMS Admin - Upsert Privacy Policy",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"We collect only the data required to deliver core platform functionality and security.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/cms/admin/privacy-policy",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cms",
+            "admin",
+            "privacy-policy"
+          ]
+        }
+      }
+    },
+    {
+      "name": "CMS Public - Get Privacy Policy",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/cms/privacy-policy",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cms",
+            "privacy-policy"
+          ]
+        }
+      }
+    },
+    {
+      "name": "CMS Admin - Upsert Terms and Conditions",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"By using StoneAcademy, users agree to follow event rules, payment policies, and community guidelines.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/cms/admin/terms-and-conditions",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cms",
+            "admin",
+            "terms-and-conditions"
+          ]
+        }
+      }
+    },
+    {
+      "name": "CMS Public - Get Terms and Conditions",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/cms/terms-and-conditions",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cms",
+            "terms-and-conditions"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    }
+  ]
+}

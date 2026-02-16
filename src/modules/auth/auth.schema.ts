@@ -26,6 +26,8 @@ export const loginSchema = z.object({
   }),
 });
 
+export const adminLoginSchema = loginSchema;
+
 export const otpSendSchema = z.object({
   body: z.object({
     email: z.string().email(MESSAGES.VALIDATION.INVALID_EMAIL),
@@ -64,10 +66,18 @@ export const refreshTokenSchema = z.object({
 });
 
 export const changePasswordSchema = z.object({
-  body: z.object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(8, MESSAGES.VALIDATION.PASSWORD_TOO_SHORT),
-  }),
+  body: z
+    .object({
+      currentPassword: z.string().min(1, "Current password is required"),
+      newPassword: z.string().min(8, MESSAGES.VALIDATION.PASSWORD_TOO_SHORT),
+      confirmNewPassword: z
+        .string()
+        .min(8, MESSAGES.VALIDATION.PASSWORD_TOO_SHORT),
+    })
+    .refine((data) => data.newPassword === data.confirmNewPassword, {
+      message: "New password and confirm new password must match",
+      path: ["confirmNewPassword"],
+    }),
 });
 
 export const googleAuthSchema = z.object({

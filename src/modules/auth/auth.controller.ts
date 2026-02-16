@@ -9,6 +9,7 @@ import { zParse } from "@/utils/validators.utils";
 import type { NextFunction, Request, Response } from "express";
 import {
   changePasswordSchema,
+  adminLoginSchema,
   googleAuthSchema,
   loginSchema,
   otpSendSchema,
@@ -67,6 +68,31 @@ export class AuthController {
       };
 
       ApiResponse.success(res, response, MESSAGES.AUTH.LOGIN_SUCCESS);
+    }
+  );
+
+  /**
+   * Admin login endpoint
+   * POST /auth/admin/login
+   */
+  adminLogin = asyncHandler(
+    async (req: Request, res: Response) => {
+      const validated = await zParse(adminLoginSchema, req);
+      const result = await this.authService.adminLogin(validated.body);
+
+      res.cookie(
+        COOKIE_CONFIG.REFRESH_TOKEN.name,
+        result.tokens.refreshToken,
+        COOKIE_CONFIG.REFRESH_TOKEN.options
+      );
+
+      const response: AuthControllerResponse = {
+        user: result.user,
+        accessToken: result.tokens.accessToken,
+        expiresIn: result.tokens.expiresIn,
+      };
+
+      ApiResponse.success(res, response, "Admin login successful");
     }
   );
 
@@ -219,6 +245,22 @@ export class AuthController {
     );
 
     ApiResponse.success(res, result, "Password changed successfully");
+  });
+
+  adminChangePassword = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(changePasswordSchema, req);
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const result = await this.authService.changePassword(
+      userId,
+      validated.body.currentPassword,
+      validated.body.newPassword
+    );
+
+    ApiResponse.success(res, result, "Admin password changed successfully");
   });
 
   /**

@@ -1,9 +1,13 @@
 import { z } from "zod";
 
-export const activateSubscriptionSchema = z.object({
+export const createSubscriptionCheckoutIntentSchema = z.object({
   body: z.object({
     plan: z.enum(["monthly", "yearly"]),
-    paymentProvider: z.string().trim().min(1).max(100).optional(),
-    externalSubscriptionId: z.string().trim().min(1).max(200).optional(),
+  }),
+});
+
+export const confirmSubscriptionPaymentSchema = z.object({
+  body: z.object({
+    paymentIntentId: z.string().trim().min(1).max(200),
   }),
 });

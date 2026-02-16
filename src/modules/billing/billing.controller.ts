@@ -146,6 +146,7 @@ billingRouter.post(
       amount: Math.round(transaction.grossAmount * 100),
       currency: (transaction.currency || "usd").toLowerCase(),
       metadata: {
+        paymentType: "event_ticket",
         transactionId: transaction._id.toString(),
         eventId: eventId,
         payerId: userId,

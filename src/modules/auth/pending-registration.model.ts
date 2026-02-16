@@ -45,7 +45,6 @@ const pendingRegistrationSchema =
     expiresAt: {
       type: Date,
       required: true,
-      index: true,
     },
     meta: {
       ip: { type: String },

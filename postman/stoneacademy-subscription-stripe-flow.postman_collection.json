@@ -1,0 +1,243 @@
+{
+  "info": {
+    "_postman_id": "6fdbe0a4-fca0-4ef4-8d8d-73f5b57c7fd1",
+    "name": "StoneAcademy Subscription + Stripe + Premium Creators",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Covers subscription checkout/activation, event paid join flow, and admin premium creator/subscription management."
+  },
+  "item": [
+    {
+      "name": "Admin - Get Subscription Fees",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          }
+        ],
+        "url": "{{base_url}}/admin/subscriptions/fees"
+      }
+    },
+    {
+      "name": "Admin - Update Subscription Fees",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"subscriptionMonthlyPrice\": 9.99,\n  \"subscriptionYearlyPrice\": 99.99\n}"
+        },
+        "url": "{{base_url}}/admin/subscriptions/fees"
+      }
+    },
+    {
+      "name": "User - Create Subscription Checkout Intent",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"plan\": \"monthly\"\n}"
+        },
+        "url": "{{base_url}}/subscriptions/checkout-intent"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json && json.data && json.data.paymentIntentId) {",
+              "  pm.collectionVariables.set('payment_intent_id_subscription', json.data.paymentIntentId);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "User - Confirm Subscription Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"paymentIntentId\": \"{{payment_intent_id_subscription}}\"\n}"
+        },
+        "url": "{{base_url}}/subscriptions/confirm-payment"
+      }
+    },
+    {
+      "name": "User - My Subscription",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          }
+        ],
+        "url": "{{base_url}}/subscriptions/me"
+      }
+    },
+    {
+      "name": "User - Cancel Subscription",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          }
+        ],
+        "url": "{{base_url}}/subscriptions/cancel"
+      }
+    },
+    {
+      "name": "User - Event Checkout Intent",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          }
+        ],
+        "url": "{{base_url}}/billing/events/{{event_id}}/checkout-intent"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json && json.data && json.data.paymentIntentId) {",
+              "  pm.collectionVariables.set('payment_intent_id_event', json.data.paymentIntentId);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "User - Join Paid Event (After Stripe Success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"providerReference\": \"{{payment_intent_id_event}}\"\n}"
+        },
+        "url": "{{base_url}}/events/{{event_id}}/join"
+      }
+    },
+    {
+      "name": "Admin - Subscriptions Table",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          }
+        ],
+        "url": "{{base_url}}/admin/subscriptions?page=1&limit=10&search="
+      }
+    },
+    {
+      "name": "Admin - Premium Event Creators (Paginated)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          }
+        ],
+        "url": "{{base_url}}/admin/event-creators/premium?page=1&limit=10&paymentStatus=all&q="
+      }
+    },
+    {
+      "name": "Admin - Premium Event Creator Details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}"
+          }
+        ],
+        "url": "{{base_url}}/admin/event-creators/premium/{{creator_id}}"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "user_token",
+      "value": ""
+    },
+    {
+      "key": "event_id",
+      "value": ""
+    },
+    {
+      "key": "creator_id",
+      "value": ""
+    },
+    {
+      "key": "payment_intent_id_subscription",
+      "value": ""
+    },
+    {
+      "key": "payment_intent_id_event",
+      "value": ""
+    }
+  ]
+}
