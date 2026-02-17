@@ -356,6 +356,97 @@ export class EventService {
     };
   }
 
+  async getFee(eventId: string) {
+    const event = await this.getById(eventId);
+    const ticketPrice = event.ticketPrice ?? 0;
+    const discountPercentage = event.discountPercentage ?? 0;
+    const payableTicketPrice = this.calculatePayableTicketPrice(
+      ticketPrice,
+      discountPercentage,
+    );
+
+    return {
+      eventId: event._id.toString(),
+      priceType: event.priceType || "free",
+      ticketPrice,
+      discountPercentage,
+      payableTicketPrice,
+      currency: event.currency || "USD",
+    };
+  }
+
+  async getJoinedUsers(eventId: string) {
+    const event = await this.getById(eventId, { allowUnapproved: true });
+    const participants = await EventParticipant.find({
+      eventId: event._id,
+      status: PARTICIPANT_STATUS.JOINED,
+    })
+      .select("userId joinedAt")
+      .populate("userId", "profileImageUrl")
+      .sort({ joinedAt: -1, createdAt: -1 })
+      .lean();
+
+    const users = participants.map((item: any) => ({
+      userId: item.userId?._id?.toString?.() || item.userId?.toString?.() || null,
+      profileAvatar: item.userId?.profileImageUrl || null,
+      joinedAt: item.joinedAt || null,
+    }));
+
+    return {
+      eventId: event._id.toString(),
+      joinedCount: users.length,
+      users,
+    };
+  }
+
+  async getJoinStatus(eventId: string, userId: string) {
+    const event = await this.getById(eventId, { allowUnapproved: true });
+    const payableTicketPrice = this.calculatePayableTicketPrice(
+      event.ticketPrice,
+      event.discountPercentage || 0,
+    );
+
+    const [participant, latestSucceededPayment, latestPayment] = await Promise.all([
+      EventParticipant.findOne({
+        eventId: event._id,
+        userId,
+        status: PARTICIPANT_STATUS.JOINED,
+      })
+        .select("_id joinedAt paymentTransactionId")
+        .lean(),
+      PaymentTransaction.findOne({
+        eventId: event._id,
+        payerId: userId,
+        status: PAYMENT_STATUS.SUCCEEDED,
+      })
+        .sort({ createdAt: -1 })
+        .select("_id providerReference status createdAt")
+        .lean(),
+      PaymentTransaction.findOne({
+        eventId: event._id,
+        payerId: userId,
+      })
+        .sort({ createdAt: -1 })
+        .select("_id providerReference status createdAt")
+        .lean(),
+    ]);
+
+    return {
+      eventId: event._id.toString(),
+      isJoined: Boolean(participant),
+      joinedAt: participant?.joinedAt || null,
+      paymentRequired: payableTicketPrice > 0,
+      paymentVerified: payableTicketPrice > 0 ? Boolean(latestSucceededPayment) : true,
+      paymentStatus: latestSucceededPayment
+        ? PAYMENT_STATUS.SUCCEEDED
+        : (latestPayment?.status || null),
+      providerReference:
+        latestSucceededPayment?.providerReference
+        || latestPayment?.providerReference
+        || null,
+    };
+  }
+
   async update(
     eventId: string,
     userId: string,

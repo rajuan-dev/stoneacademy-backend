@@ -1,0 +1,293 @@
+{
+  "info": {
+    "_postman_id": "4a4ed3d1-619d-4a05-b45a-9ab72e95f2de",
+    "name": "StoneAcademy - Review & Rating Flow",
+    "description": "End-to-end test flow for host ratings after joining activity/event. Includes: auth (host + participant), join flow, details (with gallery), submit 1-5 star review with quick tags, host aggregate rating/comments, and review listing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api/v1" },
+    { "key": "hostEmail", "value": "host@example.com" },
+    { "key": "hostPassword", "value": "Password123!" },
+    { "key": "participantEmail", "value": "participant@example.com" },
+    { "key": "participantPassword", "value": "Password123!" },
+    { "key": "hostAccessToken", "value": "" },
+    { "key": "participantAccessToken", "value": "" },
+    { "key": "activityId", "value": "" },
+    { "key": "eventId", "value": "" },
+    { "key": "hostUserId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1) Auth Setup",
+      "item": [
+        {
+          "name": "Host Login (Save hostAccessToken + hostUserId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const token = res?.data?.accessToken;",
+                  "const userId = res?.data?.user?._id || res?.data?.user?.id || '';",
+                  "if (token) pm.collectionVariables.set('hostAccessToken', token);",
+                  "if (userId) pm.collectionVariables.set('hostUserId', userId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{hostEmail}}\",\n  \"password\": \"{{hostPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Participant Login (Save participantAccessToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const token = res?.data?.accessToken;",
+                  "if (token) pm.collectionVariables.set('participantAccessToken', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{participantEmail}}\",\n  \"password\": \"{{participantPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2) Optional Host Create",
+      "item": [
+        {
+          "name": "Create Activity (Host, save activityId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const id = res?.data?._id || res?.data?.id;",
+                  "if (id) pm.collectionVariables.set('activityId', id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{hostAccessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Rating Test Activity", "type": "text" },
+                { "key": "type", "value": "walking", "type": "text" },
+                { "key": "description", "value": "Activity for review testing", "type": "text" },
+                { "key": "startAt", "value": "2026-03-20T10:00:00.000Z", "type": "text" },
+                { "key": "participantLimit", "value": "20", "type": "text" },
+                { "key": "location", "value": "{\"label\":\"San Francisco\",\"coordinates\":[-122.4194,37.7749]}", "type": "text" }
+              ]
+            },
+            "url": "{{baseUrl}}/activities"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Event (Host, save eventId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const id = res?.data?._id || res?.data?.id;",
+                  "if (id) pm.collectionVariables.set('eventId', id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{hostAccessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Rating Test Event", "type": "text" },
+                { "key": "type", "value": "running", "type": "text" },
+                { "key": "description", "value": "Event for review testing", "type": "text" },
+                { "key": "startAt", "value": "2026-03-21T14:00:00.000Z", "type": "text" },
+                { "key": "durationMinutes", "value": "90", "type": "text" },
+                { "key": "participantLimit", "value": "50", "type": "text" },
+                { "key": "location", "value": "{\"latitude\":37.7749,\"longitude\":-122.4194}", "type": "text" },
+                { "key": "priceType", "value": "free", "type": "text" }
+              ]
+            },
+            "url": "{{baseUrl}}/events"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3) Participant Join + Details",
+      "item": [
+        {
+          "name": "Join Activity (Participant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "url": "{{baseUrl}}/activities/{{activityId}}/join"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Activity Details (Gallery + Host Rating)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/activities/{{activityId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Join Event (Participant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "url": "{{baseUrl}}/events/{{eventId}}/join"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Event Details (Gallery + Host Rating)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4) Submit Ratings",
+      "item": [
+        {
+          "name": "Rate Activity Host (1-5 + quick tags + comment)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetType\": \"activity\",\n  \"targetId\": \"{{activityId}}\",\n  \"rating\": 5,\n  \"tags\": [\"friendly\", \"ontime\", \"motivating\", \"professional\"],\n  \"comment\": \"Host was friendly and motivating.\"\n}"
+            },
+            "url": "{{baseUrl}}/reviews"
+          },
+          "response": []
+        },
+        {
+          "name": "Rate Event Host (typo tags accepted)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetType\": \"event\",\n  \"targetId\": \"{{eventId}}\",\n  \"rating\": 2,\n  \"tags\": [\"fiendly\", \"not punctual\", \"disrespectfull\"],\n  \"comment\": \"Started late and behavior was not professional.\"\n}"
+            },
+            "url": "{{baseUrl}}/reviews"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5) Verify Host Ratings",
+      "item": [
+        {
+          "name": "Host: Get My Ratings (all comments + reviewer avatar)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{hostAccessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/ratings?page=1&limit=20"
+          },
+          "response": []
+        },
+        {
+          "name": "Public Host Profile (final avg + comments + gallery)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/{{hostUserId}}/host-profile?page=1&limit=20"
+          },
+          "response": []
+        },
+        {
+          "name": "List Reviews by targetUserId",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reviews?targetUserId={{hostUserId}}&page=1&limit=20"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -78,6 +78,25 @@ export class EventController {
     ApiResponse.success(res, event, "Event fetched successfully");
   });
 
+  getFee = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(eventIdSchema, req);
+    const fee = await this.service.getFee(validated.params.id);
+    ApiResponse.success(res, fee, "Event fee fetched successfully");
+  });
+
+  getJoinStatus = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(eventIdSchema, req);
+    const userId = req.user?.userId as string;
+    const status = await this.service.getJoinStatus(validated.params.id, userId);
+    ApiResponse.success(res, status, "Event join status fetched successfully");
+  });
+
+  getJoinedUsers = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(eventIdSchema, req);
+    const result = await this.service.getJoinedUsers(validated.params.id);
+    ApiResponse.success(res, result, "Event joined users fetched successfully");
+  });
+
   update = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(updateEventSchema, req);
     const userId = req.user?.userId as string;

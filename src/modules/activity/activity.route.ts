@@ -137,6 +137,8 @@ router.post(
  *               $ref: '#/components/schemas/Activity'
  */
 router.get("/:id", authMiddleware.optionalAuth, controller.getById);
+router.get("/:id/join-status", authMiddleware.verifyToken, controller.getJoinStatus);
+router.get("/:id/joined-users", authMiddleware.verifyToken, controller.getJoinedUsers);
 /**
  * @openapi
  * /activities/{id}:

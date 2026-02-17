@@ -304,6 +304,51 @@ export class ActivityService {
     };
   }
 
+  async getJoinStatus(activityId: string, userId: string) {
+    const activity = await this.getById(activityId, { allowUnapproved: true });
+    const participant = await ActivityParticipant.findOne({
+      activityId: activity._id,
+      userId,
+      status: PARTICIPANT_STATUS.JOINED,
+    })
+      .select("_id joinedAt")
+      .lean();
+
+    return {
+      activityId: activity._id.toString(),
+      isJoined: Boolean(participant),
+      joinedAt: participant?.joinedAt || null,
+      paymentRequired: false,
+      paymentVerified: true,
+      paymentStatus: null,
+      providerReference: null,
+    };
+  }
+
+  async getJoinedUsers(activityId: string) {
+    const activity = await this.getById(activityId, { allowUnapproved: true });
+    const participants = await ActivityParticipant.find({
+      activityId: activity._id,
+      status: PARTICIPANT_STATUS.JOINED,
+    })
+      .select("userId joinedAt")
+      .populate("userId", "profileImageUrl")
+      .sort({ joinedAt: -1, createdAt: -1 })
+      .lean();
+
+    const users = participants.map((item: any) => ({
+      userId: item.userId?._id?.toString?.() || item.userId?.toString?.() || null,
+      profileAvatar: item.userId?.profileImageUrl || null,
+      joinedAt: item.joinedAt || null,
+    }));
+
+    return {
+      activityId: activity._id.toString(),
+      joinedCount: users.length,
+      users,
+    };
+  }
+
   async update(
     activityId: string,
     userId: string,

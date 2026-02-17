@@ -67,6 +67,19 @@ export class ActivityController {
     ApiResponse.success(res, activity, "Activity fetched successfully");
   });
 
+  getJoinStatus = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(activityIdSchema, req);
+    const userId = req.user?.userId as string;
+    const status = await this.service.getJoinStatus(validated.params.id, userId);
+    ApiResponse.success(res, status, "Activity join status fetched successfully");
+  });
+
+  getJoinedUsers = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(activityIdSchema, req);
+    const result = await this.service.getJoinedUsers(validated.params.id);
+    ApiResponse.success(res, result, "Activity joined users fetched successfully");
+  });
+
   update = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(updateActivitySchema, req);
     const userId = req.user?.userId as string;

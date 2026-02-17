@@ -1,0 +1,153 @@
+{
+  "info": {
+    "_postman_id": "b4702f0f-a710-4378-bced-997ecbfcd710",
+    "name": "StoneAcademy User Fees APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "User app fee endpoints: subscription fee and event fee only."
+  },
+  "item": [
+    {
+      "name": "Get Subscription Fees (User App)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/subscriptions/fees",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "subscriptions",
+            "fees"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Event Fee Only",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/events/{{event_id}}/fee",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "events",
+            "{{event_id}}",
+            "fee"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Event Join Status (User)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/events/{{event_id}}/join-status",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "events",
+            "{{event_id}}",
+            "join-status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Activity Join Status (User)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/activities/{{activity_id}}/join-status",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "activities",
+            "{{activity_id}}",
+            "join-status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Event Joined Users (userId + profileAvatar)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/events/{{event_id}}/joined-users",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "events",
+            "{{event_id}}",
+            "joined-users"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Activity Joined Users (userId + profileAvatar)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/activities/{{activity_id}}/joined-users",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "activities",
+            "{{activity_id}}",
+            "joined-users"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5191/api/v1"
+    },
+    {
+      "key": "event_id",
+      "value": ""
+    },
+    {
+      "key": "user_token",
+      "value": ""
+    },
+    {
+      "key": "activity_id",
+      "value": ""
+    }
+  ]
+}

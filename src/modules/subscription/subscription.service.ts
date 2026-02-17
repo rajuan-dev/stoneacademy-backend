@@ -25,6 +25,15 @@ export class SubscriptionService {
     return Subscription.findOne({ userId }).sort({ createdAt: -1 }).exec();
   }
 
+  async getSubscriptionFees() {
+    const settings = await this.settingsService.getPlatformSettings();
+    return {
+      monthlyFee: settings.subscriptionMonthlyPrice,
+      yearlyFee: settings.subscriptionYearlyPrice,
+      currency: "USD",
+    };
+  }
+
   async createCheckoutIntent(userId: string, payload: { plan: "monthly" | "yearly" }) {
     const user = await User.findById(userId).exec();
     if (!user) {

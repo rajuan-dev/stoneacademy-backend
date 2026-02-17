@@ -13,6 +13,9 @@ router.post(
   upload.any(),
   controller.create,
 );
+router.get("/:id/fee", controller.getFee);
+router.get("/:id/join-status", authMiddleware.verifyToken, controller.getJoinStatus);
+router.get("/:id/joined-users", authMiddleware.verifyToken, controller.getJoinedUsers);
 router.get("/:id", authMiddleware.optionalAuth, controller.getById);
 router.patch("/:id", authMiddleware.verifyToken, controller.update);
 router.delete("/:id", authMiddleware.verifyToken, controller.remove);

@@ -5,6 +5,7 @@ import { SubscriptionController } from "./subscription.controller";
 const router = Router();
 const controller = new SubscriptionController();
 
+router.get("/fees", controller.getSubscriptionFees);
 router.get("/me", authMiddleware.verifyToken, controller.getMySubscription);
 router.post(
   "/checkout-intent",

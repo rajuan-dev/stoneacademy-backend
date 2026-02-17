@@ -25,6 +25,11 @@ export class SubscriptionController {
     );
   });
 
+  getSubscriptionFees = asyncHandler(async (_req: Request, res: Response) => {
+    const fees = await this.service.getSubscriptionFees();
+    ApiResponse.success(res, fees, "Subscription fees fetched successfully");
+  });
+
   createCheckoutIntent = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(createSubscriptionCheckoutIntentSchema, req);
     const userId = req.user?.userId as string;
