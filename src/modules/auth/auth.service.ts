@@ -22,6 +22,7 @@ import { adminNotificationService } from "@/modules/admin-notification/admin-not
 import { otpService } from "../otp/otp.service";
 import type { IUser } from "../user/user.interface";
 import { UserService } from "../user/user.service";
+import { AdminAccountService } from "@/modules/admin-account/admin-account.service";
 import type { UserResponse } from "../user/user.type";
 import type {
   AuthServiceResponse,
@@ -32,14 +33,26 @@ import type {
 } from "./auth.type";
 import { PendingRegistration } from "./pending-registration.model";
 import { AuthUtil } from "./auth.utils";
+type TokenSubject = {
+  id: string;
+  email: string;
+  role: string;
+  status?: string;
+  accountStatus?: string;
+  emailVerified?: boolean;
+  emailVerifiedAt?: Date | null;
+  subjectType: "user" | "admin";
+};
 
 export class AuthService {
   private userService: UserService;
+  private adminAccountService: AdminAccountService;
   private emailService: EmailService;
   private googleClient?: OAuth2Client;
 
   constructor() {
     this.userService = new UserService();
+    this.adminAccountService = new AdminAccountService();
     this.emailService = new EmailService();
     if (env.GOOGLE_CLIENT_ID) {
       this.googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
@@ -92,7 +105,9 @@ export class AuthService {
     await this.userService.updateLastLogin(user._id.toString());
     await this.userService.resetLoginAttempts(user._id.toString());
 
-    const tokens = this.generateTokens(user);
+    const tokens = this.generateTokensForSubject(
+      this.buildTokenSubjectFromUser(user),
+    );
 
     return {
       user: this.userService.toUserResponse(user),
@@ -101,12 +116,42 @@ export class AuthService {
   }
 
   async adminLogin(payload: LoginPayload): Promise<AuthServiceResponse> {
-    const result = await this.login(payload);
-    const role = result.user.role;
-    if (role !== ROLES.ADMIN && role !== ROLES.SUPER_ADMIN) {
-      throw new UnauthorizedException("Only admin can login from this endpoint");
+    const admin = await this.adminAccountService.findByEmailWithPassword(
+      payload.email,
+    );
+    if (!admin || !admin.passwordHash) {
+      throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
-    return result;
+
+    const isPasswordValid = await comparePassword(
+      payload.password,
+      admin.passwordHash,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
+    }
+
+    if (admin.status === USER_STATUS.SUSPENDED) {
+      throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
+    }
+
+    const tokens = this.generateTokensForSubject({
+      id: admin._id.toString(),
+      email: admin.email,
+      role: admin.role,
+      status: admin.status,
+      accountStatus: admin.accountStatus,
+      emailVerified: admin.emailVerified,
+      emailVerifiedAt: admin.emailVerifiedAt ?? null,
+      subjectType: "admin",
+    });
+
+    await this.adminAccountService.markLastLogin(admin._id.toString());
+
+    return {
+      user: this.adminAccountService.toUserResponse(admin),
+      tokens,
+    };
   }
 
   async loginWithGoogle(payload: {
@@ -160,7 +205,9 @@ export class AuthService {
     }
 
     await this.userService.updateLastLogin(user._id.toString());
-    const tokens = this.generateTokens(user);
+    const tokens = this.generateTokensForSubject(
+      this.buildTokenSubjectFromUser(user),
+    );
 
     return {
       user: this.userService.toUserResponse(user),
@@ -430,6 +477,35 @@ export class AuthService {
   ): Promise<{ accessToken: string }> {
     try {
       const payload = AuthUtil.verifyRefreshToken(refreshToken);
+      const subjectType = payload.subjectType === "admin" ? "admin" : "user";
+
+      if (subjectType === "admin") {
+        const admin = await this.adminAccountService.getById(payload.userId);
+        if (!admin) {
+          throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
+        }
+
+        if (
+          await this.adminAccountService.isRefreshTokenBlacklisted(refreshToken)
+        ) {
+          throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
+        }
+
+        const accessToken = AuthUtil.generateAccessToken({
+          userId: admin._id.toString(),
+          email: admin.email,
+          role: admin.role,
+          status: admin.status,
+          accountStatus: admin.accountStatus,
+          emailVerified: admin.emailVerified,
+          emailVerifiedAt: admin.emailVerifiedAt
+            ? admin.emailVerifiedAt.toISOString()
+            : null,
+          subjectType,
+        });
+
+        return { accessToken };
+      }
 
       const user = await this.userService.getById(payload.userId);
 
@@ -471,6 +547,7 @@ export class AuthService {
         emailVerifiedAt: user.emailVerifiedAt
           ? user.emailVerifiedAt.toISOString()
           : null,
+        subjectType,
       });
 
       return { accessToken };
@@ -479,24 +556,41 @@ export class AuthService {
     }
   }
 
-  private generateTokens(user: IUser): {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: string;
-  } {
-    const accessToken = AuthUtil.generateAccessToken({
-      userId: user._id.toString(),
+  private buildTokenSubjectFromUser(user: IUser): TokenSubject {
+    return {
+      id: user._id.toString(),
       email: user.email,
       role: user.role,
       status: user.status,
       accountStatus: user.accountStatus,
       emailVerified: user.emailVerified,
-      emailVerifiedAt: user.emailVerifiedAt
-        ? user.emailVerifiedAt.toISOString()
+      emailVerifiedAt: user.emailVerifiedAt ?? null,
+      subjectType: "user",
+    };
+  }
+
+  private generateTokensForSubject(subject: TokenSubject): {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: string;
+  } {
+    const accessToken = AuthUtil.generateAccessToken({
+      userId: subject.id,
+      email: subject.email,
+      role: subject.role,
+      status: subject.status,
+      accountStatus: subject.accountStatus,
+      emailVerified: subject.emailVerified,
+      emailVerifiedAt: subject.emailVerifiedAt
+        ? subject.emailVerifiedAt.toISOString()
         : null,
+      subjectType: subject.subjectType,
     });
 
-    const refreshToken = AuthUtil.generateRefreshToken(user._id.toString());
+    const refreshToken = AuthUtil.generateRefreshToken(
+      subject.id,
+      subject.subjectType,
+    );
 
     return {
       accessToken,
@@ -505,7 +599,11 @@ export class AuthService {
     };
   }
 
-  async logout(token: string, userId: string): Promise<{ message: string }> {
+  async logout(
+    token: string,
+    userId: string,
+    subjectType: "user" | "admin" = "user",
+  ): Promise<{ message: string }> {
     try {
       logger.info(
         { userId, token: token.substring(0, 20) + "..." },
@@ -513,16 +611,34 @@ export class AuthService {
       );
 
       const payload = AuthUtil.verifyRefreshToken(token);
+      if (payload.userId !== userId) {
+        throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
+      }
+
+      const tokenSubjectType = payload.subjectType === "admin" ? "admin" : "user";
+      if (tokenSubjectType !== subjectType) {
+        throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
+      }
+
       const expiresAt = payload.exp
         ? new Date(payload.exp * 1000)
         : AuthUtil.getTokenExpirationTime(AUTH.REFRESH_TOKEN_EXPIRY);
 
-      await this.userService.addRefreshTokenToBlacklist(
-        userId,
-        token,
-        expiresAt,
-        "logout",
-      );
+      if (subjectType === "admin") {
+        await this.adminAccountService.addRefreshTokenToBlacklist(
+          userId,
+          token,
+          expiresAt,
+          "logout",
+        );
+      } else {
+        await this.userService.addRefreshTokenToBlacklist(
+          userId,
+          token,
+          expiresAt,
+          "logout",
+        );
+      }
 
       return { message: "Logged out successfully" };
     } catch (error) {
@@ -535,7 +651,39 @@ export class AuthService {
     userId: string,
     currentPassword: string,
     newPassword: string,
+    subjectType: "user" | "admin" = "user",
   ): Promise<{ message: string }> {
+    if (subjectType === "admin") {
+      const admin = await this.adminAccountService.getByIdWithPassword(userId);
+      if (!admin || !admin.passwordHash) {
+        throw new NotFoundException("Admin account not found");
+      }
+
+      const isPasswordValid = await comparePassword(
+        currentPassword,
+        admin.passwordHash,
+      );
+
+      if (!isPasswordValid) {
+        logger.warn(
+          { userId },
+          "Invalid admin password change attempt",
+        );
+        throw new UnauthorizedException("Current password is incorrect");
+      }
+
+      const hashedPassword = await hashPassword(newPassword);
+      await this.adminAccountService.updatePassword(userId, hashedPassword);
+      await this.adminAccountService.invalidateAllRefreshTokens(userId);
+
+      logger.info({ userId, email: admin.email }, "Password changed successfully");
+
+      return {
+        message:
+          "Password changed successfully. Please login again with your new password.",
+      };
+    }
+
     const user = await this.userService.getUserByIdWithPassword(userId);
 
     if (!user) {
@@ -573,8 +721,15 @@ export class AuthService {
     };
   }
 
-  async logoutAll(userId: string): Promise<{ message: string }> {
-    await this.userService.invalidateAllRefreshTokensForUser(userId);
+  async logoutAll(
+    userId: string,
+    subjectType: "user" | "admin" = "user",
+  ): Promise<{ message: string }> {
+    if (subjectType === "admin") {
+      await this.adminAccountService.invalidateAllRefreshTokens(userId);
+    } else {
+      await this.userService.invalidateAllRefreshTokensForUser(userId);
+    }
     return { message: "All sessions logged out successfully" };
   }
 

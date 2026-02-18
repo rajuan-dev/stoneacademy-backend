@@ -1,6 +1,6 @@
-import { ACTIVITY_STATUS, PAGINATION } from "@/constants/app.constants";
+import { ACTIVITY_STATUS, PAGINATION, USER_STATUS } from "@/constants/app.constants";
 import { NotFoundException } from "@/utils/app-error.utils";
-import { Types } from "mongoose";
+import { PipelineStage, Types } from "mongoose";
 import { User } from "../user/user.model";
 import { Activity } from "../activity/activity.model";
 import { Event } from "../event/event.model";
@@ -12,25 +12,307 @@ import { Subscription } from "../subscription/subscription.model";
 import { SettingsService } from "../settings/settings.service";
 import { PayoutRequest } from "../billing/payout-request.model";
 import { UserService } from "../user/user.service";
+import { AdminAccountService } from "../admin-account/admin-account.service";
 import type { StorageUploadInput } from "@/services/s3.service";
+
+type AggregatedUserRow = {
+  _id: Types.ObjectId;
+  fullName: string;
+  email: string;
+  username?: string | null;
+  role: string;
+  status: string;
+  accountStatus?: string;
+  createdAt: Date;
+  joinedAt?: Date;
+  blockedReason?: string | null;
+  blockedAt?: Date | null;
+  blockedByUser?: {
+    _id?: Types.ObjectId;
+    fullName?: string;
+    email?: string;
+  } | null;
+};
+
+type AdminUserListItem = {
+  serial: number;
+  id: string;
+  fullName: string;
+  email: string;
+  username: string | null;
+  role: string;
+  status: string;
+  joinedAt: Date | null;
+  isBlocked: boolean;
+  blockedReason: string | null;
+  blockedAt: Date | null;
+  blockedBy: {
+    id: string;
+    fullName: string | null;
+    email: string | null;
+  } | null;
+  actions: {
+    canBlock: boolean;
+    canUnblock: boolean;
+    canViewDetails: boolean;
+  };
+};
+
+type AdminUserDetail = {
+  id: string;
+  fullName: string;
+  email: string;
+  username: string | null;
+  role: string;
+  status: string;
+  accountStatus: string;
+  phone: string | null;
+  joinedAt: Date | null;
+  lastLoginAt: Date | null;
+  blockedReason: string | null;
+  blockedAt: Date | null;
+  blockedBy: {
+    id: string;
+    fullName: string | null;
+    email: string | null;
+  } | null;
+  actions: {
+    canBlock: boolean;
+    canUnblock: boolean;
+  };
+};
 
 export class AdminService {
   private settingsService: SettingsService;
   private userService: UserService;
+  private adminAccountService: AdminAccountService;
 
   constructor() {
     this.settingsService = new SettingsService();
     this.userService = new UserService();
+    this.adminAccountService = new AdminAccountService();
   }
 
-  async getAdminProfile(adminId: string) {
-    const profile = await this.userService.getProfile(adminId);
+  private deriveUsername(email?: string | null): string | null {
+    if (!email) return null;
+    const [username] = email.split("@");
+    return username || null;
+  }
+
+  private buildBlockedByPayload(
+    blockedBy?: { _id?: Types.ObjectId; fullName?: string; email?: string } | null,
+  ) {
+    if (!blockedBy?._id) {
+      return null;
+    }
     return {
-      profilePhoto: profile.profileImage || profile.profilePhoto || null,
-      name: profile.fullName,
-      email: profile.email,
-      contactNo: profile.phone || profile.phoneNumber || null,
+      id: blockedBy._id.toString(),
+      fullName: blockedBy.fullName ?? null,
+      email: blockedBy.email ?? null,
     };
+  }
+
+  private toAdminUserListItem(
+    user: AggregatedUserRow,
+    serial: number,
+  ): AdminUserListItem {
+    const username = user.username ?? this.deriveUsername(user.email);
+    const isBlocked = user.status === USER_STATUS.SUSPENDED;
+
+    return {
+      serial,
+      id: user._id.toString(),
+      fullName: user.fullName,
+      email: user.email,
+      username,
+      role: user.role,
+      status: user.status,
+      joinedAt: user.joinedAt ?? user.createdAt ?? null,
+      isBlocked,
+      blockedReason: user.blockedReason ?? null,
+      blockedAt: user.blockedAt ?? null,
+      blockedBy: this.buildBlockedByPayload(user.blockedByUser),
+      actions: {
+        canBlock: !isBlocked,
+        canUnblock: isBlocked,
+        canViewDetails: true,
+      },
+    };
+  }
+
+  private buildPaginationMeta(params: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    serialStart: number;
+  }) {
+    const { page, limit, totalItems, serialStart } = params;
+    const pageCount = totalItems > 0 ? Math.ceil(totalItems / limit) : 0;
+    const hasNext = page * limit < totalItems;
+    const hasPrev = page > 1;
+
+    return {
+      currentPage: page,
+      totalPages: pageCount,
+      totalItems,
+      itemsPerPage: limit,
+      hasNext,
+      hasPrev,
+      nextPage: hasNext ? page + 1 : null,
+      prevPage: hasPrev ? page - 1 : null,
+      slNo: serialStart,
+    };
+  }
+
+  private buildUserBasePipeline(options: {
+    match: Record<string, any>;
+    search?: string;
+    sort?: Record<string, 1 | -1>;
+  }): PipelineStage[] {
+    const { match, search, sort } = options;
+    const pipeline: PipelineStage[] = [
+      { $match: match },
+      {
+        $addFields: {
+          username: {
+            $let: {
+              vars: { safeEmail: { $ifNull: ["$email", ""] } },
+              in: {
+                $cond: [
+                  { $ne: ["$$safeEmail", ""] },
+                  { $arrayElemAt: [{ $split: ["$$safeEmail", "@"] }, 0] },
+                  null,
+                ],
+              },
+            },
+          },
+        },
+      },
+    ];
+
+    if (search) {
+      const regex = new RegExp(search, "i");
+      pipeline.push({
+        $match: {
+          $or: [
+            { fullName: { $regex: regex } },
+            { email: { $regex: regex } },
+            { username: { $regex: regex } },
+          ],
+        },
+      });
+    }
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: "users",
+          localField: "blockedBy",
+          foreignField: "_id",
+          as: "blockedByUser",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                fullName: 1,
+                email: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: {
+          path: "$blockedByUser",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          fullName: 1,
+          email: 1,
+          username: 1,
+          role: 1,
+          status: 1,
+          accountStatus: 1,
+          createdAt: 1,
+          joinedAt: "$createdAt",
+          blockedReason: 1,
+          blockedAt: 1,
+          blockedByUser: 1,
+        },
+      },
+      {
+        $sort: sort || { createdAt: -1 },
+      },
+    );
+
+    return pipeline;
+  }
+
+  private async paginateUsers(options: {
+    page: number;
+    limit: number;
+    search?: string;
+    match?: Record<string, any>;
+    sort?: Record<string, 1 | -1>;
+  }) {
+    const page = options.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = options.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+    const pipeline: PipelineStage[] = this.buildUserBasePipeline({
+      match: {
+        isDeleted: false,
+        ...(options.match || {}),
+      },
+      search: options.search?.trim(),
+      sort: options.sort,
+    });
+
+    pipeline.push(
+      {
+        $facet: {
+          data: [
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          totalItems: [{ $count: "value" }],
+        },
+      },
+      {
+        $project: {
+          data: 1,
+          totalItems: {
+            $ifNull: [{ $arrayElemAt: ["$totalItems.value", 0] }, 0],
+          },
+        },
+      },
+    );
+
+    const [result] = await User.aggregate(pipeline).exec();
+    const rows = (result?.data || []) as AggregatedUserRow[];
+    const totalItems = result?.totalItems ?? 0;
+    const data = rows.map((row, index) =>
+      this.toAdminUserListItem(row, skip + index + 1),
+    );
+
+    return {
+      data,
+      pagination: this.buildPaginationMeta({
+        page,
+        limit,
+        totalItems,
+        serialStart: data.length ? skip + 1 : 0,
+      }),
+    };
+  }
+  async getAdminProfile(adminId: string) {
+    const admin = await this.adminAccountService.getById(adminId);
+    if (!admin) {
+      throw new NotFoundException("Admin account not found");
+    }
+    return this.adminAccountService.toProfileSummary(admin);
   }
 
   async updateAdminProfile(
@@ -46,35 +328,37 @@ export class AdminService {
   ) {
     const normalizedPhone = payload.phone ?? payload.contactNo ?? payload.phoneNumber;
 
-    let profile = await this.userService.getProfile(adminId);
-    const updates: {
-      fullName?: string;
-      email?: string;
-      phone?: string;
-      phoneNumber?: string;
-    } = {};
+    let adminProfile: any = null;
 
-    if (payload.fullName !== undefined) updates.fullName = payload.fullName;
-    if (payload.email !== undefined) updates.email = payload.email;
-    if (normalizedPhone !== undefined) {
-      updates.phone = normalizedPhone;
-      updates.phoneNumber = normalizedPhone;
-    }
+    const hasUpdates =
+      payload.fullName !== undefined
+      || payload.email !== undefined
+      || normalizedPhone !== undefined;
 
-    if (Object.keys(updates).length > 0) {
-      profile = await this.userService.updateProfile(adminId, updates);
+    if (hasUpdates) {
+      adminProfile = await this.adminAccountService.updateProfile(adminId, {
+        fullName: payload.fullName,
+        email: payload.email,
+        phone: normalizedPhone,
+      });
     }
 
     if (photo) {
-      profile = await this.userService.updateProfilePhoto(adminId, photo);
+      adminProfile = await this.adminAccountService.updateProfilePhoto(
+        adminId,
+        photo,
+      );
     }
 
-    return {
-      profilePhoto: profile.profileImage || profile.profilePhoto || null,
-      name: profile.fullName,
-      email: profile.email,
-      contactNo: profile.phone || profile.phoneNumber || null,
-    };
+    if (!adminProfile) {
+      adminProfile = await this.adminAccountService.getById(adminId);
+    }
+
+    if (!adminProfile) {
+      throw new NotFoundException("Admin account not found");
+    }
+
+    return this.adminAccountService.toProfileSummary(adminProfile);
   }
 
   async listUsers(query: {
@@ -85,46 +369,89 @@ export class AdminService {
     status?: string;
   }) {
     const page = query.page ?? PAGINATION.DEFAULT_PAGE;
-    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
-    const skip = (page - 1) * limit;
+    const limit = Math.min(
+      query.limit ?? PAGINATION.DEFAULT_LIMIT,
+      PAGINATION.MAX_LIMIT,
+    );
+    const match: Record<string, any> = {};
+    if (query.role) match.role = query.role;
+    if (query.status) match.status = query.status;
 
-    const filter: Record<string, any> = { isDeleted: false };
-    if (query.role) filter.role = query.role;
-    if (query.status) filter.status = query.status;
-    if (query.search) {
-      const pattern = new RegExp(query.search, "i");
-      filter.$or = [{ fullName: pattern }, { email: pattern }];
-    }
+    return this.paginateUsers({
+      page,
+      limit,
+      search: query.search,
+      match,
+    });
+  }
 
-    const [data, totalItems] = await Promise.all([
-      User.find(filter)
-        .select("-passwordHash")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .exec(),
-      User.countDocuments(filter),
-    ]);
+  async listBlockedUsers(query: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = Math.min(
+      query.limit ?? PAGINATION.DEFAULT_LIMIT,
+      PAGINATION.MAX_LIMIT,
+    );
+
+    return this.paginateUsers({
+      page,
+      limit,
+      search: query.search,
+      match: { status: USER_STATUS.SUSPENDED },
+      sort: { blockedAt: -1, createdAt: -1 },
+    });
+  }
+
+  async searchUsers(query: {
+    q: string;
+    limit?: number;
+    role?: string;
+    status?: string;
+  }) {
+    const limit = Math.min(query.limit ?? 10, 50);
+    const pipeline = this.buildUserBasePipeline({
+      match: {
+        isDeleted: false,
+        ...(query.role ? { role: query.role } : {}),
+        ...(query.status ? { status: query.status } : {}),
+      },
+      search: query.q,
+      sort: { createdAt: -1 },
+    });
+
+    pipeline.push({ $limit: limit });
+    const rows = (await User.aggregate(pipeline).exec()) as AggregatedUserRow[];
+    const items = rows.map((row, index) =>
+      this.toAdminUserListItem(row, index + 1),
+    );
 
     return {
-      data,
-      pagination: {
-        currentPage: page,
-        itemsPerPage: limit,
-        totalItems,
-        pageCount: Math.ceil(totalItems / limit),
-        hasNext: page * limit < totalItems,
-        hasPrev: page > 1,
-      },
+      items,
+      total: items.length,
     };
   }
 
-  async updateUserStatus(userId: string, status: string, reason?: string, adminId?: string) {
+  async updateUserStatus(
+    userId: string,
+    status: string,
+    reason?: string | null,
+    adminId?: string,
+  ) {
     const update: Record<string, any> = { status };
-    if (reason !== undefined) {
+
+    if (status === USER_STATUS.SUSPENDED) {
+      update.blockedReason = reason ?? null;
+      update.blockedAt = new Date();
+      update.blockedBy = adminId ? new Types.ObjectId(adminId) : null;
+    } else if (status === USER_STATUS.ACTIVE) {
+      update.blockedReason = null;
+      update.blockedAt = null;
+      update.blockedBy = null;
+    } else if (reason !== undefined) {
       update.blockedReason = reason;
-      update.blockedAt = status === "suspended" ? new Date() : null;
-      update.blockedBy = status === "suspended" && adminId ? adminId : null;
     }
 
     const user = await User.findByIdAndUpdate(
@@ -133,6 +460,27 @@ export class AdminService {
       { new: true },
     ).select("-passwordHash").exec();
     if (!user) throw new NotFoundException("User not found");
+
+    if (adminId) {
+      const action =
+        status === USER_STATUS.SUSPENDED
+          ? "user_blocked"
+          : status === USER_STATUS.ACTIVE
+            ? "user_unblocked"
+            : "user_status_updated";
+
+      await AdminAuditLog.create({
+        adminId,
+        action,
+        entityType: "user",
+        entityId: user._id,
+        meta: {
+          status,
+          reason: reason ?? null,
+        },
+      });
+    }
+
     return user;
   }
 
@@ -144,6 +492,57 @@ export class AdminService {
     ).select("-passwordHash").exec();
     if (!user) throw new NotFoundException("User not found");
     return user;
+  }
+
+  async getUserDetails(userId: string): Promise<AdminUserDetail> {
+    const user = await User.findById(userId)
+      .select("-passwordHash")
+      .populate("blockedBy", "fullName email")
+      .lean();
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    const blockedBy =
+      typeof user.blockedBy === "object" && user.blockedBy !== null
+        ? this.buildBlockedByPayload(user.blockedBy as any)
+        : null;
+
+    return {
+      id: user._id.toString(),
+      fullName: user.fullName,
+      email: user.email,
+      username: this.deriveUsername(user.email),
+      role: user.role,
+      status: user.status,
+      accountStatus: user.accountStatus,
+      phone: user.phone || user.phoneNumber || null,
+      joinedAt: user.createdAt || null,
+      lastLoginAt: user.lastLoginAt || null,
+      blockedReason: user.blockedReason ?? null,
+      blockedAt: user.blockedAt ?? null,
+      blockedBy,
+      actions: {
+        canBlock: user.status !== USER_STATUS.SUSPENDED,
+        canUnblock: user.status === USER_STATUS.SUSPENDED,
+      },
+    };
+  }
+
+  async blockUser(userId: string, adminId: string, reason?: string) {
+    await this.updateUserStatus(
+      userId,
+      USER_STATUS.SUSPENDED,
+      reason ?? "Blocked by administrator",
+      adminId,
+    );
+    return this.getUserDetails(userId);
+  }
+
+  async unblockUser(userId: string, adminId: string) {
+    await this.updateUserStatus(userId, USER_STATUS.ACTIVE, undefined, adminId);
+    return this.getUserDetails(userId);
   }
 
   async dashboardOverview() {

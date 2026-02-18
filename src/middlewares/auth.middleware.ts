@@ -25,6 +25,7 @@ declare global {
         accountStatus?: string;
         emailVerified?: boolean;
         emailVerifiedAt?: string | null;
+        subjectType?: "user" | "admin";
         iat?: number;
         exp?: number;
       };
@@ -62,6 +63,7 @@ export class AuthMiddleware {
         accountStatus: payload.accountStatus,
         emailVerified: payload.emailVerified,
         emailVerifiedAt: payload.emailVerifiedAt,
+        subjectType: payload.subjectType === "admin" ? "admin" : "user",
         iat: payload.iat,
         exp: payload.exp,
       };
@@ -127,6 +129,7 @@ export class AuthMiddleware {
           accountStatus: payload.accountStatus,
           emailVerified: payload.emailVerified,
           emailVerifiedAt: payload.emailVerifiedAt,
+          subjectType: payload.subjectType === "admin" ? "admin" : "user",
           iat: payload.iat,
           exp: payload.exp,
         };

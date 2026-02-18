@@ -121,6 +121,7 @@ export type JWTPayload = {
   accountStatus?: string;
   emailVerifiedAt?: string | null;
   emailVerified?: boolean;
+  subjectType?: "user" | "admin";
   iat?: number;
   exp?: number;
 };

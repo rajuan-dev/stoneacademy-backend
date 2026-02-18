@@ -5,17 +5,22 @@ import { zParse } from "@/utils/validators.utils";
 import type { Request, Response } from "express";
 import type { StorageUploadInput } from "@/services/s3.service";
 import {
+  blockUserSchema,
   listUsersSchema,
+  listBlockedUsersSchema,
   listActivitiesSchema,
   listEventsSchema,
   listPremiumCreatorsSchema,
   listSubscriptionsSchema,
+  searchUsersSchema,
+  unblockUserSchema,
   updateAdminProfileSchema,
   updateSubscriptionFeesSchema,
   updateActivityStatusSchema,
   updateEventStatusSchema,
   updateUserRoleSchema,
   updateUserStatusSchema,
+  userIdSchema,
 } from "./admin.schema";
 import { AdminService } from "./admin.service";
 
@@ -92,6 +97,29 @@ export class AdminController {
     ApiResponse.paginated(res, result.data, result.pagination, "Users fetched");
   });
 
+  listBlockedUsers = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listBlockedUsersSchema, req);
+    const result = await this.service.listBlockedUsers(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Blocked users fetched",
+    );
+  });
+
+  searchUsers = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(searchUsersSchema, req);
+    const result = await this.service.searchUsers(validated.query);
+    ApiResponse.success(res, result, "User search results");
+  });
+
+  getUserDetails = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(userIdSchema, req);
+    const user = await this.service.getUserDetails(validated.params.id);
+    ApiResponse.success(res, user, "User details fetched");
+  });
+
   updateUserStatus = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(updateUserStatusSchema, req);
     const user = await this.service.updateUserStatus(
@@ -110,6 +138,27 @@ export class AdminController {
       validated.body.role,
     );
     ApiResponse.success(res, user, "User role updated successfully");
+  });
+
+  blockUser = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(blockUserSchema, req);
+    const adminId = req.user?.userId as string;
+    const user = await this.service.blockUser(
+      validated.params.id,
+      adminId,
+      validated.body.reason,
+    );
+    ApiResponse.success(res, user, "User blocked successfully");
+  });
+
+  unblockUser = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(unblockUserSchema, req);
+    const adminId = req.user?.userId as string;
+    const user = await this.service.unblockUser(
+      validated.params.id,
+      adminId,
+    );
+    ApiResponse.success(res, user, "User unblocked successfully");
   });
 
   dashboardOverview = asyncHandler(async (req: Request, res: Response) => {

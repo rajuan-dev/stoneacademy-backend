@@ -194,7 +194,12 @@ export class AuthController {
       throw new UnauthorizedException("Refresh token not found");
     }
 
-    const result = await this.authService.logout(refreshToken, userId);
+    const subjectType = req.user?.subjectType === "admin" ? "admin" : "user";
+    const result = await this.authService.logout(
+      refreshToken,
+      userId,
+      subjectType,
+    );
 
     res.clearCookie(COOKIE_CONFIG.REFRESH_TOKEN.name, {
       httpOnly: true,
@@ -212,7 +217,8 @@ export class AuthController {
       throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
     }
 
-    const result = await this.authService.logoutAll(userId);
+    const subjectType = req.user?.subjectType === "admin" ? "admin" : "user";
+    const result = await this.authService.logoutAll(userId, subjectType);
 
     res.clearCookie(COOKIE_CONFIG.REFRESH_TOKEN.name, {
       httpOnly: true,
@@ -238,10 +244,12 @@ export class AuthController {
       throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
     }
 
+    const subjectType = req.user?.subjectType === "admin" ? "admin" : "user";
     const result = await this.authService.changePassword(
       userId,
       validated.body.currentPassword,
-      validated.body.newPassword
+      validated.body.newPassword,
+      subjectType,
     );
 
     ApiResponse.success(res, result, "Password changed successfully");
@@ -254,10 +262,12 @@ export class AuthController {
       throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
     }
 
+    const subjectType = req.user?.subjectType === "admin" ? "admin" : "user";
     const result = await this.authService.changePassword(
       userId,
       validated.body.currentPassword,
-      validated.body.newPassword
+      validated.body.newPassword,
+      subjectType,
     );
 
     ApiResponse.success(res, result, "Admin password changed successfully");

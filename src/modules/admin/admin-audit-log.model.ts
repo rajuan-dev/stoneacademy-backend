@@ -15,7 +15,7 @@ export interface IAdminAuditLog {
 const adminAuditLogSchema = BaseSchemaUtil.createSchema<IAdminAuditLog>({
   adminId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Admin",
     required: true,
     index: true,
   },

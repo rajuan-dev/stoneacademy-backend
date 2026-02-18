@@ -11,6 +11,23 @@ export const listUsersSchema = z.object({
   }),
 });
 
+export const listBlockedUsersSchema = z.object({
+  query: z.object({
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+    search: z.string().trim().max(200).optional(),
+  }),
+});
+
+export const searchUsersSchema = z.object({
+  query: z.object({
+    q: z.string().trim().min(1).max(200),
+    limit: z.coerce.number().min(1).max(50).optional(),
+    role: z.enum(Object.values(ROLES) as [string, ...string[]]).optional(),
+    status: z.enum(Object.values(USER_STATUS) as [string, ...string[]]).optional(),
+  }),
+});
+
 export const userIdSchema = z.object({
   params: z.object({
     id: z.string().trim().min(1),
@@ -33,6 +50,21 @@ export const updateUserRoleSchema = z.object({
   }),
   body: z.object({
     role: z.enum(Object.values(ROLES) as [string, ...string[]]),
+  }),
+});
+
+export const blockUserSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z.object({
+    reason: z.string().trim().min(3).max(500).optional(),
+  }),
+});
+
+export const unblockUserSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
   }),
 });
 

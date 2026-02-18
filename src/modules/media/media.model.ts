@@ -6,6 +6,7 @@ import { model, Schema, type Types } from "mongoose";
 export interface IMedia {
   _id: Types.ObjectId;
   ownerId: Types.ObjectId;
+  ownerModel?: "User" | "Admin";
   type: "image" | "video";
   s3Bucket: string;
   s3Key: string;
@@ -22,8 +23,14 @@ export interface IMedia {
 const mediaSchema = BaseSchemaUtil.createSchema<IMedia>({
   ownerId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    refPath: "ownerModel",
     required: true,
+    index: true,
+  },
+  ownerModel: {
+    type: String,
+    enum: ["User", "Admin"],
+    default: "User",
     index: true,
   },
   type: {

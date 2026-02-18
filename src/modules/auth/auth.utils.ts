@@ -15,8 +15,11 @@ export class AuthUtil {
     } as SignOptions);
   }
 
-  static generateRefreshToken(userId: string): string {
-    return jwt.sign({ userId }, env.JWT_REFRESH_SECRET as Secret, {
+  static generateRefreshToken(
+    userId: string,
+    subjectType: "user" | "admin" = "user",
+  ): string {
+    return jwt.sign({ userId, subjectType }, env.JWT_REFRESH_SECRET as Secret, {
       expiresIn: env.JWT_REFRESH_EXPIRY || AUTH.REFRESH_TOKEN_EXPIRY,
     } as SignOptions);
   }

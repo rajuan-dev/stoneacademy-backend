@@ -17,7 +17,7 @@ export interface IAdminNotification {
 const adminNotificationSchema = BaseSchemaUtil.createSchema<IAdminNotification>({
   adminId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Admin",
     default: null,
     index: true,
   },

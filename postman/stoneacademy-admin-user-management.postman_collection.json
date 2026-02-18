@@ -1,0 +1,248 @@
+{
+  "info": {
+    "_postman_id": "525dcc83-aa4c-4e3b-9b26-994ef7d61367",
+    "name": "StoneAcademy Admin User Management",
+    "description": "Admin endpoints covering paginated user list, search, block/unblock, and detail views for dashboard features.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin - List Users (Paginated)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/users?page={{page}}&limit={{limit}}&search={{search_term}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "users"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "{{page}}"
+            },
+            {
+              "key": "limit",
+              "value": "{{limit}}"
+            },
+            {
+              "key": "search",
+              "value": "{{search_term}}"
+            },
+            {
+              "key": "role",
+              "value": "creator",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "active",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Search Users by Name/Email/Username",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/users/search?q={{search_term}}&limit=10",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "users",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "{{search_term}}"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "role",
+              "value": "creator",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "suspended",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - List Blocked Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/users/blocked?page={{page}}&limit={{limit}}&search={{search_term}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "users",
+            "blocked"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "{{page}}"
+            },
+            {
+              "key": "limit",
+              "value": "{{limit}}"
+            },
+            {
+              "key": "search",
+              "value": "{{search_term}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Get User Details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/users/{{user_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "users",
+            "{{user_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Block User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Violation of community guidelines\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/users/{{user_id}}/block",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "users",
+            "{{user_id}}",
+            "block"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Unblock User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/users/{{user_id}}/unblock",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "users",
+            "{{user_id}}",
+            "unblock"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5191/api/v1"
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "page",
+      "value": "1"
+    },
+    {
+      "key": "limit",
+      "value": "10"
+    },
+    {
+      "key": "search_term",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": "64b5f1f4e1c1234567890abc"
+    }
+  ]
+}

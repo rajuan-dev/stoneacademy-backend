@@ -1,8 +1,8 @@
 // file: src/seeders/admin.seeder.ts
 
-import { ACCOUNT_STATUS, ROLES } from "@/constants/app.constants";
+import { ACCOUNT_STATUS, ROLES, USER_STATUS } from "@/constants/app.constants";
 import { logger } from "@/middlewares/pino-logger";
-import { User } from "@/modules/user/user.model";
+import { AdminAccount } from "@/modules/admin-account/admin-account.model";
 import { hashPassword } from "@/utils/password.utils";
 
 /**
@@ -24,9 +24,8 @@ export class AdminSeeder {
       logger.info("Starting admin seeder...");
 
       // Check if admin already exists
-      const existingAdmin = await User.findOne({
+      const existingAdmin = await AdminAccount.findOne({
         email: this.DEFAULT_ADMIN.email,
-        role: ROLES.ADMIN,
       });
 
       if (existingAdmin) {
@@ -38,13 +37,14 @@ export class AdminSeeder {
       const hashedPassword = await hashPassword(this.DEFAULT_ADMIN.password);
 
       // Create admin user
-      const adminUser = new User({
+      const adminUser = new AdminAccount({
         email: this.DEFAULT_ADMIN.email,
         passwordHash: hashedPassword,
         fullName: this.DEFAULT_ADMIN.fullName,
         phoneNumber: this.DEFAULT_ADMIN.phoneNumber,
-        address: this.DEFAULT_ADMIN.address,
+        contactNo: this.DEFAULT_ADMIN.phoneNumber,
         role: ROLES.ADMIN,
+        status: USER_STATUS.ACTIVE,
         emailVerified: true,
         emailVerifiedAt: new Date(),
         accountStatus: ACCOUNT_STATUS.ACTIVE,
@@ -82,11 +82,10 @@ export class AdminSeeder {
     try {
       const hashedPassword = await hashPassword(this.DEFAULT_ADMIN.password);
 
-      const admin = await User.findOneAndUpdate(
-        { email: this.DEFAULT_ADMIN.email, role: ROLES.ADMIN },
+      const admin = await AdminAccount.findOneAndUpdate(
+        { email: this.DEFAULT_ADMIN.email },
         {
           passwordHash: hashedPassword,
-          mustChangePassword: true, // Force password change
         },
         { new: true },
       );
