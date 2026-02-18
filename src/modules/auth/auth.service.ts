@@ -68,10 +68,6 @@ export class AuthService {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    if (user.loginLockedUntil && user.loginLockedUntil > new Date()) {
-      throw new UnauthorizedException("Account temporarily locked. Please try again later.");
-    }
-
     if (!user.emailVerifiedAt && !user.emailVerified) {
       throw new UnauthorizedException("NEEDS_OTP_VERIFY");
     }
@@ -94,16 +90,10 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      await this.userService.recordFailedLogin(
-        user._id.toString(),
-        AUTH.MAX_LOGIN_ATTEMPTS,
-        AUTH.LOGIN_LOCKOUT_MINUTES,
-      );
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
     await this.userService.updateLastLogin(user._id.toString());
-    await this.userService.resetLoginAttempts(user._id.toString());
 
     const tokens = this.generateTokensForSubject(
       this.buildTokenSubjectFromUser(user),

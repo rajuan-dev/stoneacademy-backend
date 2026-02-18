@@ -429,31 +429,6 @@ export class UserService {
     await this.userRepository.updateLastLogin(userId);
   }
 
-  async recordFailedLogin(userId: string, maxAttempts: number, lockoutMinutes: number) {
-    const user = await this.userRepository.findById(userId);
-    if (!user) return;
-
-    const attempts = (user.loginAttempts || 0) + 1;
-    user.loginAttempts = attempts;
-
-    if (attempts >= maxAttempts) {
-      const lockedUntil = new Date();
-      lockedUntil.setMinutes(lockedUntil.getMinutes() + lockoutMinutes);
-      user.loginLockedUntil = lockedUntil;
-      user.loginAttempts = 0;
-    }
-
-    await user.save();
-  }
-
-  async resetLoginAttempts(userId: string) {
-    const user = await this.userRepository.findById(userId);
-    if (!user) return;
-    user.loginAttempts = 0;
-    user.loginLockedUntil = undefined;
-    await user.save();
-  }
-
   async addRefreshTokenToBlacklist(
     userId: string,
     token: string,
