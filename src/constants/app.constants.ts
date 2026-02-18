@@ -17,7 +17,8 @@ export const ROLES = {
 
 export const USER_STATUS = {
   ACTIVE: "active",
-  SUSPENDED: "suspended",
+  BLOCKED: "blocked",
+  SUSPENDED: "blocked",
   DELETED: "deleted",
 } as const;
 
@@ -38,15 +39,25 @@ export const ACTIVITY_STATUS = {
   COMPLETED: "completed",
 } as const;
 
+export const EVENT_STATUS = {
+  PENDING_APPROVAL: "pendingApproval",
+  UPCOMING: "upcoming",
+  ONGOING: "ongoing",
+  COMPLETED: "completed",
+  CANCELED: "canceled",
+} as const;
+
 export const SUBSCRIPTION_STATUS = {
-  ACTIVE: "active",
+  PAID: "paid",
+  ACTIVE: "paid",
   EXPIRED: "expired",
   CANCELLED: "cancelled",
 } as const;
 
 export const PAYMENT_STATUS = {
   PENDING: "pending",
-  SUCCEEDED: "succeeded",
+  COMPLETED: "completed",
+  SUCCEEDED: "completed",
   FAILED: "failed",
   REFUNDED: "refunded",
 } as const;
@@ -81,6 +92,14 @@ export const OTP = {
   LENGTH: 4,
   EXPIRY_MINUTES: 10,
   MAX_ATTEMPTS: 100,
+} as const;
+
+export const NOTIFICATION_TYPES = {
+  REPORT: "report",
+  VERIFICATION: "verification",
+  USER_JOIN: "user_join",
+  COMMENT: "comment",
+  SYSTEM: "system",
 } as const;
 
 export const PAGINATION = {

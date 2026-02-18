@@ -76,7 +76,7 @@ export class AuthService {
       throw new UnauthorizedException("NEEDS_OTP_VERIFY");
     }
 
-    if (user.status === USER_STATUS.SUSPENDED) {
+    if (user.status === USER_STATUS.BLOCKED) {
       throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
     }
 
@@ -131,7 +131,7 @@ export class AuthService {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    if (admin.status === USER_STATUS.SUSPENDED) {
+    if (admin.status === USER_STATUS.BLOCKED) {
       throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
     }
 
@@ -188,7 +188,7 @@ export class AuthService {
         emailVerifiedAt: new Date(),
       });
     } else {
-      if (user.status === USER_STATUS.SUSPENDED) {
+      if (user.status === USER_STATUS.BLOCKED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
       }
       if (user.status === USER_STATUS.DELETED) {
@@ -493,6 +493,7 @@ export class AuthService {
 
         const accessToken = AuthUtil.generateAccessToken({
           userId: admin._id.toString(),
+          adminId: admin._id.toString(),
           email: admin.email,
           role: admin.role,
           status: admin.status,
@@ -529,7 +530,7 @@ export class AuthService {
         throw new UnauthorizedException(MESSAGES.AUTH.EMAIL_NOT_VERIFIED);
       }
 
-      if (user.status === USER_STATUS.SUSPENDED) {
+      if (user.status === USER_STATUS.BLOCKED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
       }
 
@@ -539,6 +540,7 @@ export class AuthService {
 
       const accessToken = AuthUtil.generateAccessToken({
         userId: user._id.toString(),
+        adminId: subjectType === "admin" ? user._id.toString() : undefined,
         email: user.email,
         role: user.role,
         status: user.status,
@@ -576,6 +578,7 @@ export class AuthService {
   } {
     const accessToken = AuthUtil.generateAccessToken({
       userId: subject.id,
+      adminId: subject.subjectType === "admin" ? subject.id : undefined,
       email: subject.email,
       role: subject.role,
       status: subject.status,

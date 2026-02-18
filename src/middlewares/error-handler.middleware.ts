@@ -27,6 +27,8 @@ function formatZodError(res: Response, error: z.ZodError, requestId?: string) {
   return res.status(HTTPSTATUS.BAD_REQUEST).json({
     success: false,
     message: "Validation failed",
+    data: null,
+    meta: null,
     errors,
     errorCode: ErrorCodeEnum.VALIDATION_ERROR,
     requestId,
@@ -129,6 +131,8 @@ export const errorHandler: ErrorRequestHandler = (
     return res.status(HTTPSTATUS.BAD_REQUEST).json({
       success: false,
       message: "Invalid JSON format in request body",
+      data: null,
+      meta: null,
       errorCode: ErrorCodeEnum.VALIDATION_ERROR,
       requestId,
       timestamp: new Date().toISOString(),
@@ -144,6 +148,8 @@ export const errorHandler: ErrorRequestHandler = (
     return res.status(mongoError.statusCode).json({
       success: false,
       message: mongoError.message,
+      data: null,
+      meta: null,
       errors: mongoError.errors,
       errorCode: mongoError.errorCode,
       requestId: mongoError.requestId,
@@ -155,6 +161,8 @@ export const errorHandler: ErrorRequestHandler = (
     return res.status(error.statusCode).json({
       success: false,
       message: error.message,
+      data: null,
+      meta: null,
       errorCode: error.errorCode,
       requestId,
       timestamp: new Date().toISOString(),
@@ -165,6 +173,8 @@ export const errorHandler: ErrorRequestHandler = (
     return res.status(HTTPSTATUS.BAD_REQUEST).json({
       success: false,
       message: "Invalid request body format",
+      data: null,
+      meta: null,
       errorCode: ErrorCodeEnum.VALIDATION_ERROR,
       requestId,
       timestamp: new Date().toISOString(),
@@ -175,6 +185,8 @@ export const errorHandler: ErrorRequestHandler = (
     return res.status(HTTPSTATUS.BAD_REQUEST).json({
       success: false,
       message: "Request body too large",
+      data: null,
+      meta: null,
       errorCode: ErrorCodeEnum.REQUEST_TOO_LARGE,
       requestId,
       timestamp: new Date().toISOString(),
@@ -185,6 +197,8 @@ export const errorHandler: ErrorRequestHandler = (
     return res.status(HTTPSTATUS.TOO_MANY_REQUESTS).json({
       success: false,
       message: "Too many requests, please try again later",
+      data: null,
+      meta: null,
       errorCode: ErrorCodeEnum.AUTH_TOO_MANY_ATTEMPTS,
       requestId,
       timestamp: new Date().toISOString(),
@@ -197,6 +211,8 @@ export const errorHandler: ErrorRequestHandler = (
       env.NODE_ENV === "development"
         ? error.message || "Unknown error occurred"
         : "Internal Server Error",
+    data: null,
+    meta: null,
     errorCode: ErrorCodeEnum.INTERNAL_SERVER_ERROR,
     requestId,
     timestamp: new Date().toISOString(),

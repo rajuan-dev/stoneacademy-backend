@@ -68,7 +68,7 @@ export class AuthMiddleware {
         exp: payload.exp,
       };
 
-      if (req.user.status === USER_STATUS.SUSPENDED) {
+      if (req.user.status === USER_STATUS.BLOCKED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
       }
       if (req.user.status === USER_STATUS.DELETED) {

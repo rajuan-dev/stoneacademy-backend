@@ -115,6 +115,7 @@ export type ChangePasswordPayload = {
 
 export type JWTPayload = {
   userId: string;
+  adminId?: string;
   email: string;
   role: string;
   status?: string;

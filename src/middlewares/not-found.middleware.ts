@@ -10,6 +10,8 @@ export function notFound(req: Request, res: Response, _next: NextFunction) {
   return res.status(HTTPSTATUS.NOT_FOUND).json({
     success: false,
     message: `🔍 -  route ${req.method} ${req.originalUrl} not found`,
+    data: null,
+    meta: null,
     errorCode: ErrorCodeEnum.RESOURCE_NOT_FOUND,
     requestId,
     timestamp: new Date().toISOString(),

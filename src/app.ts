@@ -55,9 +55,16 @@ app.use(
   }),
 );
 
-app.get<object>("/", (req, res) => {
+app.get<object>("/", (_req, res) => {
   res.json({
-    message: "project-service-API",
+    success: true,
+    message: "Stone Academy admin backend is running",
+    data: {
+      name: "project-service-API",
+      version: "1.0.0",
+    },
+    meta: null,
+    timestamp: new Date().toISOString(),
   });
 });
 

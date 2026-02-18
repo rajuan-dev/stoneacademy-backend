@@ -3,6 +3,7 @@ import billingRouter from "@/modules/billing/billing.route";
 import activityRouter from "@/modules/activity/activity.route";
 import adminCategoryRouter from "@/modules/category/admin-category.route";
 import adminRouter from "@/modules/admin/admin.route";
+import adminAuthRouter from "@/modules/admin-auth/admin-auth.route";
 import categoryRouter from "@/modules/category/category.route";
 import eventRouter from "@/modules/event/event.route";
 import reportRouter from "@/modules/report/report.route";
@@ -37,6 +38,10 @@ const moduleRoutes = [
   {
     path: "/admin/categories",
     route: adminCategoryRouter,
+  },
+  {
+    path: "/admin",
+    route: adminAuthRouter,
   },
   {
     path: "/admin",

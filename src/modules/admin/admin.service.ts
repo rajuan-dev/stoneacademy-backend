@@ -117,7 +117,7 @@ export class AdminService {
     serial: number,
   ): AdminUserListItem {
     const username = user.username ?? this.deriveUsername(user.email);
-    const isBlocked = user.status === USER_STATUS.SUSPENDED;
+    const isBlocked = user.status === USER_STATUS.BLOCKED;
 
     return {
       serial,
@@ -400,7 +400,7 @@ export class AdminService {
       page,
       limit,
       search: query.search,
-      match: { status: USER_STATUS.SUSPENDED },
+      match: { status: USER_STATUS.BLOCKED },
       sort: { blockedAt: -1, createdAt: -1 },
     });
   }
@@ -442,7 +442,7 @@ export class AdminService {
   ) {
     const update: Record<string, any> = { status };
 
-    if (status === USER_STATUS.SUSPENDED) {
+    if (status === USER_STATUS.BLOCKED) {
       update.blockedReason = reason ?? null;
       update.blockedAt = new Date();
       update.blockedBy = adminId ? new Types.ObjectId(adminId) : null;
@@ -463,7 +463,7 @@ export class AdminService {
 
     if (adminId) {
       const action =
-        status === USER_STATUS.SUSPENDED
+        status === USER_STATUS.BLOCKED
           ? "user_blocked"
           : status === USER_STATUS.ACTIVE
             ? "user_unblocked"
@@ -524,8 +524,8 @@ export class AdminService {
       blockedAt: user.blockedAt ?? null,
       blockedBy,
       actions: {
-        canBlock: user.status !== USER_STATUS.SUSPENDED,
-        canUnblock: user.status === USER_STATUS.SUSPENDED,
+        canBlock: user.status !== USER_STATUS.BLOCKED,
+        canUnblock: user.status === USER_STATUS.BLOCKED,
       },
     };
   }
@@ -533,7 +533,7 @@ export class AdminService {
   async blockUser(userId: string, adminId: string, reason?: string) {
     await this.updateUserStatus(
       userId,
-      USER_STATUS.SUSPENDED,
+      USER_STATUS.BLOCKED,
       reason ?? "Blocked by administrator",
       adminId,
     );
