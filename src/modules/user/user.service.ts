@@ -894,6 +894,134 @@ export class UserService {
     };
   }
 
+  async listHostedActivities(
+    userId: string,
+    query: { page?: number; limit?: number },
+  ) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const filter = { hostId: userId };
+    const [activities, totalItems] = await Promise.all([
+      Activity.find(filter)
+        .sort({ startAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("media", "url type mimeType")
+        .lean(),
+      Activity.countDocuments(filter),
+    ]);
+
+    const data = activities.map((activity: any) => ({
+      _id: activity._id.toString(),
+      title: activity.title,
+      type: activity.type,
+      description: activity.description || null,
+      startAt: activity.startAt,
+      endAt: activity.endAt || null,
+      location: activity.location?.label || null,
+      locationCoordinates: activity.location?.coordinates?.coordinates || null,
+      participantLimit: activity.participantLimit ?? null,
+      status: activity.status,
+      stats: {
+        joinedCount: activity.stats?.joinedCount ?? 0,
+      },
+      gallery: Array.isArray(activity.media)
+        ? activity.media.map((media: any) => ({
+            _id: media._id?.toString?.() || null,
+            url: media.url || null,
+            type: media.type || null,
+            mimeType: media.mimeType || null,
+          }))
+        : [],
+      createdAt: activity.createdAt,
+      updatedAt: activity.updatedAt,
+    }));
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async listHostedEvents(
+    userId: string,
+    query: { page?: number; limit?: number },
+  ) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const filter = { creatorId: userId };
+    const [events, totalItems] = await Promise.all([
+      Event.find(filter)
+        .sort({ startAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("media", "url type mimeType")
+        .lean(),
+      Event.countDocuments(filter),
+    ]);
+
+    const data = events.map((event: any) => {
+      const ticketPrice = event.ticketPrice ?? 0;
+      const discountPercentage = event.discountPercentage ?? 0;
+      return {
+        _id: event._id.toString(),
+        title: event.title,
+        type: event.type,
+        description: event.description || null,
+        startAt: event.startAt,
+        endAt: event.endAt || null,
+        location: event.location?.label || null,
+        locationCoordinates: event.location?.coordinates?.coordinates || null,
+        participantLimit: event.participantLimit ?? null,
+        status: event.status,
+        priceType: event.priceType || "free",
+        ticketPrice,
+        discountPercentage,
+        payableTicketPrice: this.calculatePayablePrice(
+          ticketPrice,
+          discountPercentage,
+        ),
+        currency: event.currency || "USD",
+        stats: {
+          joinedCount: event.stats?.joinedCount ?? 0,
+        },
+        gallery: Array.isArray(event.media)
+          ? event.media.map((media: any) => ({
+              _id: media._id?.toString?.() || null,
+              url: media.url || null,
+              type: media.type || null,
+              mimeType: media.mimeType || null,
+            }))
+          : [],
+        createdAt: event.createdAt,
+        updatedAt: event.updatedAt,
+      };
+    });
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
   async deleteAccount(userId: string): Promise<void> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
@@ -904,5 +1032,14 @@ export class UserService {
     user.isDeleted = true as any;
     user.deletedAt = new Date() as any;
     await user.save();
+  }
+
+  private calculatePayablePrice(ticketPrice: number, discountPercentage: number) {
+    if (ticketPrice <= 0) return 0;
+    if (discountPercentage <= 0) {
+      return Number(ticketPrice.toFixed(2));
+    }
+    const discounted = ticketPrice - (ticketPrice * discountPercentage) / 100;
+    return Number(Math.max(0, discounted).toFixed(2));
   }
 }

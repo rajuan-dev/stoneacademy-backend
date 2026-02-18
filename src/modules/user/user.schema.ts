@@ -104,6 +104,13 @@ export const listMyRatingsSchema = z.object({
   }),
 });
 
+export const listHostedContentSchema = z.object({
+  query: z.object({
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+  }),
+});
+
 export const userIdSchema = z.object({
   params: z.object({
     id: z.string().trim().min(1),

@@ -4,10 +4,12 @@ import { model, Schema, type Types } from "mongoose";
 export interface IProduct {
   _id: Types.ObjectId;
   name: string;
+  category: string;
   description?: string;
   price: number;
   currency: string;
   imageUrl?: string;
+  ctaUrl: string;
   rating?: {
     avg: number;
     count: number;
@@ -24,6 +26,13 @@ const productSchema = BaseSchemaUtil.createSchema<IProduct>({
     required: true,
     trim: true,
     maxlength: 200,
+  },
+  category: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 80,
+    index: true,
   },
   description: {
     type: String,
@@ -43,6 +52,12 @@ const productSchema = BaseSchemaUtil.createSchema<IProduct>({
   imageUrl: {
     type: String,
     trim: true,
+  },
+  ctaUrl: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 2000,
   },
   rating: {
     avg: { type: Number, default: 0, min: 0, max: 5 },

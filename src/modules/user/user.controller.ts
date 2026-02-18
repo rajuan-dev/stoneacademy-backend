@@ -17,6 +17,7 @@ import {
   listCleanersSchema,
   listMyGallerySchema,
   listMyRatingsSchema,
+  listHostedContentSchema,
   hostProfileSchema,
   userIdSchema,
   updateCleanerSchema,
@@ -219,6 +220,34 @@ export class UserController {
       validated.query,
     );
     ApiResponse.paginated(res, result.data, result.pagination, "Ratings fetched successfully");
+  });
+
+  getMyHostedActivities = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listHostedContentSchema, req);
+    const result = await this.userService.listHostedActivities(
+      userId,
+      validated.query,
+    );
+    ApiResponse.paginated(res, result.data, result.pagination, "Hosted activities fetched successfully");
+  });
+
+  getMyHostedEvents = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listHostedContentSchema, req);
+    const result = await this.userService.listHostedEvents(
+      userId,
+      validated.query,
+    );
+    ApiResponse.paginated(res, result.data, result.pagination, "Hosted events fetched successfully");
   });
 
   getPublicProfile = asyncHandler(async (req: Request, res: Response) => {

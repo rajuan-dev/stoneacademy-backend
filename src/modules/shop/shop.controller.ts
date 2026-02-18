@@ -10,8 +10,10 @@ import {
   productIdSchema,
   updateCartItemSchema,
   updateProductSchema,
+  updateProductStatusSchema,
 } from "./shop.schema";
 import { ShopService } from "./shop.service";
+import { BadRequestException } from "@/utils/app-error.utils";
 
 export class ShopController {
   private service: ShopService;
@@ -26,25 +28,60 @@ export class ShopController {
     ApiResponse.paginated(res, result.data, result.pagination, "Products fetched");
   });
 
-  getProduct = asyncHandler(async (req: Request, res: Response) => {
-    const validated = await zParse(productIdSchema, req);
-    const product = await this.service.getProduct(validated.params.id);
-    ApiResponse.success(res, product, "Product fetched");
+  listAdminProducts = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listProductsSchema, req);
+    const result = await this.service.listProducts(validated.query, {
+      defaultActive: false,
+    });
+    ApiResponse.paginated(res, result.data, result.pagination, "Admin products fetched");
   });
 
   createProduct = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(createProductSchema, req);
-    const product = await this.service.createProduct(validated.body);
+    const file = req.file;
+    if (!file) {
+      throw new BadRequestException("Product image is required");
+    }
+    const imageUpload = {
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      originalName: file.originalname,
+    };
+    const product = await this.service.createProduct(validated.body, imageUpload);
     ApiResponse.created(res, product, "Product created");
   });
 
   updateProduct = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(updateProductSchema, req);
+    const file = req.file;
+    const hasBodyUpdates = Object.values(validated.body).some(
+      (value) => value !== undefined,
+    );
+    if (!hasBodyUpdates && !file) {
+      throw new BadRequestException("Provide at least one field or an image");
+    }
+    const imageUpload = file
+      ? {
+          buffer: file.buffer,
+          mimeType: file.mimetype,
+          originalName: file.originalname,
+        }
+      : undefined;
     const product = await this.service.updateProduct(
       validated.params.id,
       validated.body,
+      imageUpload,
     );
     ApiResponse.success(res, product, "Product updated");
+  });
+
+  updateProductStatus = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(updateProductStatusSchema, req);
+    const product = await this.service.updateProductStatus(
+      validated.params.id,
+      validated.body.isActive,
+    );
+    ApiResponse.success(res, product, "Product status updated");
   });
 
   deleteProduct = asyncHandler(async (req: Request, res: Response) => {

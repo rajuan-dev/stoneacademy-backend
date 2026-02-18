@@ -210,6 +210,16 @@ router.delete(
  *         description: Ratings list
  */
 router.get("/me/ratings", authMiddleware.verifyToken, userController.getMyRatings);
+router.get(
+  "/me/hosted/activities",
+  authMiddleware.verifyToken,
+  userController.getMyHostedActivities,
+);
+router.get(
+  "/me/hosted/events",
+  authMiddleware.verifyToken,
+  userController.getMyHostedEvents,
+);
 router.get("/:id/host-profile", userController.getHostProfile);
 
 /**

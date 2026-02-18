@@ -1,19 +1,25 @@
 import { PAGINATION, ORDER_STATUS } from "@/constants/app.constants";
 import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
+import { s3Service, type StorageUploadInput } from "@/services/s3.service";
 import { Cart } from "./cart.model";
 import { Order } from "./order.model";
 import { Product } from "./product.model";
 
 export class ShopService {
-  async listProducts(query: {
-    q?: string;
-    page?: number;
-    limit?: number;
-    active?: boolean;
-  }) {
+  async listProducts(
+    query: {
+      q?: string;
+      page?: number;
+      limit?: number;
+      active?: boolean;
+      category?: string;
+    },
+    options?: { defaultActive?: boolean },
+  ) {
     const page = query.page ?? PAGINATION.DEFAULT_PAGE;
     const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
+    const defaultActive = options?.defaultActive ?? true;
 
     const filter: Record<string, any> = {};
     if (query.q) {
@@ -22,8 +28,11 @@ export class ShopService {
     }
     if (query.active !== undefined) {
       filter.isActive = query.active;
-    } else {
+    } else if (defaultActive) {
       filter.isActive = true;
+    }
+    if (query.category) {
+      filter.category = query.category;
     }
 
     const [data, totalItems] = await Promise.all([
@@ -52,21 +61,28 @@ export class ShopService {
     return product;
   }
 
-  async createProduct(payload: {
-    name: string;
-    description?: string;
-    price: number;
-    currency?: string;
-    imageUrl?: string;
-    stock?: number;
-    isActive?: boolean;
-  }) {
+  async createProduct(
+    payload: {
+      name: string;
+      category: string;
+      description?: string;
+      price: number;
+      currency?: string;
+      ctaUrl: string;
+      stock?: number;
+      isActive?: boolean;
+    },
+    image: StorageUploadInput,
+  ) {
+    const upload = await this.uploadProductImage(image, payload.category);
     return Product.create({
       name: payload.name,
+      category: payload.category,
       description: payload.description,
       price: payload.price,
       currency: payload.currency || "USD",
-      imageUrl: payload.imageUrl,
+      imageUrl: upload.url,
+      ctaUrl: payload.ctaUrl,
       stock: payload.stock ?? 0,
       isActive: payload.isActive ?? true,
     });
@@ -76,13 +92,15 @@ export class ShopService {
     productId: string,
     payload: {
       name?: string;
+      category?: string;
       description?: string;
       price?: number;
       currency?: string;
-      imageUrl?: string;
+      ctaUrl?: string;
       stock?: number;
       isActive?: boolean;
     },
+    image?: StorageUploadInput,
   ) {
     const product = await Product.findById(productId).exec();
     if (!product) {
@@ -90,12 +108,20 @@ export class ShopService {
     }
 
     if (payload.name !== undefined) product.name = payload.name;
+    if (payload.category !== undefined) product.category = payload.category;
     if (payload.description !== undefined) product.description = payload.description;
     if (payload.price !== undefined) product.price = payload.price;
     if (payload.currency !== undefined) product.currency = payload.currency;
-    if (payload.imageUrl !== undefined) product.imageUrl = payload.imageUrl;
+    if (payload.ctaUrl !== undefined) product.ctaUrl = payload.ctaUrl;
     if (payload.stock !== undefined) product.stock = payload.stock;
     if (payload.isActive !== undefined) product.isActive = payload.isActive;
+    if (image) {
+      const upload = await this.uploadProductImage(
+        image,
+        payload.category ?? product.category,
+      );
+      product.imageUrl = upload.url;
+    }
 
     await product.save();
     return product;
@@ -107,6 +133,28 @@ export class ShopService {
       throw new NotFoundException("Product not found");
     }
     return { deleted: true };
+  }
+
+  async updateProductStatus(productId: string, isActive: boolean) {
+    const product = await Product.findById(productId).exec();
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
+    product.isActive = isActive;
+    await product.save();
+    return product;
+  }
+
+  async getProductCta(productId: string) {
+    const product = await this.getProduct(productId);
+    if (!product.isActive) {
+      throw new BadRequestException("Product is not available");
+    }
+    return {
+      productId: product._id,
+      name: product.name,
+      ctaUrl: product.ctaUrl,
+    };
   }
 
   async getCart(userId: string) {
@@ -221,5 +269,24 @@ export class ShopService {
     await cart.save();
 
     return order;
+  }
+
+  private async uploadProductImage(
+    file: StorageUploadInput,
+    category?: string,
+  ) {
+    if (!file?.buffer?.length) {
+      throw new BadRequestException("Product image file is missing");
+    }
+    if (!file.mimeType?.startsWith("image/")) {
+      throw new BadRequestException("Product image must be an image file");
+    }
+    const prefix = `shop/products/${this.slugifyCategory(category)}`;
+    return s3Service.uploadFile(file, { prefix });
+  }
+
+  private slugifyCategory(category?: string) {
+    const base = category?.trim().toLowerCase() || "general";
+    return base.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "general";
   }
 }

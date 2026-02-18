@@ -1,0 +1,290 @@
+{
+  "info": {
+    "_postman_id": "6fa54fb2-6a81-4e54-b7c2-df74381d3307",
+    "name": "StoneAcademy Shop Ads",
+    "description": "Shop module APIs for managing ad-style products and exposing CTA URLs to the app.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Shop Products (User App)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/shop/products?active=true&category={{category_filter}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "products"
+          ],
+          "query": [
+            {
+              "key": "active",
+              "value": "true"
+            },
+            {
+              "key": "category",
+              "value": "{{category_filter}}",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin List Shop Products",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/shop/admin/products?active={{show_active_only}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "admin",
+            "products"
+          ],
+          "query": [
+            {
+              "key": "active",
+              "value": "{{show_active_only}}",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Create Shop Product Ad",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "name",
+              "value": "Premium Yoga Mat",
+              "type": "text"
+            },
+            {
+              "key": "category",
+              "value": "Premium Yoga Mat",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "Non-slip, 6mm thick mat",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "39",
+              "type": "text"
+            },
+            {
+              "key": "currency",
+              "value": "USD",
+              "type": "text"
+            },
+            {
+              "key": "stock",
+              "value": "100",
+              "type": "text"
+            },
+            {
+              "key": "ctaUrl",
+              "value": "https://example.com/checkout/yoga-mat",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/shop/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "products"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Update Shop Product Ad",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "price",
+              "value": "35",
+              "type": "text"
+            },
+            {
+              "key": "name",
+              "value": "Premium Yoga Mat (Updated)",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "category",
+              "value": "Premium Gear",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "description",
+              "value": "Updated selling point copy",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "currency",
+              "value": "USD",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "ctaUrl",
+              "value": "https://example.com/checkout/yoga-mat?discount=spring",
+              "type": "text"
+            },
+            {
+              "key": "isActive",
+              "value": "true",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": "",
+              "disabled": true
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/shop/products/{{product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "products",
+            "{{product_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Delete Shop Product Ad",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/shop/products/{{product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "products",
+            "{{product_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Toggle Shop Product Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/shop/products/{{product_id}}/status",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "products",
+            "{{product_id}}",
+            "status"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5191/api/v1"
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": ""
+    },
+    {
+      "key": "category_filter",
+      "value": "PROTEIN"
+    },
+    {
+      "key": "show_active_only",
+      "value": "true"
+    }
+  ]
+}
