@@ -417,16 +417,31 @@ export class AuthService {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    await otpService.verifyOtp({
-      email,
-      purpose: OTP_PURPOSES.RESET_PASSWORD,
-      code,
-    });
+    try {
+      await otpService.verifyOtp({
+        email,
+        purpose: OTP_PURPOSES.RESET_PASSWORD,
+        code,
+      });
+    } catch (error) {
+      const alreadyVerified = await otpService.hasVerifiedOtpSession({
+        email,
+        purpose: OTP_PURPOSES.RESET_PASSWORD,
+      });
+
+      if (!alreadyVerified) {
+        throw error;
+      }
+    }
 
     const hashedPassword = await hashPassword(newPassword);
 
     await this.userService.updatePassword(user._id.toString(), hashedPassword);
     await this.userService.invalidateAllRefreshTokensForUser(user._id.toString());
+    await otpService.clearOtpRecords({
+      email,
+      purpose: OTP_PURPOSES.RESET_PASSWORD,
+    });
 
     await this.emailService.sendPasswordResetConfirmation(
       user.fullName,

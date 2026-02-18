@@ -118,6 +118,58 @@ export class OtpService {
     return record;
   }
 
+  async isOtpAlreadyVerified(params: {
+    email: string;
+    purpose: OtpPurpose;
+    code: string;
+  }): Promise<boolean> {
+    const email = params.email.toLowerCase();
+    const record = await OtpCode.findOne({
+      email,
+      purpose: params.purpose,
+      consumedAt: { $exists: true },
+      expiresAt: { $gt: new Date() },
+    })
+      .sort({ consumedAt: -1, createdAt: -1 })
+      .select("+codeHash")
+      .exec();
+
+    if (!record) {
+      return false;
+    }
+
+    const incomingHash = this.hashCode(params.code);
+    return incomingHash === record.codeHash;
+  }
+
+  async hasVerifiedOtpSession(params: {
+    email: string;
+    purpose: OtpPurpose;
+  }): Promise<boolean> {
+    const email = params.email.toLowerCase();
+    const record = await OtpCode.findOne({
+      email,
+      purpose: params.purpose,
+      consumedAt: { $exists: true },
+      expiresAt: { $gt: new Date() },
+    })
+      .sort({ consumedAt: -1, createdAt: -1 })
+      .select("_id")
+      .exec();
+
+    return Boolean(record);
+  }
+
+  async clearOtpRecords(params: {
+    email: string;
+    purpose: OtpPurpose;
+  }): Promise<void> {
+    await OtpCode.deleteMany({
+      email: params.email.toLowerCase(),
+      purpose: params.purpose,
+    }).exec();
+  }
+
   private hashCode(code: string): string {
     return crypto
       .createHmac("sha256", this.secret)
