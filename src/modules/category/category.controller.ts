@@ -7,6 +7,7 @@ import type { Request, Response } from "express";
 import {
   categoryIdSchema,
   createCategorySchema,
+  listAdminCategoriesSchema,
   listCategoriesSchema,
   updateCategorySchema,
 } from "./category.schema";
@@ -22,12 +23,31 @@ export class CategoryController {
   list = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(listCategoriesSchema, req);
     const categories = await this.service.list(validated.query.activeOnly);
-    ApiResponse.success(res, categories, "Categories fetched successfully");
+    const data = categories.map((category: any) => ({
+      id: category._id,
+      categoryName: category.name,
+      isActive: category.isActive,
+    }));
+    ApiResponse.success(res, data, "Categories fetched successfully");
+  });
+
+  listAdmin = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listAdminCategoriesSchema, req);
+    const result = await this.service.listAdmin(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Admin categories fetched successfully",
+    );
   });
 
   create = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(createCategorySchema, req);
-    const category = await this.service.create(validated.body);
+    const category = await this.service.create({
+      name: validated.body.name ?? validated.body.categoryName!,
+      isActive: validated.body.isActive,
+    });
     ApiResponse.created(res, category, "Category created successfully");
   });
 
@@ -35,7 +55,10 @@ export class CategoryController {
     const validated = await zParse(updateCategorySchema, req);
     const category = await this.service.update(
       validated.params.id,
-      validated.body,
+      {
+        name: validated.body.name ?? validated.body.categoryName,
+        isActive: validated.body.isActive,
+      },
     );
     ApiResponse.success(res, category, "Category updated successfully");
   });

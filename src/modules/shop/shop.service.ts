@@ -6,6 +6,8 @@ import { Order } from "./order.model";
 import { Product } from "./product.model";
 
 export class ShopService {
+  private static readonly ADMIN_ROW_ID_PAD = 2;
+
   async listProducts(
     query: {
       q?: string;
@@ -64,7 +66,7 @@ export class ShopService {
   async createProduct(
     payload: {
       name: string;
-      category: string;
+      category?: string;
       description?: string;
       price: number;
       currency?: string;
@@ -271,6 +273,44 @@ export class ShopService {
     return order;
   }
 
+  async listAdminProductsTable(query: {
+    q?: string;
+    page?: number;
+    limit?: number;
+    active?: boolean;
+    category?: string;
+  }) {
+    const result = await this.listProducts(query, { defaultActive: false });
+    const rows = result.data.map((product, index) => {
+      const rowNumber =
+        result.pagination.totalItems -
+        ((result.pagination.currentPage - 1) * result.pagination.itemsPerPage + index);
+      return {
+        id: product._id,
+        rowId: String(Math.max(rowNumber, 0)).padStart(
+          ShopService.ADMIN_ROW_ID_PAD,
+          "0",
+        ),
+        product: product.name,
+        category: product.category ?? "",
+        description: this.toRowDescription(product.description),
+        price: Number(product.price.toFixed(2)),
+        priceLabel: `$${product.price.toFixed(2)}`,
+        status: product.isActive ? "Active" : "Inactive",
+        action: {
+          canEdit: true,
+          canDelete: true,
+          canToggleStatus: true,
+        },
+      };
+    });
+
+    return {
+      data: rows,
+      pagination: result.pagination,
+    };
+  }
+
   private async uploadProductImage(
     file: StorageUploadInput,
     category?: string,
@@ -288,5 +328,13 @@ export class ShopService {
   private slugifyCategory(category?: string) {
     const base = category?.trim().toLowerCase() || "general";
     return base.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "general";
+  }
+
+  private toRowDescription(description?: string) {
+    if (!description) return "";
+    const trimmed = description.trim();
+    if (!trimmed) return "";
+    const firstLine = trimmed.split(/\r?\n/)[0];
+    return firstLine.length > 120 ? `${firstLine.slice(0, 117)}...` : firstLine;
   }
 }

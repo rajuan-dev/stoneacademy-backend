@@ -17,16 +17,22 @@ export const productIdSchema = z.object({
 });
 
 export const createProductSchema = z.object({
-  body: z.object({
-    name: z.string().trim().min(2).max(200),
-    category: z.string().trim().min(2).max(80),
-    description: z.string().trim().max(3000).optional(),
-    price: z.coerce.number().min(0),
-    currency: z.string().trim().min(3).max(10).optional(),
-    ctaUrl: z.string().trim().url().max(2000),
-    stock: z.coerce.number().min(0).optional(),
-    isActive: z.coerce.boolean().optional(),
-  }),
+  body: z
+    .object({
+      name: z.string().trim().min(2).max(200),
+      category: z.string().trim().min(2).max(80).optional(),
+      description: z.string().trim().max(3000).optional(),
+      price: z.coerce.number().min(0),
+      currency: z.string().trim().min(3).max(10).optional(),
+      ctaUrl: z.string().trim().url().max(2000).optional(),
+      destinationUrl: z.string().trim().url().max(2000).optional(),
+      stock: z.coerce.number().min(0).optional(),
+      isActive: z.coerce.boolean().optional(),
+    })
+    .refine((body) => Boolean(body.ctaUrl || body.destinationUrl), {
+      message: "Destination URL is required",
+      path: ["destinationUrl"],
+    }),
 });
 
 export const updateProductSchema = z.object({
@@ -40,6 +46,7 @@ export const updateProductSchema = z.object({
     price: z.coerce.number().min(0).optional(),
     currency: z.string().trim().min(3).max(10).optional(),
     ctaUrl: z.string().trim().url().max(2000).optional(),
+    destinationUrl: z.string().trim().url().max(2000).optional(),
     stock: z.coerce.number().min(0).optional(),
     isActive: z.coerce.boolean().optional(),
   }),

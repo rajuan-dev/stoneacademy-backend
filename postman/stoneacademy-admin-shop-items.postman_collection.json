@@ -1,35 +1,13 @@
 {
   "info": {
-    "_postman_id": "6fa54fb2-6a81-4e54-b7c2-df74381d3307",
-    "name": "StoneAcademy Shop Ads",
-    "description": "Shop module APIs for managing ad-style products and exposing CTA URLs to the app.",
+    "_postman_id": "ab9b1fbf-6464-4ec4-a6ba-d4f09c2435e4",
+    "name": "StoneAcademy Admin Shop Items",
+    "description": "Admin APIs for creating and managing shop items/ads.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "List Shop Products (User App)",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "{{base_url}}/shop/products?active=true",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "shop",
-            "products"
-          ],
-          "query": [
-            {
-              "key": "active",
-              "value": "true"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Admin List Shop Products",
+      "name": "Admin List Items (Raw)",
       "request": {
         "method": "GET",
         "header": [
@@ -40,7 +18,7 @@
           }
         ],
         "url": {
-          "raw": "{{base_url}}/shop/admin/products?active={{show_active_only}}",
+          "raw": "{{base_url}}/shop/admin/products?page=1&limit=10",
           "host": [
             "{{base_url}}"
           ],
@@ -51,16 +29,54 @@
           ],
           "query": [
             {
-              "key": "active",
-              "value": "{{show_active_only}}",
-              "disabled": true
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
             }
           ]
         }
       }
     },
     {
-      "name": "Admin Create Shop Product Ad",
+      "name": "Admin List Items (Table)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/shop/admin/products/table?page=1&limit=10",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "admin",
+            "products",
+            "table"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Create Item",
       "request": {
         "method": "POST",
         "header": [
@@ -75,17 +91,17 @@
           "formdata": [
             {
               "key": "name",
-              "value": "Premium Yoga Mat",
+              "value": "Whey Protein Plus",
               "type": "text"
             },
             {
               "key": "description",
-              "value": "Non-slip, 6mm thick mat",
+              "value": "Vanilla flavor 2lbs, clean ingredients...",
               "type": "text"
             },
             {
               "key": "price",
-              "value": "39",
+              "value": "49",
               "type": "text"
             },
             {
@@ -94,13 +110,13 @@
               "type": "text"
             },
             {
-              "key": "stock",
-              "value": "100",
+              "key": "destinationUrl",
+              "value": "https://example.com/your-landing-page",
               "type": "text"
             },
             {
-              "key": "ctaUrl",
-              "value": "https://example.com/checkout/yoga-mat",
+              "key": "isActive",
+              "value": "true",
               "type": "text"
             },
             {
@@ -111,19 +127,20 @@
           ]
         },
         "url": {
-          "raw": "{{base_url}}/shop/products",
+          "raw": "{{base_url}}/shop/admin/products",
           "host": [
             "{{base_url}}"
           ],
           "path": [
             "shop",
+            "admin",
             "products"
           ]
         }
       }
     },
     {
-      "name": "Admin Update Shop Product Ad",
+      "name": "Admin Update Item",
       "request": {
         "method": "PATCH",
         "header": [
@@ -137,42 +154,31 @@
           "mode": "formdata",
           "formdata": [
             {
-              "key": "price",
-              "value": "35",
-              "type": "text"
-            },
-            {
               "key": "name",
-              "value": "Premium Yoga Mat (Updated)",
-              "type": "text",
-              "disabled": true
-            },
-            {
-              "key": "category",
-              "value": "Premium Gear",
+              "value": "Whey Protein Plus",
               "type": "text",
               "disabled": true
             },
             {
               "key": "description",
-              "value": "Updated selling point copy",
+              "value": "Vanilla flavor 2lbs, clean ingredients...",
               "type": "text",
               "disabled": true
             },
             {
-              "key": "currency",
-              "value": "USD",
-              "type": "text",
-              "disabled": true
-            },
-            {
-              "key": "ctaUrl",
-              "value": "https://example.com/checkout/yoga-mat?discount=spring",
+              "key": "price",
+              "value": "59",
               "type": "text"
             },
             {
+              "key": "destinationUrl",
+              "value": "https://example.com/your-landing-page?v=2",
+              "type": "text",
+              "disabled": true
+            },
+            {
               "key": "isActive",
-              "value": "true",
+              "value": "false",
               "type": "text",
               "disabled": true
             },
@@ -185,12 +191,13 @@
           ]
         },
         "url": {
-          "raw": "{{base_url}}/shop/products/{{product_id}}",
+          "raw": "{{base_url}}/shop/admin/products/{{product_id}}",
           "host": [
             "{{base_url}}"
           ],
           "path": [
             "shop",
+            "admin",
             "products",
             "{{product_id}}"
           ]
@@ -198,31 +205,7 @@
       }
     },
     {
-      "name": "Admin Delete Shop Product Ad",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{admin_token}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "{{base_url}}/shop/products/{{product_id}}",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "shop",
-            "products",
-            "{{product_id}}"
-          ]
-        }
-      }
-    },
-    {
-      "name": "Admin Toggle Shop Product Status",
+      "name": "Admin Toggle Status",
       "request": {
         "method": "PATCH",
         "header": [
@@ -233,7 +216,8 @@
           },
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
         "body": {
@@ -241,15 +225,41 @@
           "raw": "{\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "{{base_url}}/shop/products/{{product_id}}/status",
+          "raw": "{{base_url}}/shop/admin/products/{{product_id}}/status",
           "host": [
             "{{base_url}}"
           ],
           "path": [
             "shop",
+            "admin",
             "products",
             "{{product_id}}",
             "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Delete Item",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/shop/admin/products/{{product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "shop",
+            "admin",
+            "products",
+            "{{product_id}}"
           ]
         }
       }
@@ -267,10 +277,6 @@
     {
       "key": "product_id",
       "value": ""
-    },
-    {
-      "key": "show_active_only",
-      "value": "true"
     }
   ]
 }

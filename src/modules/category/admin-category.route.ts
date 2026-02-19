@@ -8,6 +8,13 @@ import { CategoryController } from "./category.controller";
 const router = Router();
 const controller = new CategoryController();
 
+router.get(
+  "/",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  controller.listAdmin,
+);
+
 /**
  * @openapi
  * /admin/categories:

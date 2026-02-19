@@ -4,7 +4,7 @@ import { model, Schema, type Types } from "mongoose";
 export interface IProduct {
   _id: Types.ObjectId;
   name: string;
-  category: string;
+  category?: string;
   description?: string;
   price: number;
   currency: string;
@@ -29,7 +29,6 @@ const productSchema = BaseSchemaUtil.createSchema<IProduct>({
   },
   category: {
     type: String,
-    required: true,
     trim: true,
     maxlength: 80,
     index: true,

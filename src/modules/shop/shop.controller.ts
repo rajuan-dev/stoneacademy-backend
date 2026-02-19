@@ -16,6 +16,13 @@ import { ShopService } from "./shop.service";
 import { BadRequestException } from "@/utils/app-error.utils";
 
 export class ShopController {
+  private static readonly MAX_CREATIVE_SIZE_BYTES = 5 * 1024 * 1024;
+  private static readonly ALLOWED_CREATIVE_MIME_TYPES = new Set([
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+  ]);
+
   private service: ShopService;
 
   constructor() {
@@ -36,18 +43,53 @@ export class ShopController {
     ApiResponse.paginated(res, result.data, result.pagination, "Admin products fetched");
   });
 
+  listAdminProductsTable = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listProductsSchema, req);
+    const result = await this.service.listAdminProductsTable(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Admin product table fetched",
+    );
+  });
+
   createProduct = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(createProductSchema, req);
     const file = req.file;
     if (!file) {
       throw new BadRequestException("Product image is required");
     }
+    this.validateCreativeUpload(file);
     const imageUpload = {
       buffer: file.buffer,
       mimeType: file.mimetype,
       originalName: file.originalname,
     };
-    const product = await this.service.createProduct(validated.body, imageUpload);
+    const {
+      destinationUrl,
+      ctaUrl,
+      name,
+      category,
+      description,
+      price,
+      currency,
+      stock,
+      isActive,
+    } = validated.body;
+    const product = await this.service.createProduct(
+      {
+        name,
+        category,
+        description,
+        price,
+        currency,
+        stock,
+        isActive,
+        ctaUrl: ctaUrl ?? destinationUrl!,
+      },
+      imageUpload,
+    );
     ApiResponse.created(res, product, "Product created");
   });
 
@@ -60,6 +102,9 @@ export class ShopController {
     if (!hasBodyUpdates && !file) {
       throw new BadRequestException("Provide at least one field or an image");
     }
+    if (file) {
+      this.validateCreativeUpload(file);
+    }
     const imageUpload = file
       ? {
           buffer: file.buffer,
@@ -67,9 +112,30 @@ export class ShopController {
           originalName: file.originalname,
         }
       : undefined;
+    const {
+      destinationUrl,
+      ctaUrl,
+      name,
+      category,
+      description,
+      price,
+      currency,
+      stock,
+      isActive,
+    } = validated.body;
+    const payload = {
+      name,
+      category,
+      description,
+      price,
+      currency,
+      stock,
+      isActive,
+      ctaUrl: ctaUrl ?? destinationUrl,
+    };
     const product = await this.service.updateProduct(
       validated.params.id,
-      validated.body,
+      payload,
       imageUpload,
     );
     ApiResponse.success(res, product, "Product updated");
@@ -133,4 +199,13 @@ export class ShopController {
     const order = await this.service.checkout(userId);
     ApiResponse.success(res, order, "Order placed");
   });
+
+  private validateCreativeUpload(file: Express.Multer.File) {
+    if (!ShopController.ALLOWED_CREATIVE_MIME_TYPES.has(file.mimetype)) {
+      throw new BadRequestException("Image must be PNG or JPG");
+    }
+    if (file.size > ShopController.MAX_CREATIVE_SIZE_BYTES) {
+      throw new BadRequestException("Image size must not exceed 5MB");
+    }
+  }
 }

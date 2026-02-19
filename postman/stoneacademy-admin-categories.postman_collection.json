@@ -1,0 +1,177 @@
+{
+  "info": {
+    "_postman_id": "2fb57184-4d9d-4a54-a43a-9f8f5a1c6c33",
+    "name": "StoneAcademy Admin Categories",
+    "description": "Postman collection to test admin category CRUD and paginated list.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "App List Categories",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/categories?activeOnly=true",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "categories"
+          ],
+          "query": [
+            {
+              "key": "activeOnly",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin List Categories",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/categories?page=1&limit=10&q=&active=",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "categories"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "q",
+              "value": "",
+              "disabled": true
+            },
+            {
+              "key": "active",
+              "value": "",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Create Category",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoryName\": \"Protein\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/categories",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "categories"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Update Category",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoryName\": \"Protein & Supplements\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/categories/{{category_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "categories",
+            "{{category_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin Delete Category",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/admin/categories/{{category_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "categories",
+            "{{category_id}}"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5191/api/v1"
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "category_id",
+      "value": ""
+    }
+  ]
+}

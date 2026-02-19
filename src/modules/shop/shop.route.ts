@@ -14,6 +14,38 @@ router.get(
   authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
   controller.listAdminProducts,
 );
+router.get(
+  "/admin/products/table",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  controller.listAdminProductsTable,
+);
+router.post(
+  "/admin/products",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  upload.single("image"),
+  controller.createProduct,
+);
+router.patch(
+  "/admin/products/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  upload.single("image"),
+  controller.updateProduct,
+);
+router.patch(
+  "/admin/products/:id/status",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  controller.updateProductStatus,
+);
+router.delete(
+  "/admin/products/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  controller.deleteProduct,
+);
 
 router.post(
   "/products",
