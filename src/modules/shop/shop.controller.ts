@@ -57,18 +57,20 @@ export class ShopController {
   createProduct = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(createProductSchema, req);
     const file = req.file;
-    if (!file) {
-      throw new BadRequestException("Product image is required");
+    if (file) {
+      this.validateCreativeUpload(file);
     }
-    this.validateCreativeUpload(file);
-    const imageUpload = {
-      buffer: file.buffer,
-      mimeType: file.mimetype,
-      originalName: file.originalname,
-    };
+    const imageUpload = file
+      ? {
+          buffer: file.buffer,
+          mimeType: file.mimetype,
+          originalName: file.originalname,
+        }
+      : undefined;
     const {
       destinationUrl,
       ctaUrl,
+      imageUrl,
       name,
       category,
       description,
@@ -86,6 +88,7 @@ export class ShopController {
         currency,
         stock,
         isActive,
+        imageUrl,
         ctaUrl: ctaUrl ?? destinationUrl!,
       },
       imageUpload,
@@ -115,6 +118,7 @@ export class ShopController {
     const {
       destinationUrl,
       ctaUrl,
+      imageUrl,
       name,
       category,
       description,
@@ -131,6 +135,7 @@ export class ShopController {
       currency,
       stock,
       isActive,
+      imageUrl,
       ctaUrl: ctaUrl ?? destinationUrl,
     };
     const product = await this.service.updateProduct(
