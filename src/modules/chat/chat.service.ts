@@ -6,6 +6,7 @@ import {
 } from "@/utils/app-error.utils";
 import { Types } from "mongoose";
 import { Activity } from "../activity/activity.model";
+import { AdminAccount } from "../admin-account/admin-account.model";
 import { Event } from "../event/event.model";
 import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
@@ -35,15 +36,19 @@ export class ChatService {
     }
 
     const [user, other] = await Promise.all([
-      User.findById(userId).select("_id blockedUsers").exec(),
-      User.findById(otherUserId).select("_id blockedUsers").exec(),
+      this.findParticipantById(userId),
+      this.findParticipantById(otherUserId),
     ]);
 
     if (!user || !other) {
       throw new NotFoundException("User not found");
     }
 
-    if (this.isBlockedBetween(user as any, other as any, userId, otherUserId)) {
+    if (
+      user.kind === "user"
+      && other.kind === "user"
+      && this.isBlockedBetween(user.record as any, other.record as any, userId, otherUserId)
+    ) {
       throw new ForbiddenException("You cannot message this user");
     }
 
@@ -88,7 +93,7 @@ export class ChatService {
   }
 
   async ensureAdminThread(requesterUserId: string): Promise<ChatThreadSummary> {
-    const admin = await User.findOne({
+    const adminUser = await User.findOne({
       role: { $in: [ROLES.ADMIN, ROLES.SUPER_ADMIN] },
       status: USER_STATUS.ACTIVE,
     })
@@ -96,9 +101,21 @@ export class ChatService {
       .select("_id")
       .exec();
 
-    if (!admin) throw new NotFoundException("No admin available");
+    if (adminUser) {
+      return this.ensureDirectThread(requesterUserId, adminUser._id.toString());
+    }
 
-    return this.ensureDirectThread(requesterUserId, admin._id.toString());
+    const adminAccount = await AdminAccount.findOne({
+      role: { $in: [ROLES.ADMIN, ROLES.SUPER_ADMIN] },
+      status: USER_STATUS.ACTIVE,
+    })
+      .sort({ role: 1, createdAt: 1 })
+      .select("_id")
+      .exec();
+
+    if (!adminAccount) throw new NotFoundException("No admin available");
+
+    return this.ensureDirectThread(requesterUserId, adminAccount._id.toString());
   }
 
   async sendMessageToThread(
@@ -228,7 +245,7 @@ export class ChatService {
       try {
         directPeer = await this.userService.getProfile(peerId);
       } catch {
-        directPeer = null;
+        directPeer = await this.getAdminProfileFallback(peerId);
       }
     }
 
@@ -256,7 +273,7 @@ export class ChatService {
     try {
       sender = await this.userService.getProfile(senderId);
     } catch {
-      sender = null;
+      sender = await this.getAdminProfileFallback(senderId);
     }
 
     const seenByUserIds = (message.seenByUserIds || []).map((id) => id.toString());
@@ -273,6 +290,42 @@ export class ChatService {
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
       sender,
+    };
+  }
+
+  private async findParticipantById(userId: string): Promise<{
+    kind: "user" | "admin";
+    record: any;
+  } | null> {
+    const user = await User.findById(userId).select("_id blockedUsers").exec();
+    if (user) {
+      return { kind: "user", record: user };
+    }
+
+    const admin = await AdminAccount.findById(userId).select("_id").exec();
+    if (admin) {
+      return { kind: "admin", record: admin };
+    }
+
+    return null;
+  }
+
+  private async getAdminProfileFallback(adminId: string) {
+    const admin = await AdminAccount.findById(adminId)
+      .select("_id email fullName role createdAt updatedAt profileImageUrl")
+      .exec();
+
+    if (!admin) return null;
+
+    return {
+      _id: admin._id.toString(),
+      email: admin.email,
+      fullName: admin.fullName,
+      role: admin.role,
+      createdAt: admin.createdAt,
+      updatedAt: admin.updatedAt,
+      profileImage: admin.profileImageUrl || undefined,
+      profilePhoto: null,
     };
   }
 }
