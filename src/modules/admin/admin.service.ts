@@ -13,6 +13,7 @@ import { SettingsService } from "../settings/settings.service";
 import { PayoutRequest } from "../billing/payout-request.model";
 import { UserService } from "../user/user.service";
 import { AdminAccountService } from "../admin-account/admin-account.service";
+import { AdminAccount } from "../admin-account/admin-account.model";
 import type { StorageUploadInput } from "@/services/s3.service";
 
 type AggregatedUserRow = {
@@ -373,16 +374,109 @@ export class AdminService {
       query.limit ?? PAGINATION.DEFAULT_LIMIT,
       PAGINATION.MAX_LIMIT,
     );
-    const match: Record<string, any> = {};
-    if (query.role) match.role = query.role;
-    if (query.status) match.status = query.status;
+    const skip = (page - 1) * limit;
+    const search = query.search?.trim();
+    const searchRegex = search ? new RegExp(search, "i") : undefined;
 
-    return this.paginateUsers({
-      page,
-      limit,
-      search: query.search,
-      match,
+    const userMatch: Record<string, any> = { isDeleted: false };
+    const adminMatch: Record<string, any> = {};
+
+    if (query.role) {
+      userMatch.role = query.role;
+      adminMatch.role = query.role;
+    }
+
+    if (query.status) {
+      userMatch.status = query.status;
+      adminMatch.status = query.status;
+    }
+
+    if (searchRegex) {
+      userMatch.$or = [
+        { fullName: { $regex: searchRegex } },
+        { email: { $regex: searchRegex } },
+      ];
+      adminMatch.$or = [
+        { fullName: { $regex: searchRegex } },
+        { email: { $regex: searchRegex } },
+      ];
+    }
+
+    const [users, admins] = await Promise.all([
+      User.find(userMatch)
+        .select(
+          "_id fullName email role status createdAt blockedReason blockedAt",
+        )
+        .lean(),
+      AdminAccount.find(adminMatch)
+        .select("_id fullName email role status createdAt")
+        .lean(),
+    ]);
+
+    const merged = [
+      ...users.map((item) => ({
+        _id: item._id,
+        fullName: item.fullName,
+        email: item.email,
+        role: item.role,
+        status: item.status,
+        createdAt: item.createdAt,
+        blockedReason: item.blockedReason ?? null,
+        blockedAt: item.blockedAt ?? null,
+        blockedBy: null as null,
+        source: "user" as const,
+      })),
+      ...admins.map((item) => ({
+        _id: item._id,
+        fullName: item.fullName,
+        email: item.email,
+        role: item.role,
+        status: item.status,
+        createdAt: item.createdAt,
+        blockedReason: null,
+        blockedAt: null,
+        blockedBy: null as null,
+        source: "admin" as const,
+      })),
+    ].sort((a, b) => {
+      const left = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const right = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return right - left;
     });
+
+    const paged = merged.slice(skip, skip + limit);
+    const data = paged.map((item, index) => {
+      const isBlocked = item.status === USER_STATUS.BLOCKED;
+      return {
+        serial: skip + index + 1,
+        id: item._id.toString(),
+        fullName: item.fullName,
+        email: item.email,
+        username: this.deriveUsername(item.email),
+        role: item.role,
+        status: item.status,
+        joinedAt: item.createdAt ?? null,
+        isBlocked,
+        blockedReason: item.blockedReason,
+        blockedAt: item.blockedAt,
+        blockedBy: item.blockedBy,
+        actions: {
+          canBlock: item.source === "user" && !isBlocked,
+          canUnblock: item.source === "user" && isBlocked,
+          canViewDetails: true,
+        },
+      };
+    });
+
+    return {
+      data,
+      pagination: this.buildPaginationMeta({
+        page,
+        limit,
+        totalItems: merged.length,
+        serialStart: data.length ? skip + 1 : 0,
+      }),
+    };
   }
 
   async listBlockedUsers(query: {
