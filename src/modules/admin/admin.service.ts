@@ -14,6 +14,7 @@ import { PayoutRequest } from "../billing/payout-request.model";
 import { UserService } from "../user/user.service";
 import { AdminAccountService } from "../admin-account/admin-account.service";
 import { AdminAccount } from "../admin-account/admin-account.model";
+import { SubscriptionPayment } from "../subscription/subscription-payment.model";
 import type { StorageUploadInput } from "@/services/s3.service";
 
 type AggregatedUserRow = {
@@ -654,6 +655,7 @@ export class AdminService {
       openReports,
       openSupportTickets,
       paymentSummary,
+      subscriptionRevenueSummary,
     ] = await Promise.all([
       User.countDocuments({ isDeleted: false }),
       Activity.countDocuments({}),
@@ -671,7 +673,26 @@ export class AdminService {
           },
         },
       ]),
+      SubscriptionPayment.aggregate([
+        { $match: { status: "succeeded" } },
+        {
+          $group: {
+            _id: null,
+            totalSubscriptionRevenue: { $sum: "$amount" },
+          },
+        },
+      ]),
     ]);
+
+    const eventPlatformFeeRevenue = Number(
+      (paymentSummary?.[0]?.platformFee || 0).toFixed(2),
+    );
+    const subscriptionRevenue = Number(
+      (subscriptionRevenueSummary?.[0]?.totalSubscriptionRevenue || 0).toFixed(2),
+    );
+    const totalRevenue = Number(
+      (eventPlatformFeeRevenue + subscriptionRevenue).toFixed(2),
+    );
 
     return {
       totalUsers,
@@ -679,6 +700,9 @@ export class AdminService {
       totalEvents,
       openReports,
       openSupportTickets,
+      totalRevenue,
+      eventPlatformFeeRevenue,
+      subscriptionRevenue,
       payments: paymentSummary[0] || {
         gross: 0,
         platformFee: 0,
@@ -1676,6 +1700,171 @@ export class AdminService {
       pendingAmountBefore: pendingAmount,
       pendingAmountAfter: Number((pendingAmount - payout.amount).toFixed(2)),
       processedAt: payout.reviewedAt,
+    };
+  }
+
+  async listEarningTransactions(query: {
+    page?: number;
+    limit?: number;
+    status?: "pending" | "succeeded" | "failed" | "refunded";
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const status = query.status || "succeeded";
+
+    const [eventRows, subscriptionRows] = await Promise.all([
+      PaymentTransaction.find({ status })
+        .sort({ createdAt: -1 })
+        .populate("payerId", "fullName email profileImageUrl")
+        .populate("eventId", "title")
+        .exec(),
+      SubscriptionPayment.find({ status })
+        .sort({ createdAt: -1 })
+        .populate("userId", "fullName email profileImageUrl")
+        .exec(),
+    ]);
+
+    const normalizedRows = [
+      ...eventRows.map((row: any) => {
+        const payer = row.payerId || null;
+        const amount = Number(row.platformFeeAmount || 0);
+        return {
+          id: row._id.toString(),
+          payer: {
+            id: payer?._id?.toString?.() || null,
+            fullName: payer?.fullName || "N/A",
+            email: payer?.email || null,
+            avatarUrl: payer?.profileImageUrl || null,
+          },
+          transactionId: row.providerReference || row._id.toString(),
+          plan: "Event Commission (10%)",
+          adminEarning: amount,
+          currency: row.currency || "USD",
+          date: row.createdAt,
+          status: row.status,
+          eventTitle: row.eventId?.title || null,
+          sourceType: "event_commission",
+        };
+      }),
+      ...subscriptionRows.map((row: any) => {
+        const payer = row.userId || null;
+        const amount = Number(row.amount || 0);
+        return {
+          id: row._id.toString(),
+          payer: {
+            id: payer?._id?.toString?.() || null,
+            fullName: payer?.fullName || "N/A",
+            email: payer?.email || null,
+            avatarUrl: payer?.profileImageUrl || null,
+          },
+          transactionId: row.providerReference || row._id.toString(),
+          plan: row.plan === "yearly" ? "Subscription (Yearly)" : "Subscription (Monthly)",
+          adminEarning: amount,
+          currency: row.currency || "USD",
+          date: row.createdAt,
+          status: row.status,
+          eventTitle: null,
+          sourceType: "subscription",
+        };
+      }),
+    ].sort(
+      (a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
+    );
+
+    const totalItems = normalizedRows.length;
+    const data = normalizedRows.slice(skip, skip + limit).map((row, index) => {
+      return {
+        ...row,
+        sId: skip + index + 1,
+      };
+    });
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async getEarningTransactionDetails(transactionId: string) {
+    const eventRow = await PaymentTransaction.findById(transactionId)
+      .populate("payerId", "fullName email profileImageUrl")
+      .populate("eventId", "title")
+      .exec();
+    if (eventRow) {
+      const payer: any = eventRow.payerId || null;
+      return {
+        id: eventRow._id.toString(),
+        transactionId: eventRow.providerReference || eventRow._id.toString(),
+        plan: "Event Commission (10%)",
+        amount: Number(eventRow.platformFeeAmount || 0),
+        currency: eventRow.currency || "USD",
+        date: eventRow.createdAt,
+        status: eventRow.status,
+        sourceType: "event_commission",
+        eventTitle: (eventRow.eventId as any)?.title || null,
+        payer: {
+          id: payer?._id?.toString?.() || null,
+          fullName: payer?.fullName || "N/A",
+          email: payer?.email || null,
+          avatarUrl: payer?.profileImageUrl || null,
+          accountNumberMasked: "**** **** **** *545",
+        },
+      };
+    }
+
+    const subscriptionRow = await SubscriptionPayment.findById(transactionId)
+      .populate("userId", "fullName email profileImageUrl")
+      .exec();
+    if (!subscriptionRow) throw new NotFoundException("Earning transaction not found");
+
+    const payer: any = subscriptionRow.userId || null;
+    return {
+      id: subscriptionRow._id.toString(),
+      transactionId: subscriptionRow.providerReference || subscriptionRow._id.toString(),
+      plan:
+        subscriptionRow.plan === "yearly"
+          ? "Subscription (Yearly)"
+          : "Subscription (Monthly)",
+      amount: Number(subscriptionRow.amount || 0),
+      currency: subscriptionRow.currency || "USD",
+      date: subscriptionRow.createdAt,
+      status: subscriptionRow.status,
+      sourceType: "subscription",
+      eventTitle: null,
+      payer: {
+        id: payer?._id?.toString?.() || null,
+        fullName: payer?.fullName || "N/A",
+        email: payer?.email || null,
+        avatarUrl: payer?.profileImageUrl || null,
+        accountNumberMasked: "**** **** **** *545",
+      },
+    };
+  }
+
+  async generateEarningInvoice(transactionId: string) {
+    const details = await this.getEarningTransactionDetails(transactionId);
+    return {
+      invoiceId: `INV-${details.id.slice(-8).toUpperCase()}`,
+      transactionId: details.transactionId,
+      amount: details.amount,
+      currency: details.currency,
+      date: details.date,
+      billTo: {
+        name: details.payer.fullName,
+        email: details.payer.email,
+      },
+      eventTitle: details.eventTitle,
+      status: details.status,
+      generatedAt: new Date(),
     };
   }
 }

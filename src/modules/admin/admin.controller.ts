@@ -7,6 +7,8 @@ import type { StorageUploadInput } from "@/services/s3.service";
 import {
   blockUserSchema,
   creatorIdSchema,
+  earningTransactionIdSchema,
+  listEarningTransactionsSchema,
   processEventCreatorPayoutSchema,
   listUsersSchema,
   listBlockedUsersSchema,
@@ -278,5 +280,28 @@ export class AdminController {
       validated.body,
     );
     ApiResponse.success(res, result, "Event creator payout processed");
+  });
+
+  listEarningTransactions = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listEarningTransactionsSchema, req);
+    const result = await this.service.listEarningTransactions(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Earning transactions fetched",
+    );
+  });
+
+  getEarningTransactionDetails = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(earningTransactionIdSchema, req);
+    const result = await this.service.getEarningTransactionDetails(validated.params.id);
+    ApiResponse.success(res, result, "Earning transaction fetched");
+  });
+
+  generateEarningInvoice = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(earningTransactionIdSchema, req);
+    const result = await this.service.generateEarningInvoice(validated.params.id);
+    ApiResponse.success(res, result, "Invoice generated");
   });
 }

@@ -37,5 +37,8 @@ router.get("/event-creators/premium/:id", controller.getPremiumEventCreatorDetai
 router.get("/event-creators", controller.listEventCreators);
 router.get("/event-creators/:id", controller.getEventCreatorDetails);
 router.post("/event-creators/:id/payout", controller.processEventCreatorPayout);
+router.get("/earnings/transactions", controller.listEarningTransactions);
+router.get("/earnings/transactions/:id", controller.getEarningTransactionDetails);
+router.post("/earnings/transactions/:id/invoice", controller.generateEarningInvoice);
 
 export default router;
