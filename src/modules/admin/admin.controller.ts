@@ -11,6 +11,7 @@ import {
   listActivitiesSchema,
   listEventsSchema,
   listPremiumCreatorsSchema,
+  dashboardAnalyticsSchema,
   listSubscriptionsSchema,
   searchUsersSchema,
   unblockUserSchema,
@@ -166,8 +167,9 @@ export class AdminController {
     ApiResponse.success(res, result, "Dashboard overview fetched successfully");
   });
 
-  dashboardAnalytics = asyncHandler(async (_req: Request, res: Response) => {
-    const result = await this.service.dashboardAnalytics();
+  dashboardAnalytics = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(dashboardAnalyticsSchema, req);
+    const result = await this.service.dashboardAnalytics(validated.query);
     ApiResponse.success(res, result, "Dashboard analytics fetched successfully");
   });
 

@@ -134,6 +134,12 @@ export const listPremiumCreatorsSchema = z.object({
   }),
 });
 
+export const dashboardAnalyticsSchema = z.object({
+  query: z.object({
+    year: z.coerce.number().int().min(1970).max(9999).optional(),
+  }),
+});
+
 export const updateAdminProfileSchema = z.object({
   body: z
     .object({

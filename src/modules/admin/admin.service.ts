@@ -20,6 +20,7 @@ type AggregatedUserRow = {
   _id: Types.ObjectId;
   fullName: string;
   email: string;
+  profileImageUrl?: string | null;
   username?: string | null;
   role: string;
   status: string;
@@ -40,6 +41,7 @@ type AdminUserListItem = {
   id: string;
   fullName: string;
   email: string;
+  avatarUrl: string | null;
   username: string | null;
   role: string;
   status: string;
@@ -125,6 +127,7 @@ export class AdminService {
       id: user._id.toString(),
       fullName: user.fullName,
       email: user.email,
+      avatarUrl: user.profileImageUrl ?? null,
       username,
       role: user.role,
       status: user.status,
@@ -233,6 +236,7 @@ export class AdminService {
           _id: 1,
           fullName: 1,
           email: 1,
+          profileImageUrl: 1,
           username: 1,
           role: 1,
           status: 1,
@@ -405,11 +409,11 @@ export class AdminService {
     const [users, admins] = await Promise.all([
       User.find(userMatch)
         .select(
-          "_id fullName email role status createdAt blockedReason blockedAt",
+          "_id fullName email role status createdAt blockedReason blockedAt profileImageUrl",
         )
         .lean(),
       AdminAccount.find(adminMatch)
-        .select("_id fullName email role status createdAt")
+        .select("_id fullName email role status createdAt profileImageUrl")
         .lean(),
     ]);
 
@@ -424,6 +428,7 @@ export class AdminService {
         blockedReason: item.blockedReason ?? null,
         blockedAt: item.blockedAt ?? null,
         blockedBy: null as null,
+        avatarUrl: item.profileImageUrl ?? null,
         source: "user" as const,
       })),
       ...admins.map((item) => ({
@@ -436,6 +441,7 @@ export class AdminService {
         blockedReason: null,
         blockedAt: null,
         blockedBy: null as null,
+        avatarUrl: item.profileImageUrl ?? null,
         source: "admin" as const,
       })),
     ].sort((a, b) => {
@@ -460,6 +466,7 @@ export class AdminService {
         blockedReason: item.blockedReason,
         blockedAt: item.blockedAt,
         blockedBy: item.blockedBy,
+        avatarUrl: item.avatarUrl,
         actions: {
           canBlock: item.source === "user" && !isBlocked,
           canUnblock: item.source === "user" && isBlocked,
@@ -680,59 +687,122 @@ export class AdminService {
     };
   }
 
-  async dashboardAnalytics() {
-    const since = new Date();
-    since.setMonth(since.getMonth() - 6);
+  async dashboardAnalytics(query?: { year?: number }) {
+    const selectedYear = query?.year ?? new Date().getFullYear();
+    const startOfYear = new Date(selectedYear, 0, 1);
+    const startOfNextYear = new Date(selectedYear + 1, 0, 1);
+    const monthLabels = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
     const [userSeries, activitySeries, eventSeries, revenueSeries] =
       await Promise.all([
         User.aggregate([
-          { $match: { createdAt: { $gte: since } } },
+          {
+            $match: {
+              createdAt: { $gte: startOfYear, $lt: startOfNextYear },
+              isDeleted: false,
+            },
+          },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               count: { $sum: 1 },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
         Activity.aggregate([
-          { $match: { createdAt: { $gte: since } } },
+          { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               count: { $sum: 1 },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
         Event.aggregate([
-          { $match: { createdAt: { $gte: since } } },
+          { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               count: { $sum: 1 },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
         PaymentTransaction.aggregate([
-          { $match: { status: "succeeded", createdAt: { $gte: since } } },
+          {
+            $match: {
+              status: "succeeded",
+              createdAt: { $gte: startOfYear, $lt: startOfNextYear },
+            },
+          },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               gross: { $sum: "$grossAmount" },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
       ]);
 
+    const usersByMonth = new Map<number, number>(
+      userSeries.map((entry) => [Number(entry._id?.month), Number(entry.count) || 0]),
+    );
+    const activitiesByMonth = new Map<number, number>(
+      activitySeries.map((entry) => [
+        Number(entry._id?.month),
+        Number(entry.count) || 0,
+      ]),
+    );
+    const eventsByMonth = new Map<number, number>(
+      eventSeries.map((entry) => [Number(entry._id?.month), Number(entry.count) || 0]),
+    );
+    const revenueByMonth = new Map<number, number>(
+      revenueSeries.map((entry) => [
+        Number(entry._id?.month),
+        Number(entry.gross) || 0,
+      ]),
+    );
+
+    const monthlyUsers = monthLabels.map((month, index) => ({
+      month,
+      users: usersByMonth.get(index + 1) || 0,
+    }));
+
     return {
-      users: userSeries,
-      activities: activitySeries,
-      events: eventSeries,
-      revenue: revenueSeries,
+      year: selectedYear,
+      monthlyUsers,
+      users: monthLabels.map((month, index) => ({
+        month,
+        count: usersByMonth.get(index + 1) || 0,
+      })),
+      activities: monthLabels.map((month, index) => ({
+        month,
+        count: activitiesByMonth.get(index + 1) || 0,
+      })),
+      events: monthLabels.map((month, index) => ({
+        month,
+        count: eventsByMonth.get(index + 1) || 0,
+      })),
+      revenue: monthLabels.map((month, index) => ({
+        month,
+        gross: revenueByMonth.get(index + 1) || 0,
+      })),
     };
   }
 
