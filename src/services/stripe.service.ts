@@ -4,38 +4,47 @@ import { env } from "@/env";
 import Stripe from "stripe";
 
 export class StripeService {
-  private stripe: Stripe;
+  private stripe?: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-      apiVersion: "2025-12-15.clover",
-    });
+    if (env.STRIPE_SECRET_KEY?.trim()) {
+      this.stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+        apiVersion: "2025-12-15.clover",
+      });
+    }
+  }
+
+  private getClient(): Stripe {
+    if (!this.stripe) {
+      throw new Error("Stripe is not configured");
+    }
+    return this.stripe;
   }
 
   async createPaymentIntent(params: Stripe.PaymentIntentCreateParams) {
-    return this.stripe.paymentIntents.create(params);
+    return this.getClient().paymentIntents.create(params);
   }
 
   async createCheckoutSession(params: Stripe.Checkout.SessionCreateParams) {
-    return this.stripe.checkout.sessions.create(params);
+    return this.getClient().checkout.sessions.create(params);
   }
 
   async retrievePaymentIntent(paymentIntentId: string) {
-    return this.stripe.paymentIntents.retrieve(paymentIntentId);
+    return this.getClient().paymentIntents.retrieve(paymentIntentId);
   }
 
   async retrieveCheckoutSession(
     sessionId: string,
     params?: Stripe.Checkout.SessionRetrieveParams,
   ) {
-    return this.stripe.checkout.sessions.retrieve(sessionId, params);
+    return this.getClient().checkout.sessions.retrieve(sessionId, params);
   }
 
   async listCheckoutSessionsByPaymentIntent(
     paymentIntentId: string,
     limit: number = 1,
   ) {
-    return this.stripe.checkout.sessions.list({
+    return this.getClient().checkout.sessions.list({
       payment_intent: paymentIntentId,
       limit,
     });
@@ -48,7 +57,7 @@ export class StripeService {
     const params = paymentMethodId
       ? { payment_method: paymentMethodId }
       : undefined;
-    return this.stripe.paymentIntents.confirm(paymentIntentId, params);
+    return this.getClient().paymentIntents.confirm(paymentIntentId, params);
   }
 
   constructWebhookEvent(
@@ -56,7 +65,7 @@ export class StripeService {
     signature: string,
     webhookSecret: string,
   ) {
-    return this.stripe.webhooks.constructEvent(
+    return this.getClient().webhooks.constructEvent(
       payload,
       signature,
       webhookSecret,

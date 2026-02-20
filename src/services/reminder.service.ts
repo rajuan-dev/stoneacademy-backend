@@ -1,4 +1,4 @@
-import cron from "node-cron";
+import cron, { type ScheduledTask } from "node-cron";
 import dayjs from "dayjs";
 import { env } from "@/env";
 import { ACTIVITY_STATUS, PARTICIPANT_STATUS } from "@/constants/app.constants";
@@ -11,7 +11,7 @@ import { Notification } from "@/modules/notification/notification.model";
 const WINDOW_MINUTES = 5;
 
 class ReminderService {
-  private task?: cron.ScheduledTask;
+  private task?: ScheduledTask;
 
   start(): void {
     if (this.task) return;

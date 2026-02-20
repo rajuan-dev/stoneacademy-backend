@@ -50,6 +50,9 @@ export interface IUser extends Document {
   loginAttempts?: number;
   loginLockedUntil?: Date;
   refreshTokenInvalidBefore?: Date;
+  isDeleted?: boolean;
+  deletedAt?: Date;
+  deletedBy?: Types.ObjectId;
   onboardingCompletedAt?: Date;
   onboardingSkippedAt?: Date;
   mustChangePassword?: boolean;
