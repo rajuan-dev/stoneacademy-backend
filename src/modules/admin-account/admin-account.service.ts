@@ -126,6 +126,9 @@ export class AdminAccountService {
       throw new NotFoundException("Admin account not found");
     }
 
+    const previousPhotoId = admin.profilePhoto ? admin.profilePhoto.toString() : null;
+    const previousPhotoUrl = admin.profileImageUrl || null;
+
     const media = await Media.create({
       ownerId: admin._id,
       ownerModel: "Admin",
@@ -140,6 +143,16 @@ export class AdminAccountService {
     admin.profilePhoto = media._id;
     admin.profileImageUrl = upload.url;
     await admin.save();
+
+    if (previousPhotoId) {
+      await this.removeMediaAsset(previousPhotoId);
+    }
+    if (!previousPhotoId && previousPhotoUrl && previousPhotoUrl !== upload.url) {
+      const previousKey = this.extractS3KeyFromUrl(previousPhotoUrl);
+      if (previousKey) {
+        await this.safeDeleteS3Object(previousKey);
+      }
+    }
 
     return admin;
   }
@@ -183,5 +196,35 @@ export class AdminAccountService {
 
   async invalidateAllRefreshTokens(adminId: string): Promise<void> {
     await AdminRefreshTokenBlacklist.deleteMany({ adminId }).exec();
+  }
+
+  private async removeMediaAsset(mediaId: string): Promise<void> {
+    const media = await Media.findById(mediaId).exec();
+    if (!media) return;
+
+    if (media.s3Key) {
+      await this.safeDeleteS3Object(media.s3Key);
+    }
+
+    await Media.deleteOne({ _id: media._id }).exec();
+  }
+
+  private async safeDeleteS3Object(key: string): Promise<void> {
+    try {
+      await s3Service.deleteFile(key);
+    } catch {
+      // Keep profile update successful even if storage cleanup fails.
+    }
+  }
+
+  private extractS3KeyFromUrl(url: string): string | null {
+    if (!url) return null;
+    try {
+      const parsed = new URL(url);
+      const pathname = parsed.pathname.replace(/^\/+/, "");
+      return pathname || null;
+    } catch {
+      return null;
+    }
   }
 }

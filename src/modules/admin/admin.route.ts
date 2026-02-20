@@ -34,5 +34,8 @@ router.get("/subscriptions/fees", controller.getSubscriptionFees);
 router.patch("/subscriptions/fees", controller.updateSubscriptionFees);
 router.get("/event-creators/premium", controller.listPremiumEventCreators);
 router.get("/event-creators/premium/:id", controller.getPremiumEventCreatorDetails);
+router.get("/event-creators", controller.listEventCreators);
+router.get("/event-creators/:id", controller.getEventCreatorDetails);
+router.post("/event-creators/:id/payout", controller.processEventCreatorPayout);
 
 export default router;

@@ -6,6 +6,8 @@ import type { Request, Response } from "express";
 import type { StorageUploadInput } from "@/services/s3.service";
 import {
   blockUserSchema,
+  creatorIdSchema,
+  processEventCreatorPayoutSchema,
   listUsersSchema,
   listBlockedUsersSchema,
   listActivitiesSchema,
@@ -248,5 +250,33 @@ export class AdminController {
     const creatorId = req.params.id;
     const result = await this.service.getPremiumEventCreatorDetails(creatorId);
     ApiResponse.success(res, result, "Premium event creator details fetched");
+  });
+
+  listEventCreators = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listPremiumCreatorsSchema, req);
+    const result = await this.service.listEventCreators(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Event creators fetched",
+    );
+  });
+
+  getEventCreatorDetails = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(creatorIdSchema, req);
+    const result = await this.service.getPremiumEventCreatorDetails(validated.params.id);
+    ApiResponse.success(res, result, "Event creator details fetched");
+  });
+
+  processEventCreatorPayout = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(processEventCreatorPayoutSchema, req);
+    const adminId = req.user?.userId as string;
+    const result = await this.service.processEventCreatorPayout(
+      validated.params.id,
+      adminId,
+      validated.body,
+    );
+    ApiResponse.success(res, result, "Event creator payout processed");
   });
 }

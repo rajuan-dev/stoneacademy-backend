@@ -1,5 +1,5 @@
 import { ACTIVITY_STATUS, PAGINATION, USER_STATUS } from "@/constants/app.constants";
-import { NotFoundException } from "@/utils/app-error.utils";
+import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
 import { PipelineStage, Types } from "mongoose";
 import { User } from "../user/user.model";
 import { Activity } from "../activity/activity.model";
@@ -1200,6 +1200,8 @@ export class AdminService {
           creatorId: "$user._id",
           creatorName: "$user.fullName",
           creatorEmail: "$user.email",
+          creatorAvatarUrl: "$user.profileImageUrl",
+          creatorStatus: "$user.status",
           latestPlan: 1,
           latestEndAt: 1,
         },
@@ -1286,6 +1288,8 @@ export class AdminService {
         creatorId: id,
         creatorName: creator.creatorName,
         creatorEmail: creator.creatorEmail,
+        creatorAvatarUrl: creator.creatorAvatarUrl || null,
+        creatorStatus: creator.creatorStatus || null,
         totalEvents: eventRow?.totalEvents || 0,
         ticketSold: earningRow?.ticketSold || 0,
         totalEarnings: totalCreatorEarnings,
@@ -1322,20 +1326,174 @@ export class AdminService {
     };
   }
 
+  async listEventCreators(query: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    paymentStatus?: "pending" | "complete" | "all";
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+    const searchRegex = query.q ? new RegExp(query.q, "i") : null;
+
+    const creatorRows = await Event.aggregate([
+      {
+        $group: {
+          _id: "$creatorId",
+          totalEvents: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: false } },
+      ...(searchRegex
+        ? [
+            {
+              $match: {
+                $or: [
+                  { "user.fullName": searchRegex },
+                  { "user.email": searchRegex },
+                ],
+              },
+            },
+          ]
+        : []),
+      {
+        $project: {
+          _id: 0,
+          creatorId: "$user._id",
+          creatorName: "$user.fullName",
+          creatorEmail: "$user.email",
+          creatorAvatarUrl: "$user.profileImageUrl",
+          creatorStatus: "$user.status",
+          totalEvents: 1,
+        },
+      },
+    ]);
+
+    const creatorIds = creatorRows.map((item: any) => item.creatorId);
+    if (!creatorIds.length) {
+      return {
+        data: [],
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: 0,
+          pageCount: 0,
+          hasNext: false,
+          hasPrev: page > 1,
+        },
+      };
+    }
+
+    const [earningStats, payoutStats] = await Promise.all([
+      PaymentTransaction.aggregate([
+        { $match: { status: "succeeded" } },
+        {
+          $lookup: {
+            from: "events",
+            localField: "eventId",
+            foreignField: "_id",
+            as: "event",
+          },
+        },
+        { $unwind: { path: "$event", preserveNullAndEmptyArrays: false } },
+        { $match: { "event.creatorId": { $in: creatorIds } } },
+        {
+          $group: {
+            _id: "$event.creatorId",
+            ticketSold: { $sum: 1 },
+            totalEarnings: { $sum: "$creatorShareAmount" },
+          },
+        },
+      ]),
+      PayoutRequest.aggregate([
+        { $match: { creatorId: { $in: creatorIds }, status: "paid" } },
+        {
+          $group: {
+            _id: "$creatorId",
+            totalPaidOut: { $sum: "$amount" },
+          },
+        },
+      ]),
+    ]);
+
+    const earningStatsMap = new Map(
+      earningStats.map((item: any) => [item._id.toString(), item]),
+    );
+    const payoutStatsMap = new Map(
+      payoutStats.map((item: any) => [item._id.toString(), item]),
+    );
+
+    const merged = creatorRows.map((creator: any) => {
+      const id = creator.creatorId.toString();
+      const earningRow = earningStatsMap.get(id);
+      const payoutRow = payoutStatsMap.get(id);
+      const totalCreatorEarnings = Number((earningRow?.totalEarnings || 0).toFixed(2));
+      const totalPaidOut = Number((payoutRow?.totalPaidOut || 0).toFixed(2));
+      const pendingAmount = Number((totalCreatorEarnings - totalPaidOut).toFixed(2));
+
+      return {
+        creatorId: id,
+        creatorName: creator.creatorName,
+        creatorEmail: creator.creatorEmail,
+        creatorAvatarUrl: creator.creatorAvatarUrl || null,
+        creatorStatus: creator.creatorStatus || null,
+        totalEvents: creator.totalEvents || 0,
+        ticketSold: earningRow?.ticketSold || 0,
+        totalEarnings: totalCreatorEarnings,
+        paymentStatus: pendingAmount > 0 ? "pending" : "complete",
+        pendingAmount: Math.max(0, pendingAmount),
+      };
+    });
+
+    const filtered =
+      query.paymentStatus && query.paymentStatus !== "all"
+        ? merged.filter((item) => item.paymentStatus === query.paymentStatus)
+        : merged;
+
+    filtered.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+    const paged = filtered.slice(skip, skip + limit).map((item, idx) => ({
+      sId: skip + idx + 1,
+      ...item,
+    }));
+
+    const totalItems = filtered.length;
+    return {
+      data: paged,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
   async getPremiumEventCreatorDetails(creatorId: string) {
     if (!Types.ObjectId.isValid(creatorId)) {
       throw new NotFoundException("Creator not found");
     }
 
     const creator = await User.findById(creatorId)
-      .select("fullName email role creatorStatus")
+      .select("fullName email role creatorStatus profileImageUrl status")
       .exec();
     if (!creator) throw new NotFoundException("Creator not found");
 
     const [latestSubscription, eventRows, totalEvents, paymentSummary, payoutSummary] = await Promise.all([
       Subscription.findOne({ userId: creatorId }).sort({ createdAt: -1 }).exec(),
       Event.find({ creatorId })
-        .select("title type startAt endAt status createdAt priceType ticketPrice discountPercentage")
+        .select("title type startAt endAt status createdAt priceType ticketPrice discountPercentage stats")
         .sort({ createdAt: -1 })
         .limit(50)
         .exec(),
@@ -1394,6 +1552,8 @@ export class AdminService {
         fullName: creator.fullName,
         email: creator.email,
         role: creator.role,
+        status: creator.status || null,
+        avatarUrl: creator.profileImageUrl || null,
       },
       subscription: latestSubscription
         ? {
@@ -1415,6 +1575,107 @@ export class AdminService {
         paymentStatus: pendingAmount > 0 ? "pending" : "complete",
       },
       events: eventRows,
+    };
+  }
+
+  async processEventCreatorPayout(
+    creatorId: string,
+    adminId: string,
+    payload: { amount?: number; currency?: string; note?: string },
+  ) {
+    if (!Types.ObjectId.isValid(creatorId)) {
+      throw new NotFoundException("Creator not found");
+    }
+
+    const creator = await User.findById(creatorId).select("_id").exec();
+    if (!creator) throw new NotFoundException("Creator not found");
+
+    const [paymentSummary, payoutSummary] = await Promise.all([
+      PaymentTransaction.aggregate([
+        { $match: { status: "succeeded" } },
+        {
+          $lookup: {
+            from: "events",
+            localField: "eventId",
+            foreignField: "_id",
+            as: "event",
+          },
+        },
+        { $unwind: "$event" },
+        { $match: { "event.creatorId": new Types.ObjectId(creatorId) } },
+        {
+          $group: {
+            _id: null,
+            totalEarnings: { $sum: "$creatorShareAmount" },
+          },
+        },
+      ]),
+      PayoutRequest.aggregate([
+        {
+          $match: {
+            creatorId: new Types.ObjectId(creatorId),
+            status: "paid",
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalPaidOut: { $sum: "$amount" },
+          },
+        },
+      ]),
+    ]);
+
+    const totalEarnings = paymentSummary?.[0]?.totalEarnings || 0;
+    const totalPaidOut = payoutSummary?.[0]?.totalPaidOut || 0;
+    const pendingAmount = Math.max(
+      0,
+      Number((totalEarnings - totalPaidOut).toFixed(2)),
+    );
+
+    if (pendingAmount <= 0) {
+      throw new BadRequestException("No pending payout amount available");
+    }
+
+    const amount = payload.amount ?? pendingAmount;
+    if (amount <= 0) {
+      throw new BadRequestException("Payout amount must be greater than zero");
+    }
+    if (amount > pendingAmount) {
+      throw new BadRequestException("Payout amount exceeds pending balance");
+    }
+
+    const payout = await PayoutRequest.create({
+      creatorId: creator._id,
+      amount: Number(amount.toFixed(2)),
+      currency: payload.currency || "USD",
+      status: "paid",
+      note: payload.note || "Processed by admin",
+      reviewedBy: adminId as any,
+      reviewedAt: new Date(),
+    });
+
+    await AdminAuditLog.create({
+      adminId,
+      action: "event_creator_payout_processed",
+      entityType: "creator",
+      entityId: creator._id,
+      meta: {
+        payoutId: payout._id.toString(),
+        amount: payout.amount,
+        currency: payout.currency,
+      },
+    });
+
+    return {
+      payoutId: payout._id.toString(),
+      creatorId: creator._id.toString(),
+      amount: payout.amount,
+      currency: payout.currency,
+      status: payout.status,
+      pendingAmountBefore: pendingAmount,
+      pendingAmountAfter: Number((pendingAmount - payout.amount).toFixed(2)),
+      processedAt: payout.reviewedAt,
     };
   }
 }
