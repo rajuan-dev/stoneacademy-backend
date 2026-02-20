@@ -825,10 +825,47 @@ export class AdminService {
       filter.status = query.status;
     }
 
-    const [data, totalItems] = await Promise.all([
-      Activity.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+    const [rows, totalItems] = await Promise.all([
+      Activity.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("hostId", "fullName email profileImageUrl")
+        .populate("media", "url")
+        .exec(),
       Activity.countDocuments(filter),
     ]);
+
+    const data = rows.map((row: any, index: number) => {
+      const host = row.hostId || null;
+      const mediaList = Array.isArray(row.media) ? row.media : [];
+      const firstImageUrl = mediaList.length ? (mediaList[0]?.url || null) : null;
+
+      return {
+        id: row._id.toString(),
+        sId: skip + index + 1,
+        entityType: "activity",
+        title: row.title || "Untitled Activity",
+        type: row.type || "general",
+        description: row.description || null,
+        status: row.status,
+        startAt: row.startAt || null,
+        endAt: row.endAt || null,
+        location: row.location?.label || null,
+        participantLimit: row.participantLimit ?? null,
+        joinedCount: row.stats?.joinedCount ?? 0,
+        createdAt: row.createdAt || null,
+        host: {
+          id: host?._id?.toString?.() || host?.toString?.() || null,
+          name: host?.fullName || null,
+          email: host?.email || null,
+          avatarUrl: host?.profileImageUrl || null,
+        },
+        hostName: host?.fullName || null,
+        hostAvatarUrl: host?.profileImageUrl || null,
+        imageUrl: firstImageUrl,
+      };
+    });
 
     return {
       data,
@@ -862,10 +899,47 @@ export class AdminService {
       filter.status = query.status;
     }
 
-    const [data, totalItems] = await Promise.all([
-      Event.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+    const [rows, totalItems] = await Promise.all([
+      Event.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("creatorId", "fullName email profileImageUrl")
+        .populate("media", "url")
+        .exec(),
       Event.countDocuments(filter),
     ]);
+
+    const data = rows.map((row: any, index: number) => {
+      const creator = row.creatorId || null;
+      const mediaList = Array.isArray(row.media) ? row.media : [];
+      const firstImageUrl = mediaList.length ? (mediaList[0]?.url || null) : null;
+
+      return {
+        id: row._id.toString(),
+        sId: skip + index + 1,
+        entityType: "event",
+        title: row.title || "Untitled Event",
+        type: row.type || "general",
+        description: row.description || null,
+        status: row.status,
+        startAt: row.startAt || null,
+        endAt: row.endAt || null,
+        location: row.location?.label || null,
+        participantLimit: row.participantLimit ?? null,
+        joinedCount: row.stats?.joinedCount ?? 0,
+        createdAt: row.createdAt || null,
+        host: {
+          id: creator?._id?.toString?.() || creator?.toString?.() || null,
+          name: creator?.fullName || null,
+          email: creator?.email || null,
+          avatarUrl: creator?.profileImageUrl || null,
+        },
+        hostName: creator?.fullName || null,
+        hostAvatarUrl: creator?.profileImageUrl || null,
+        imageUrl: firstImageUrl,
+      };
+    });
 
     return {
       data,
