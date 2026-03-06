@@ -89,6 +89,12 @@ router.patch(
   authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
   controller.update,
 );
+router.put(
+  "/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  controller.update,
+);
 
 /**
  * @openapi

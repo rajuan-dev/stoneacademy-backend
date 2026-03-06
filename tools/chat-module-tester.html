@@ -74,6 +74,16 @@
       background: #eef2ff;
       border: 1px solid #c7d2fe;
     }
+    .hint {
+      font-size: 12px;
+      color: #374151;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 6px 8px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -107,6 +117,9 @@
       <button id="createHostThreadBtn">POST /chat/threads/host</button>
 
       <button id="createAdminThreadBtn">POST /chat/threads/admin</button>
+      <div class="hint">
+        Admin thread works only when an admin exists in the <code>users</code> collection.
+      </div>
     </div>
 
     <div class="card">
@@ -154,6 +167,32 @@
       outputEl.textContent = line + outputEl.textContent;
     }
 
+    function parseJwtPayload(token) {
+      try {
+        const parts = String(token || "").split(".");
+        if (parts.length !== 3) return null;
+        const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+        return JSON.parse(atob(payload));
+      } catch {
+        return null;
+      }
+    }
+
+    function getThreadIdRequired() {
+      const threadId = document.getElementById("threadId").value.trim();
+      if (!threadId) {
+        throw new Error("Thread ID is required. Create/list/select a thread first.");
+      }
+      return threadId;
+    }
+
+    function setThreadIdFromResponse(data) {
+      const id = data?.data?._id || data?._id;
+      if (id) {
+        document.getElementById("threadId").value = id;
+      }
+    }
+
     async function api(path, method, body) {
       const token = tokenEl.value.trim();
       const headers = { "Content-Type": "application/json" };
@@ -179,6 +218,10 @@
     function connectSocket() {
       if (socket) socket.disconnect();
       const token = tokenEl.value.trim();
+      if (!parseJwtPayload(token)) {
+        log("error socket connect", { message: "Invalid JWT token format" });
+        return;
+      }
       socket = io(socketBaseEl.value.replace(/\/+$/, ""), {
         path: "/ws",
         auth: { token },
@@ -220,23 +263,41 @@
         const body = {};
         if (targetId) body.targetId = targetId;
         if (hostUserId) body.hostUserId = hostUserId;
-        const data = await api("/chat/threads/host", "POST", {
-          ...body,
-        });
+        const data = await api("/chat/threads/host", "POST", { ...body });
+        setThreadIdFromResponse(data);
         log("create host thread", data);
       } catch (e) { log("error create host thread", e); }
     };
 
     document.getElementById("createAdminThreadBtn").onclick = async () => {
       try {
+        const token = tokenEl.value.trim();
+        if (!parseJwtPayload(token)) {
+          throw new Error("Invalid JWT token format");
+        }
         const data = await api("/chat/threads/admin", "POST");
+        setThreadIdFromResponse(data);
         log("create admin thread", data);
-      } catch (e) { log("error create admin thread", e); }
+      } catch (e) {
+        const msg = e?.data?.message || e?.message || "";
+        if (String(msg).toLowerCase().includes("no admin available")) {
+          log("error create admin thread", {
+            ...e,
+            hint: "No admin user exists in users collection. Use /chat/threads/host with a valid host user id, or create an admin user in users collection.",
+          });
+          return;
+        }
+        log("error create admin thread", e);
+      }
     };
 
     document.getElementById("listThreadsBtn").onclick = async () => {
       try {
         const data = await api("/chat/threads", "GET");
+        const firstId = data?.data?.[0]?._id;
+        if (firstId) {
+          document.getElementById("threadId").value = firstId;
+        }
         log("list threads", data);
       } catch (e) { log("error list threads", e); }
     };
@@ -246,7 +307,7 @@
         if (!socket || !socket.connected) {
           throw new Error("Socket not connected");
         }
-        const threadId = document.getElementById("threadId").value.trim();
+        const threadId = getThreadIdRequired();
         socket.emit("chat:thread:join", threadId);
         log("socket join thread", { threadId });
       } catch (e) { log("error join thread socket", e.message || e); }
@@ -254,7 +315,7 @@
 
     document.getElementById("listMessagesBtn").onclick = async () => {
       try {
-        const threadId = document.getElementById("threadId").value.trim();
+        const threadId = getThreadIdRequired();
         const data = await api("/chat/threads/" + encodeURIComponent(threadId) + "/messages", "GET");
         log("list messages", data);
       } catch (e) { log("error list messages", e); }
@@ -262,11 +323,19 @@
 
     document.getElementById("sendMessageBtn").onclick = async () => {
       try {
-        const threadId = document.getElementById("threadId").value.trim();
+        const threadId = getThreadIdRequired();
         const type = document.getElementById("messageType").value;
         const body = { type };
-        if (type === "text") body.text = document.getElementById("messageText").value.trim();
-        if (type === "image") body.imageUrl = document.getElementById("imageUrl").value.trim();
+        if (type === "text") {
+          const text = document.getElementById("messageText").value.trim();
+          if (!text) throw new Error("Message text is required for text message.");
+          body.text = text;
+        }
+        if (type === "image") {
+          const imageUrl = document.getElementById("imageUrl").value.trim();
+          if (!imageUrl) throw new Error("Image URL is required for image message.");
+          body.imageUrl = imageUrl;
+        }
         const data = await api("/chat/threads/" + encodeURIComponent(threadId) + "/messages", "POST", body);
         log("send message", data);
       } catch (e) { log("error send message", e); }
@@ -274,7 +343,7 @@
 
     document.getElementById("markSeenBtn").onclick = async () => {
       try {
-        const threadId = document.getElementById("threadId").value.trim();
+        const threadId = getThreadIdRequired();
         const data = await api("/chat/threads/" + encodeURIComponent(threadId) + "/seen", "POST");
         log("mark seen", data);
       } catch (e) { log("error mark seen", e); }

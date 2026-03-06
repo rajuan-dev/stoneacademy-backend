@@ -1,0 +1,1653 @@
+{
+	"info": {
+		"_postman_id": "1081998b-1e38-4686-b115-8eae5c632429",
+		"name": "Admin - Functionality Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41974181",
+		"_collection_link": "https://team00-9871.postman.co/workspace/Rajuan's_Workspace~fc561aad-1e16-44e6-bde4-763b3a2364c1/collection/41974181-1081998b-1e38-4686-b115-8eae5c632429?action=share&source=collection_link&creator=41974181"
+	},
+	"item": [
+		{
+			"name": "Admin - Functionality Copy",
+			"item": [
+				{
+					"name": "Admin Auth + CMS Pages (settings + my profile)",
+					"item": [
+						{
+							"name": "Auth - Admin Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"",
+											"",
+											"const res = pm.response.json();",
+											"",
+											"if (res?.data?.accessToken) {",
+											"    pm.environment.set('admin_token', res.data.accessToken);",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"admin@stoneacademy.com\",\n  \"password\": \"admin@123\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/admin/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"admin",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Auth - Admin Change Password",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"currentPassword\": \"Admin@123456\",\n  \"newPassword\": \"admin@123\",\n  \"confirmNewPassword\": \"admin@123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/admin/change-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"admin",
+										"change-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin - Get My Profile",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/profile",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin - Update My Profile (Text + Optional Photo)",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "fullName",
+											"value": "Admin Updated Name",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "admin.updated@example.com",
+											"type": "text"
+										},
+										{
+											"key": "contactNo",
+											"value": "+1-555-0102",
+											"type": "text"
+										},
+										{
+											"key": "photo",
+											"type": "file",
+											"src": "/C:/Users/Rajuan/OneDrive/Pictures/me.png"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/profile",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CMS Admin - Upsert About Us",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"StoneAcademy helps people discover and create high-quality fitness activities and events.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/cms/admin/about-us",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cms",
+										"admin",
+										"about-us"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CMS Public - Get About Us",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/cms/about-us",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cms",
+										"about-us"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CMS Admin - Upsert Privacy Policy",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"We collect only the data required to deliver core platform functionality and security.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/cms/admin/privacy-policy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cms",
+										"admin",
+										"privacy-policy"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CMS Public - Get Privacy Policy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/cms/privacy-policy",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cms",
+										"privacy-policy"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CMS Admin - Upsert Terms and Conditions",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"By using StoneAcademy, users agree to follow event rules, payment policies, and community guidelines.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/cms/admin/terms-and-conditions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cms",
+										"admin",
+										"terms-and-conditions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CMS Public - Get Terms and Conditions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/cms/terms-and-conditions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cms",
+										"terms-and-conditions"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Shop Ads",
+					"item": [
+						{
+							"name": "Admin List Items (Raw)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/shop/admin/products?page=1&limit=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"shop",
+										"admin",
+										"products"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin List Items (Table)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/shop/admin/products/table?page=1&limit=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"shop",
+										"admin",
+										"products",
+										"table"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Create Item",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "rakib Protein Plus",
+											"type": "text"
+										},
+										{
+											"key": "category",
+											"value": "Protein",
+											"type": "text"
+										},
+										{
+											"key": "description",
+											"value": "Vanilla flavor 2lbs, clean ingredients...",
+											"type": "text"
+										},
+										{
+											"key": "price",
+											"value": "49",
+											"type": "text"
+										},
+										{
+											"key": "currency",
+											"value": "USD",
+											"type": "text"
+										},
+										{
+											"key": "destinationUrl",
+											"value": "https://example.com/your-landing-page",
+											"type": "text"
+										},
+										{
+											"key": "isActive",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"type": "file",
+											"src": "/C:/Users/Rajuan/OneDrive/Pictures/photo_2026-01-17_03-44-57.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/shop/admin/products",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"shop",
+										"admin",
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Update Item",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Whey Protein Plus",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "category",
+											"value": "Protein",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "description",
+											"value": "Vanilla flavor 2lbs, clean ingredients...",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "price",
+											"value": "59",
+											"type": "text"
+										},
+										{
+											"key": "destinationUrl",
+											"value": "https://example.com/your-landing-page?v=2",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "isActive",
+											"value": "false",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "image",
+											"value": "",
+											"type": "file",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/shop/admin/products/{{product_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"shop",
+										"admin",
+										"products",
+										"{{product_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Toggle Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/shop/admin/products/{{product_id}}/status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"shop",
+										"admin",
+										"products",
+										"{{product_id}}",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Delete Item",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/shop/admin/products/{{product_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"shop",
+										"admin",
+										"products",
+										"{{product_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Dashboard Overview",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/dashboard/overview",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"dashboard",
+										"overview"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Dashboard Analytics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/dashboard/analytics",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"dashboard",
+										"analytics"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/users",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"suspended\",\n  \"reason\": \"Violation\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/users/:id/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										":id",
+										"status"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User Role",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"role\": \"admin\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/users/:id/role",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										":id",
+										"role"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Activities",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/activities",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"activities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Activity Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"approved\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/activities/:id/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"activities",
+										":id",
+										"status"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Events",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/events",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Event Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"approved\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/events/:id/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"events",
+										":id",
+										"status"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Subscriptions",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/subscriptions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"subscriptions"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Admin Settings",
+					"item": [
+						{
+							"name": "Get Platform Settings",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/settings/platform",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"settings",
+										"platform"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Platform Settings",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"platformFeePercent\": 10\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/settings/platform",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"settings",
+										"platform"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Admin Notifications",
+					"item": [
+						{
+							"name": "List",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/notifications",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"notifications"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Unread Count",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/notifications/unread-count",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"notifications",
+										"unread-count"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Mark Read",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/notifications/:id/read",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"notifications",
+										":id",
+										"read"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Mark Read All",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/admin/notifications/read-all",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"admin",
+										"notifications",
+										"read-all"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "CMS",
+					"item": [
+						{
+							"name": "Get Page",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/cms/pages/:slug",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"pages",
+										":slug"
+									],
+									"variable": [
+										{
+											"key": "slug"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Terms of Service",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/cms/pages/terms-of-service",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"pages",
+										"terms-of-service"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Privacy Policy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/cms/pages/privacy-policy",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"pages",
+										"privacy-policy"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get About Us",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/cms/pages/about-us",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"pages",
+										"about-us"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin List Pages",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/cms/admin/pages",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"admin",
+										"pages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Create Page",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"slug\": \"privacy\",\n  \"title\": \"Privacy Policy\",\n  \"content\": \"...\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/cms/admin/pages",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"admin",
+										"pages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Update Page",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"Updated\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/cms/admin/pages/:slug",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"admin",
+										"pages",
+										":slug"
+									],
+									"variable": [
+										{
+											"key": "slug"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Delete Page",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/cms/admin/pages/:slug",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"cms",
+										"admin",
+										"pages",
+										":slug"
+									],
+									"variable": [
+										{
+											"key": "slug"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Shop",
+					"item": [
+						{
+							"name": "List Products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/shop/products",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Product",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/shop/products/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"products",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Create Product",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Yoga Mat\",\n  \"price\": 19.99\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/shop/products",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Update Product",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"price\": 25.99\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/shop/products/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"products",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Delete Product",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/shop/products/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"products",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Cart",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/shop/cart",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"cart"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Cart Item",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"productId\": \"PRODUCT_ID\",\n  \"quantity\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/shop/cart/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"cart",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Cart Item",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"quantity\": 2\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/shop/cart/items/:productId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"cart",
+										"items",
+										":productId"
+									],
+									"variable": [
+										{
+											"key": "productId"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Cart Item",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/shop/cart/items/:productId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"cart",
+										"items",
+										":productId"
+									],
+									"variable": [
+										{
+											"key": "productId"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Checkout",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/shop/checkout",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"shop",
+										"checkout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reports",
+					"item": [
+						{
+							"name": "Admin - List Reports (Activity/Event)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/reports/admin?page=1&limit=10&entityType=activity&status=open",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"reports",
+										"admin"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "entityType",
+											"value": "activity"
+										},
+										{
+											"key": "status",
+											"value": "open"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin - Update Report Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{adminToken}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"resolved\",\n  \"adminNote\": \"Action taken against host account\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/reports/admin/{{reportId}}/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"reports",
+										"admin",
+										"{{reportId}}",
+										"status"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

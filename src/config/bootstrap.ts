@@ -6,13 +6,13 @@ import { reminderService } from "@/services/reminder.service";
 
 export async function bootstrapApplication(): Promise<void> {
   try {
-    logger.info("🚀 Bootstrapping application...");
+    logger.info("Bootstrapping application...");
     await AdminSeeder.run();
     reminderService.start();
 
-    logger.info("✅ Application bootstrapped successfully");
+    logger.info("Application bootstrapped successfully");
   } catch (error) {
-    logger.error(error, "❌ Bootstrap failed");
+    logger.error(error, "Bootstrap failed");
     throw error;
   }
 }

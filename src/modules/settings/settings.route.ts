@@ -13,5 +13,9 @@ router.use(
 
 router.get("/platform", controller.getPlatformSettings);
 router.patch("/platform", controller.updatePlatformSettings);
+router.get("/profile", controller.getProfileSettings);
+router.put("/profile", controller.updateProfileSettings);
+router.get("/security", controller.getSecuritySettings);
+router.put("/security", controller.updateSecuritySettings);
 
 export default router;

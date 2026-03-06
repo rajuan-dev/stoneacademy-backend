@@ -1,6 +1,6 @@
 // file: src/database/plugins/audit.plugin.ts
 
-import type { Schema } from "mongoose";
+import { Schema } from "mongoose";
 
 type AuditPluginOptions = {
   softDelete?: boolean;
@@ -39,4 +39,3 @@ export function addAdminAuditFields(schema: Schema, options: AuditPluginOptions 
     });
   }
 }
-

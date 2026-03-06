@@ -26,6 +26,7 @@ export const createProductSchema = z.object({
       currency: z.string().trim().min(3).max(10).optional(),
       ctaUrl: z.string().trim().url().max(2000).optional(),
       destinationUrl: z.string().trim().url().max(2000).optional(),
+      imageUrl: z.string().trim().url().max(2000).optional(),
       stock: z.coerce.number().min(0).optional(),
       isActive: z.coerce.boolean().optional(),
     })
@@ -47,6 +48,7 @@ export const updateProductSchema = z.object({
     currency: z.string().trim().min(3).max(10).optional(),
     ctaUrl: z.string().trim().url().max(2000).optional(),
     destinationUrl: z.string().trim().url().max(2000).optional(),
+    imageUrl: z.string().trim().url().max(2000).optional(),
     stock: z.coerce.number().min(0).optional(),
     isActive: z.coerce.boolean().optional(),
   }),

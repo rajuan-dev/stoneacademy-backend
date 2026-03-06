@@ -26,7 +26,7 @@ export class OnboardingService {
       throw new NotFoundException("User not found");
     }
     user.onboardingCompletedAt = new Date();
-    user.onboardingSkippedAt = null;
+    user.onboardingSkippedAt = undefined;
     await user.save();
     return {
       onboardingCompletedAt: user.onboardingCompletedAt,

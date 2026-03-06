@@ -6,11 +6,16 @@ import type { Request, Response } from "express";
 import type { StorageUploadInput } from "@/services/s3.service";
 import {
   blockUserSchema,
+  creatorIdSchema,
+  earningTransactionIdSchema,
+  listEarningTransactionsSchema,
+  processEventCreatorPayoutSchema,
   listUsersSchema,
   listBlockedUsersSchema,
   listActivitiesSchema,
   listEventsSchema,
   listPremiumCreatorsSchema,
+  dashboardAnalyticsSchema,
   listSubscriptionsSchema,
   searchUsersSchema,
   unblockUserSchema,
@@ -166,8 +171,9 @@ export class AdminController {
     ApiResponse.success(res, result, "Dashboard overview fetched successfully");
   });
 
-  dashboardAnalytics = asyncHandler(async (_req: Request, res: Response) => {
-    const result = await this.service.dashboardAnalytics();
+  dashboardAnalytics = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(dashboardAnalyticsSchema, req);
+    const result = await this.service.dashboardAnalytics(validated.query);
     ApiResponse.success(res, result, "Dashboard analytics fetched successfully");
   });
 
@@ -246,5 +252,56 @@ export class AdminController {
     const creatorId = req.params.id;
     const result = await this.service.getPremiumEventCreatorDetails(creatorId);
     ApiResponse.success(res, result, "Premium event creator details fetched");
+  });
+
+  listEventCreators = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listPremiumCreatorsSchema, req);
+    const result = await this.service.listEventCreators(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Event creators fetched",
+    );
+  });
+
+  getEventCreatorDetails = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(creatorIdSchema, req);
+    const result = await this.service.getPremiumEventCreatorDetails(validated.params.id);
+    ApiResponse.success(res, result, "Event creator details fetched");
+  });
+
+  processEventCreatorPayout = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(processEventCreatorPayoutSchema, req);
+    const adminId = req.user?.userId as string;
+    const result = await this.service.processEventCreatorPayout(
+      validated.params.id,
+      adminId,
+      validated.body,
+    );
+    ApiResponse.success(res, result, "Event creator payout processed");
+  });
+
+  listEarningTransactions = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(listEarningTransactionsSchema, req);
+    const result = await this.service.listEarningTransactions(validated.query);
+    ApiResponse.paginated(
+      res,
+      result.data,
+      result.pagination,
+      "Earning transactions fetched",
+    );
+  });
+
+  getEarningTransactionDetails = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(earningTransactionIdSchema, req);
+    const result = await this.service.getEarningTransactionDetails(validated.params.id);
+    ApiResponse.success(res, result, "Earning transaction fetched");
+  });
+
+  generateEarningInvoice = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(earningTransactionIdSchema, req);
+    const result = await this.service.generateEarningInvoice(validated.params.id);
+    ApiResponse.success(res, result, "Invoice generated");
   });
 }

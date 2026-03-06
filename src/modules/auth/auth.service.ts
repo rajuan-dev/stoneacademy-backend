@@ -545,7 +545,7 @@ export class AuthService {
 
       const accessToken = AuthUtil.generateAccessToken({
         userId: user._id.toString(),
-        adminId: subjectType === "admin" ? user._id.toString() : undefined,
+        adminId: undefined,
         email: user.email,
         role: user.role,
         status: user.status,

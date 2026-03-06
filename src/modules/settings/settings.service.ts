@@ -1,4 +1,7 @@
 import { env } from "@/env";
+import { AuthService } from "@/modules/auth/auth.service";
+import { AdminAccountService } from "@/modules/admin-account/admin-account.service";
+import { NotFoundException } from "@/utils/app-error.utils";
 import { Settings } from "./settings.model";
 
 const PLATFORM_SETTINGS_KEY = "platform";
@@ -22,6 +25,14 @@ const DEFAULT_SETTINGS: PlatformSettings = {
 };
 
 export class SettingsService {
+  private authService: AuthService;
+  private adminAccountService: AdminAccountService;
+
+  constructor() {
+    this.authService = new AuthService();
+    this.adminAccountService = new AdminAccountService();
+  }
+
   async getPlatformSettings(): Promise<PlatformSettings> {
     const doc = await Settings.findOne({ key: PLATFORM_SETTINGS_KEY }).exec();
     if (!doc) {
@@ -46,5 +57,52 @@ export class SettingsService {
       { new: true, upsert: true },
     ).exec();
     return (doc?.value || updatedValue) as PlatformSettings;
+  }
+
+  async getAdminSettingsProfile(adminId: string) {
+    const admin = await this.adminAccountService.getById(adminId);
+    if (!admin) {
+      throw new NotFoundException("Admin account not found");
+    }
+    return this.adminAccountService.toProfileSummary(admin);
+  }
+
+  async updateAdminSettingsProfile(
+    adminId: string,
+    payload: {
+      fullName?: string;
+      email?: string;
+      phone?: string;
+      contactNo?: string;
+      phoneNumber?: string;
+    },
+  ) {
+    const updated = await this.adminAccountService.updateProfile(adminId, payload);
+    return this.adminAccountService.toProfileSummary(updated);
+  }
+
+  async getAdminSettingsSecurity() {
+    return {
+      passwordPolicy: {
+        minLength: 8,
+        requiresUppercase: true,
+        requiresLowercase: true,
+        requiresNumber: true,
+        requiresSpecialCharacter: true,
+      },
+      canChangePassword: true,
+    };
+  }
+
+  async updateAdminSettingsSecurity(
+    adminId: string,
+    payload: { currentPassword: string; newPassword: string },
+  ) {
+    return this.authService.changePassword(
+      adminId,
+      payload.currentPassword,
+      payload.newPassword,
+      "admin",
+    );
   }
 }

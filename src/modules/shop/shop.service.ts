@@ -71,19 +71,22 @@ export class ShopService {
       price: number;
       currency?: string;
       ctaUrl: string;
+      imageUrl?: string;
       stock?: number;
       isActive?: boolean;
     },
-    image: StorageUploadInput,
+    image?: StorageUploadInput,
   ) {
-    const upload = await this.uploadProductImage(image, payload.category);
+    const upload = image
+      ? await this.uploadProductImage(image, payload.category)
+      : null;
     return Product.create({
       name: payload.name,
       category: payload.category,
       description: payload.description,
       price: payload.price,
       currency: payload.currency || "USD",
-      imageUrl: upload.url,
+      imageUrl: upload?.url || payload.imageUrl,
       ctaUrl: payload.ctaUrl,
       stock: payload.stock ?? 0,
       isActive: payload.isActive ?? true,
@@ -99,6 +102,7 @@ export class ShopService {
       price?: number;
       currency?: string;
       ctaUrl?: string;
+      imageUrl?: string;
       stock?: number;
       isActive?: boolean;
     },
@@ -115,6 +119,7 @@ export class ShopService {
     if (payload.price !== undefined) product.price = payload.price;
     if (payload.currency !== undefined) product.currency = payload.currency;
     if (payload.ctaUrl !== undefined) product.ctaUrl = payload.ctaUrl;
+    if (payload.imageUrl !== undefined) product.imageUrl = payload.imageUrl;
     if (payload.stock !== undefined) product.stock = payload.stock;
     if (payload.isActive !== undefined) product.isActive = payload.isActive;
     if (image) {

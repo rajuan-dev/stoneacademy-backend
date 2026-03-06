@@ -1,5 +1,5 @@
 import { ACTIVITY_STATUS, PAGINATION, USER_STATUS } from "@/constants/app.constants";
-import { NotFoundException } from "@/utils/app-error.utils";
+import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
 import { PipelineStage, Types } from "mongoose";
 import { User } from "../user/user.model";
 import { Activity } from "../activity/activity.model";
@@ -13,12 +13,15 @@ import { SettingsService } from "../settings/settings.service";
 import { PayoutRequest } from "../billing/payout-request.model";
 import { UserService } from "../user/user.service";
 import { AdminAccountService } from "../admin-account/admin-account.service";
+import { AdminAccount } from "../admin-account/admin-account.model";
+import { SubscriptionPayment } from "../subscription/subscription-payment.model";
 import type { StorageUploadInput } from "@/services/s3.service";
 
 type AggregatedUserRow = {
   _id: Types.ObjectId;
   fullName: string;
   email: string;
+  profileImageUrl?: string | null;
   username?: string | null;
   role: string;
   status: string;
@@ -39,6 +42,7 @@ type AdminUserListItem = {
   id: string;
   fullName: string;
   email: string;
+  avatarUrl: string | null;
   username: string | null;
   role: string;
   status: string;
@@ -124,6 +128,7 @@ export class AdminService {
       id: user._id.toString(),
       fullName: user.fullName,
       email: user.email,
+      avatarUrl: user.profileImageUrl ?? null,
       username,
       role: user.role,
       status: user.status,
@@ -232,6 +237,7 @@ export class AdminService {
           _id: 1,
           fullName: 1,
           email: 1,
+          profileImageUrl: 1,
           username: 1,
           role: 1,
           status: 1,
@@ -373,16 +379,112 @@ export class AdminService {
       query.limit ?? PAGINATION.DEFAULT_LIMIT,
       PAGINATION.MAX_LIMIT,
     );
-    const match: Record<string, any> = {};
-    if (query.role) match.role = query.role;
-    if (query.status) match.status = query.status;
+    const skip = (page - 1) * limit;
+    const search = query.search?.trim();
+    const searchRegex = search ? new RegExp(search, "i") : undefined;
 
-    return this.paginateUsers({
-      page,
-      limit,
-      search: query.search,
-      match,
+    const userMatch: Record<string, any> = { isDeleted: false };
+    const adminMatch: Record<string, any> = {};
+
+    if (query.role) {
+      userMatch.role = query.role;
+      adminMatch.role = query.role;
+    }
+
+    if (query.status) {
+      userMatch.status = query.status;
+      adminMatch.status = query.status;
+    }
+
+    if (searchRegex) {
+      userMatch.$or = [
+        { fullName: { $regex: searchRegex } },
+        { email: { $regex: searchRegex } },
+      ];
+      adminMatch.$or = [
+        { fullName: { $regex: searchRegex } },
+        { email: { $regex: searchRegex } },
+      ];
+    }
+
+    const [users, admins] = await Promise.all([
+      User.find(userMatch)
+        .select(
+          "_id fullName email role status createdAt blockedReason blockedAt profileImageUrl",
+        )
+        .lean(),
+      AdminAccount.find(adminMatch)
+        .select("_id fullName email role status createdAt profileImageUrl")
+        .lean(),
+    ]);
+
+    const merged = [
+      ...users.map((item) => ({
+        _id: item._id,
+        fullName: item.fullName,
+        email: item.email,
+        role: item.role,
+        status: item.status,
+        createdAt: item.createdAt,
+        blockedReason: item.blockedReason ?? null,
+        blockedAt: item.blockedAt ?? null,
+        blockedBy: null as null,
+        avatarUrl: item.profileImageUrl ?? null,
+        source: "user" as const,
+      })),
+      ...admins.map((item) => ({
+        _id: item._id,
+        fullName: item.fullName,
+        email: item.email,
+        role: item.role,
+        status: item.status,
+        createdAt: item.createdAt,
+        blockedReason: null,
+        blockedAt: null,
+        blockedBy: null as null,
+        avatarUrl: item.profileImageUrl ?? null,
+        source: "admin" as const,
+      })),
+    ].sort((a, b) => {
+      const left = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const right = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return right - left;
     });
+
+    const paged = merged.slice(skip, skip + limit);
+    const data = paged.map((item, index) => {
+      const isBlocked = item.status === USER_STATUS.BLOCKED;
+      return {
+        serial: skip + index + 1,
+        id: item._id.toString(),
+        fullName: item.fullName,
+        email: item.email,
+        username: this.deriveUsername(item.email),
+        role: item.role,
+        status: item.status,
+        joinedAt: item.createdAt ?? null,
+        isBlocked,
+        blockedReason: item.blockedReason,
+        blockedAt: item.blockedAt,
+        blockedBy: item.blockedBy,
+        avatarUrl: item.avatarUrl,
+        actions: {
+          canBlock: item.source === "user" && !isBlocked,
+          canUnblock: item.source === "user" && isBlocked,
+          canViewDetails: true,
+        },
+      };
+    });
+
+    return {
+      data,
+      pagination: this.buildPaginationMeta({
+        page,
+        limit,
+        totalItems: merged.length,
+        serialStart: data.length ? skip + 1 : 0,
+      }),
+    };
   }
 
   async listBlockedUsers(query: {
@@ -553,6 +655,7 @@ export class AdminService {
       openReports,
       openSupportTickets,
       paymentSummary,
+      subscriptionRevenueSummary,
     ] = await Promise.all([
       User.countDocuments({ isDeleted: false }),
       Activity.countDocuments({}),
@@ -570,7 +673,26 @@ export class AdminService {
           },
         },
       ]),
+      SubscriptionPayment.aggregate([
+        { $match: { status: "succeeded" } },
+        {
+          $group: {
+            _id: null,
+            totalSubscriptionRevenue: { $sum: "$amount" },
+          },
+        },
+      ]),
     ]);
+
+    const eventPlatformFeeRevenue = Number(
+      (paymentSummary?.[0]?.platformFee || 0).toFixed(2),
+    );
+    const subscriptionRevenue = Number(
+      (subscriptionRevenueSummary?.[0]?.totalSubscriptionRevenue || 0).toFixed(2),
+    );
+    const totalRevenue = Number(
+      (eventPlatformFeeRevenue + subscriptionRevenue).toFixed(2),
+    );
 
     return {
       totalUsers,
@@ -578,6 +700,9 @@ export class AdminService {
       totalEvents,
       openReports,
       openSupportTickets,
+      totalRevenue,
+      eventPlatformFeeRevenue,
+      subscriptionRevenue,
       payments: paymentSummary[0] || {
         gross: 0,
         platformFee: 0,
@@ -586,59 +711,122 @@ export class AdminService {
     };
   }
 
-  async dashboardAnalytics() {
-    const since = new Date();
-    since.setMonth(since.getMonth() - 6);
+  async dashboardAnalytics(query?: { year?: number }) {
+    const selectedYear = query?.year ?? new Date().getFullYear();
+    const startOfYear = new Date(selectedYear, 0, 1);
+    const startOfNextYear = new Date(selectedYear + 1, 0, 1);
+    const monthLabels = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
     const [userSeries, activitySeries, eventSeries, revenueSeries] =
       await Promise.all([
         User.aggregate([
-          { $match: { createdAt: { $gte: since } } },
+          {
+            $match: {
+              createdAt: { $gte: startOfYear, $lt: startOfNextYear },
+              isDeleted: false,
+            },
+          },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               count: { $sum: 1 },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
         Activity.aggregate([
-          { $match: { createdAt: { $gte: since } } },
+          { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               count: { $sum: 1 },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
         Event.aggregate([
-          { $match: { createdAt: { $gte: since } } },
+          { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               count: { $sum: 1 },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
         PaymentTransaction.aggregate([
-          { $match: { status: "succeeded", createdAt: { $gte: since } } },
+          {
+            $match: {
+              status: "succeeded",
+              createdAt: { $gte: startOfYear, $lt: startOfNextYear },
+            },
+          },
           {
             $group: {
-              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: { month: { $month: "$createdAt" } },
               gross: { $sum: "$grossAmount" },
             },
           },
-          { $sort: { "_id.year": 1, "_id.month": 1 } },
+          { $sort: { "_id.month": 1 } },
         ]),
       ]);
 
+    const usersByMonth = new Map<number, number>(
+      userSeries.map((entry) => [Number(entry._id?.month), Number(entry.count) || 0]),
+    );
+    const activitiesByMonth = new Map<number, number>(
+      activitySeries.map((entry) => [
+        Number(entry._id?.month),
+        Number(entry.count) || 0,
+      ]),
+    );
+    const eventsByMonth = new Map<number, number>(
+      eventSeries.map((entry) => [Number(entry._id?.month), Number(entry.count) || 0]),
+    );
+    const revenueByMonth = new Map<number, number>(
+      revenueSeries.map((entry) => [
+        Number(entry._id?.month),
+        Number(entry.gross) || 0,
+      ]),
+    );
+
+    const monthlyUsers = monthLabels.map((month, index) => ({
+      month,
+      users: usersByMonth.get(index + 1) || 0,
+    }));
+
     return {
-      users: userSeries,
-      activities: activitySeries,
-      events: eventSeries,
-      revenue: revenueSeries,
+      year: selectedYear,
+      monthlyUsers,
+      users: monthLabels.map((month, index) => ({
+        month,
+        count: usersByMonth.get(index + 1) || 0,
+      })),
+      activities: monthLabels.map((month, index) => ({
+        month,
+        count: activitiesByMonth.get(index + 1) || 0,
+      })),
+      events: monthLabels.map((month, index) => ({
+        month,
+        count: eventsByMonth.get(index + 1) || 0,
+      })),
+      revenue: monthLabels.map((month, index) => ({
+        month,
+        gross: revenueByMonth.get(index + 1) || 0,
+      })),
     };
   }
 
@@ -661,10 +849,47 @@ export class AdminService {
       filter.status = query.status;
     }
 
-    const [data, totalItems] = await Promise.all([
-      Activity.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+    const [rows, totalItems] = await Promise.all([
+      Activity.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("hostId", "fullName email profileImageUrl")
+        .populate("media", "url")
+        .exec(),
       Activity.countDocuments(filter),
     ]);
+
+    const data = rows.map((row: any, index: number) => {
+      const host = row.hostId || null;
+      const mediaList = Array.isArray(row.media) ? row.media : [];
+      const firstImageUrl = mediaList.length ? (mediaList[0]?.url || null) : null;
+
+      return {
+        id: row._id.toString(),
+        sId: skip + index + 1,
+        entityType: "activity",
+        title: row.title || "Untitled Activity",
+        type: row.type || "general",
+        description: row.description || null,
+        status: row.status,
+        startAt: row.startAt || null,
+        endAt: row.endAt || null,
+        location: row.location?.label || null,
+        participantLimit: row.participantLimit ?? null,
+        joinedCount: row.stats?.joinedCount ?? 0,
+        createdAt: row.createdAt || null,
+        host: {
+          id: host?._id?.toString?.() || host?.toString?.() || null,
+          name: host?.fullName || null,
+          email: host?.email || null,
+          avatarUrl: host?.profileImageUrl || null,
+        },
+        hostName: host?.fullName || null,
+        hostAvatarUrl: host?.profileImageUrl || null,
+        imageUrl: firstImageUrl,
+      };
+    });
 
     return {
       data,
@@ -698,10 +923,47 @@ export class AdminService {
       filter.status = query.status;
     }
 
-    const [data, totalItems] = await Promise.all([
-      Event.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+    const [rows, totalItems] = await Promise.all([
+      Event.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("creatorId", "fullName email profileImageUrl")
+        .populate("media", "url")
+        .exec(),
       Event.countDocuments(filter),
     ]);
+
+    const data = rows.map((row: any, index: number) => {
+      const creator = row.creatorId || null;
+      const mediaList = Array.isArray(row.media) ? row.media : [];
+      const firstImageUrl = mediaList.length ? (mediaList[0]?.url || null) : null;
+
+      return {
+        id: row._id.toString(),
+        sId: skip + index + 1,
+        entityType: "event",
+        title: row.title || "Untitled Event",
+        type: row.type || "general",
+        description: row.description || null,
+        status: row.status,
+        startAt: row.startAt || null,
+        endAt: row.endAt || null,
+        location: row.location?.label || null,
+        participantLimit: row.participantLimit ?? null,
+        joinedCount: row.stats?.joinedCount ?? 0,
+        createdAt: row.createdAt || null,
+        host: {
+          id: creator?._id?.toString?.() || creator?.toString?.() || null,
+          name: creator?.fullName || null,
+          email: creator?.email || null,
+          avatarUrl: creator?.profileImageUrl || null,
+        },
+        hostName: creator?.fullName || null,
+        hostAvatarUrl: creator?.profileImageUrl || null,
+        imageUrl: firstImageUrl,
+      };
+    });
 
     return {
       data,
@@ -817,6 +1079,8 @@ export class AdminService {
             _id: "$user._id",
             fullName: "$user.fullName",
             email: "$user.email",
+            profileImageUrl: "$user.profileImageUrl",
+            avatarUrl: "$user.profileImageUrl",
           },
         },
       },
@@ -860,6 +1124,8 @@ export class AdminService {
       userId: row.user?._id?.toString?.() || null,
       user: row.user?.fullName || null,
       email: row.user?.email || null,
+      avatarUrl: row.user?.profileImageUrl || null,
+      profileImageUrl: row.user?.profileImageUrl || null,
       plans: row.plan,
       expirationDate: row.endAt,
       startAt: row.startAt,
@@ -958,6 +1224,8 @@ export class AdminService {
           creatorId: "$user._id",
           creatorName: "$user.fullName",
           creatorEmail: "$user.email",
+          creatorAvatarUrl: "$user.profileImageUrl",
+          creatorStatus: "$user.status",
           latestPlan: 1,
           latestEndAt: 1,
         },
@@ -1044,6 +1312,8 @@ export class AdminService {
         creatorId: id,
         creatorName: creator.creatorName,
         creatorEmail: creator.creatorEmail,
+        creatorAvatarUrl: creator.creatorAvatarUrl || null,
+        creatorStatus: creator.creatorStatus || null,
         totalEvents: eventRow?.totalEvents || 0,
         ticketSold: earningRow?.ticketSold || 0,
         totalEarnings: totalCreatorEarnings,
@@ -1080,20 +1350,174 @@ export class AdminService {
     };
   }
 
+  async listEventCreators(query: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    paymentStatus?: "pending" | "complete" | "all";
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+    const searchRegex = query.q ? new RegExp(query.q, "i") : null;
+
+    const creatorRows = await Event.aggregate([
+      {
+        $group: {
+          _id: "$creatorId",
+          totalEvents: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: false } },
+      ...(searchRegex
+        ? [
+            {
+              $match: {
+                $or: [
+                  { "user.fullName": searchRegex },
+                  { "user.email": searchRegex },
+                ],
+              },
+            },
+          ]
+        : []),
+      {
+        $project: {
+          _id: 0,
+          creatorId: "$user._id",
+          creatorName: "$user.fullName",
+          creatorEmail: "$user.email",
+          creatorAvatarUrl: "$user.profileImageUrl",
+          creatorStatus: "$user.status",
+          totalEvents: 1,
+        },
+      },
+    ]);
+
+    const creatorIds = creatorRows.map((item: any) => item.creatorId);
+    if (!creatorIds.length) {
+      return {
+        data: [],
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: 0,
+          pageCount: 0,
+          hasNext: false,
+          hasPrev: page > 1,
+        },
+      };
+    }
+
+    const [earningStats, payoutStats] = await Promise.all([
+      PaymentTransaction.aggregate([
+        { $match: { status: "succeeded" } },
+        {
+          $lookup: {
+            from: "events",
+            localField: "eventId",
+            foreignField: "_id",
+            as: "event",
+          },
+        },
+        { $unwind: { path: "$event", preserveNullAndEmptyArrays: false } },
+        { $match: { "event.creatorId": { $in: creatorIds } } },
+        {
+          $group: {
+            _id: "$event.creatorId",
+            ticketSold: { $sum: 1 },
+            totalEarnings: { $sum: "$creatorShareAmount" },
+          },
+        },
+      ]),
+      PayoutRequest.aggregate([
+        { $match: { creatorId: { $in: creatorIds }, status: "paid" } },
+        {
+          $group: {
+            _id: "$creatorId",
+            totalPaidOut: { $sum: "$amount" },
+          },
+        },
+      ]),
+    ]);
+
+    const earningStatsMap = new Map(
+      earningStats.map((item: any) => [item._id.toString(), item]),
+    );
+    const payoutStatsMap = new Map(
+      payoutStats.map((item: any) => [item._id.toString(), item]),
+    );
+
+    const merged = creatorRows.map((creator: any) => {
+      const id = creator.creatorId.toString();
+      const earningRow = earningStatsMap.get(id);
+      const payoutRow = payoutStatsMap.get(id);
+      const totalCreatorEarnings = Number((earningRow?.totalEarnings || 0).toFixed(2));
+      const totalPaidOut = Number((payoutRow?.totalPaidOut || 0).toFixed(2));
+      const pendingAmount = Number((totalCreatorEarnings - totalPaidOut).toFixed(2));
+
+      return {
+        creatorId: id,
+        creatorName: creator.creatorName,
+        creatorEmail: creator.creatorEmail,
+        creatorAvatarUrl: creator.creatorAvatarUrl || null,
+        creatorStatus: creator.creatorStatus || null,
+        totalEvents: creator.totalEvents || 0,
+        ticketSold: earningRow?.ticketSold || 0,
+        totalEarnings: totalCreatorEarnings,
+        paymentStatus: pendingAmount > 0 ? "pending" : "complete",
+        pendingAmount: Math.max(0, pendingAmount),
+      };
+    });
+
+    const filtered =
+      query.paymentStatus && query.paymentStatus !== "all"
+        ? merged.filter((item) => item.paymentStatus === query.paymentStatus)
+        : merged;
+
+    filtered.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+    const paged = filtered.slice(skip, skip + limit).map((item, idx) => ({
+      sId: skip + idx + 1,
+      ...item,
+    }));
+
+    const totalItems = filtered.length;
+    return {
+      data: paged,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
   async getPremiumEventCreatorDetails(creatorId: string) {
     if (!Types.ObjectId.isValid(creatorId)) {
       throw new NotFoundException("Creator not found");
     }
 
     const creator = await User.findById(creatorId)
-      .select("fullName email role creatorStatus")
+      .select("fullName email role creatorStatus profileImageUrl status")
       .exec();
     if (!creator) throw new NotFoundException("Creator not found");
 
     const [latestSubscription, eventRows, totalEvents, paymentSummary, payoutSummary] = await Promise.all([
       Subscription.findOne({ userId: creatorId }).sort({ createdAt: -1 }).exec(),
       Event.find({ creatorId })
-        .select("title type startAt endAt status createdAt priceType ticketPrice discountPercentage")
+        .select("title type startAt endAt status createdAt priceType ticketPrice discountPercentage stats")
         .sort({ createdAt: -1 })
         .limit(50)
         .exec(),
@@ -1152,6 +1576,8 @@ export class AdminService {
         fullName: creator.fullName,
         email: creator.email,
         role: creator.role,
+        status: creator.status || null,
+        avatarUrl: creator.profileImageUrl || null,
       },
       subscription: latestSubscription
         ? {
@@ -1173,6 +1599,272 @@ export class AdminService {
         paymentStatus: pendingAmount > 0 ? "pending" : "complete",
       },
       events: eventRows,
+    };
+  }
+
+  async processEventCreatorPayout(
+    creatorId: string,
+    adminId: string,
+    payload: { amount?: number; currency?: string; note?: string },
+  ) {
+    if (!Types.ObjectId.isValid(creatorId)) {
+      throw new NotFoundException("Creator not found");
+    }
+
+    const creator = await User.findById(creatorId).select("_id").exec();
+    if (!creator) throw new NotFoundException("Creator not found");
+
+    const [paymentSummary, payoutSummary] = await Promise.all([
+      PaymentTransaction.aggregate([
+        { $match: { status: "succeeded" } },
+        {
+          $lookup: {
+            from: "events",
+            localField: "eventId",
+            foreignField: "_id",
+            as: "event",
+          },
+        },
+        { $unwind: "$event" },
+        { $match: { "event.creatorId": new Types.ObjectId(creatorId) } },
+        {
+          $group: {
+            _id: null,
+            totalEarnings: { $sum: "$creatorShareAmount" },
+          },
+        },
+      ]),
+      PayoutRequest.aggregate([
+        {
+          $match: {
+            creatorId: new Types.ObjectId(creatorId),
+            status: "paid",
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalPaidOut: { $sum: "$amount" },
+          },
+        },
+      ]),
+    ]);
+
+    const totalEarnings = paymentSummary?.[0]?.totalEarnings || 0;
+    const totalPaidOut = payoutSummary?.[0]?.totalPaidOut || 0;
+    const pendingAmount = Math.max(
+      0,
+      Number((totalEarnings - totalPaidOut).toFixed(2)),
+    );
+
+    if (pendingAmount <= 0) {
+      throw new BadRequestException("No pending payout amount available");
+    }
+
+    const amount = payload.amount ?? pendingAmount;
+    if (amount <= 0) {
+      throw new BadRequestException("Payout amount must be greater than zero");
+    }
+    if (amount > pendingAmount) {
+      throw new BadRequestException("Payout amount exceeds pending balance");
+    }
+
+    const payout = await PayoutRequest.create({
+      creatorId: creator._id,
+      amount: Number(amount.toFixed(2)),
+      currency: payload.currency || "USD",
+      status: "paid",
+      note: payload.note || "Processed by admin",
+      reviewedBy: adminId as any,
+      reviewedAt: new Date(),
+    });
+
+    await AdminAuditLog.create({
+      adminId,
+      action: "event_creator_payout_processed",
+      entityType: "creator",
+      entityId: creator._id,
+      meta: {
+        payoutId: payout._id.toString(),
+        amount: payout.amount,
+        currency: payout.currency,
+      },
+    });
+
+    return {
+      payoutId: payout._id.toString(),
+      creatorId: creator._id.toString(),
+      amount: payout.amount,
+      currency: payout.currency,
+      status: payout.status,
+      pendingAmountBefore: pendingAmount,
+      pendingAmountAfter: Number((pendingAmount - payout.amount).toFixed(2)),
+      processedAt: payout.reviewedAt,
+    };
+  }
+
+  async listEarningTransactions(query: {
+    page?: number;
+    limit?: number;
+    status?: "pending" | "succeeded" | "failed" | "refunded";
+  }) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const status = query.status || "succeeded";
+
+    const [eventRows, subscriptionRows] = await Promise.all([
+      PaymentTransaction.find({ status })
+        .sort({ createdAt: -1 })
+        .populate("payerId", "fullName email profileImageUrl")
+        .populate("eventId", "title")
+        .exec(),
+      SubscriptionPayment.find({ status })
+        .sort({ createdAt: -1 })
+        .populate("userId", "fullName email profileImageUrl")
+        .exec(),
+    ]);
+
+    const normalizedRows = [
+      ...eventRows.map((row: any) => {
+        const payer = row.payerId || null;
+        const amount = Number(row.platformFeeAmount || 0);
+        return {
+          id: row._id.toString(),
+          payer: {
+            id: payer?._id?.toString?.() || null,
+            fullName: payer?.fullName || "N/A",
+            email: payer?.email || null,
+            avatarUrl: payer?.profileImageUrl || null,
+          },
+          transactionId: row.providerReference || row._id.toString(),
+          plan: "Event Commission (10%)",
+          adminEarning: amount,
+          currency: row.currency || "USD",
+          date: row.createdAt,
+          status: row.status,
+          eventTitle: row.eventId?.title || null,
+          sourceType: "event_commission",
+        };
+      }),
+      ...subscriptionRows.map((row: any) => {
+        const payer = row.userId || null;
+        const amount = Number(row.amount || 0);
+        return {
+          id: row._id.toString(),
+          payer: {
+            id: payer?._id?.toString?.() || null,
+            fullName: payer?.fullName || "N/A",
+            email: payer?.email || null,
+            avatarUrl: payer?.profileImageUrl || null,
+          },
+          transactionId: row.providerReference || row._id.toString(),
+          plan: row.plan === "yearly" ? "Subscription (Yearly)" : "Subscription (Monthly)",
+          adminEarning: amount,
+          currency: row.currency || "USD",
+          date: row.createdAt,
+          status: row.status,
+          eventTitle: null,
+          sourceType: "subscription",
+        };
+      }),
+    ].sort(
+      (a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
+    );
+
+    const totalItems = normalizedRows.length;
+    const data = normalizedRows.slice(skip, skip + limit).map((row, index) => {
+      return {
+        ...row,
+        sId: skip + index + 1,
+      };
+    });
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async getEarningTransactionDetails(transactionId: string) {
+    const eventRow = await PaymentTransaction.findById(transactionId)
+      .populate("payerId", "fullName email profileImageUrl")
+      .populate("eventId", "title")
+      .exec();
+    if (eventRow) {
+      const payer: any = eventRow.payerId || null;
+      return {
+        id: eventRow._id.toString(),
+        transactionId: eventRow.providerReference || eventRow._id.toString(),
+        plan: "Event Commission (10%)",
+        amount: Number(eventRow.platformFeeAmount || 0),
+        currency: eventRow.currency || "USD",
+        date: eventRow.createdAt,
+        status: eventRow.status,
+        sourceType: "event_commission",
+        eventTitle: (eventRow.eventId as any)?.title || null,
+        payer: {
+          id: payer?._id?.toString?.() || null,
+          fullName: payer?.fullName || "N/A",
+          email: payer?.email || null,
+          avatarUrl: payer?.profileImageUrl || null,
+          accountNumberMasked: "**** **** **** *545",
+        },
+      };
+    }
+
+    const subscriptionRow = await SubscriptionPayment.findById(transactionId)
+      .populate("userId", "fullName email profileImageUrl")
+      .exec();
+    if (!subscriptionRow) throw new NotFoundException("Earning transaction not found");
+
+    const payer: any = subscriptionRow.userId || null;
+    return {
+      id: subscriptionRow._id.toString(),
+      transactionId: subscriptionRow.providerReference || subscriptionRow._id.toString(),
+      plan:
+        subscriptionRow.plan === "yearly"
+          ? "Subscription (Yearly)"
+          : "Subscription (Monthly)",
+      amount: Number(subscriptionRow.amount || 0),
+      currency: subscriptionRow.currency || "USD",
+      date: subscriptionRow.createdAt,
+      status: subscriptionRow.status,
+      sourceType: "subscription",
+      eventTitle: null,
+      payer: {
+        id: payer?._id?.toString?.() || null,
+        fullName: payer?.fullName || "N/A",
+        email: payer?.email || null,
+        avatarUrl: payer?.profileImageUrl || null,
+        accountNumberMasked: "**** **** **** *545",
+      },
+    };
+  }
+
+  async generateEarningInvoice(transactionId: string) {
+    const details = await this.getEarningTransactionDetails(transactionId);
+    return {
+      invoiceId: `INV-${details.id.slice(-8).toUpperCase()}`,
+      transactionId: details.transactionId,
+      amount: details.amount,
+      currency: details.currency,
+      date: details.date,
+      billTo: {
+        name: details.payer.fullName,
+        email: details.payer.email,
+      },
+      eventTitle: details.eventTitle,
+      status: details.status,
+      generatedAt: new Date(),
     };
   }
 }

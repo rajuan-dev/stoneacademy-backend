@@ -1,12 +1,12 @@
 // file: src/utils/pagination-helper.ts
 
 import type { PaginatedResponse } from "@/ts/pagination.types";
+import type { PaginationMeta } from "@/utils/response.utils";
 import {
   buildMongoFilters,
   buildPaginationMeta,
   buildSort,
   parsePaginationParams,
-  type PaginationMeta,
   type PaginationQueryParams,
 } from "@/core/http/pagination";
 
@@ -123,4 +123,3 @@ export class PaginationHelper {
     return buildSort(sortBy, sortOrder);
   }
 }
-

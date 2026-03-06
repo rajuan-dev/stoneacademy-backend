@@ -134,6 +134,46 @@ export const listPremiumCreatorsSchema = z.object({
   }),
 });
 
+export const creatorIdSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+});
+
+export const processEventCreatorPayoutSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z
+    .object({
+      amount: z.coerce.number().min(0.01).optional(),
+      currency: z.string().trim().min(3).max(10).optional(),
+      note: z.string().trim().max(2000).optional(),
+    })
+    .optional()
+    .default({}),
+});
+
+export const listEarningTransactionsSchema = z.object({
+  query: z.object({
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+    status: z.enum(["pending", "succeeded", "failed", "refunded"]).optional(),
+  }),
+});
+
+export const earningTransactionIdSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+});
+
+export const dashboardAnalyticsSchema = z.object({
+  query: z.object({
+    year: z.coerce.number().int().min(1970).max(9999).optional(),
+  }),
+});
+
 export const updateAdminProfileSchema = z.object({
   body: z
     .object({

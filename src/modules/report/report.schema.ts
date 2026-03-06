@@ -35,3 +35,40 @@ export const updateReportStatusSchema = z.object({
     adminNote: z.string().trim().max(3000).optional(),
   }),
 });
+
+export const adminResolveReportSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z
+    .object({
+      status: z.enum(["resolved", "under_review", "closed"]).optional(),
+      adminNote: z.string().trim().max(3000).optional(),
+      resolutionNotes: z.string().trim().max(3000).optional(),
+    })
+    .optional()
+    .default({}),
+});
+
+export const adminDismissReportSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z
+    .object({
+      adminNote: z.string().trim().max(3000).optional(),
+      dismissalReason: z.string().trim().max(3000).optional(),
+    })
+    .optional()
+    .default({}),
+});
+
+export const adminReportActionSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  body: z.object({
+    action: z.enum(["warn", "disable_user", "recover_user"]),
+    note: z.string().trim().max(3000).optional(),
+  }),
+});

@@ -1,4 +1,5 @@
-import { PAGINATION } from "@/constants/app.constants";
+import { PAGINATION, USER_STATUS } from "@/constants/app.constants";
+import { AdminAuditLog } from "@/modules/admin/admin-audit-log.model";
 import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
 import { notificationService } from "@/modules/notification/notification.service";
 import {
@@ -108,6 +109,97 @@ export class ReportService {
     return this.getByIdHydrated(report._id.toString());
   }
 
+  async applyAdminAction(
+    reportId: string,
+    adminId: string,
+    payload: { action: "warn" | "disable_user" | "recover_user"; note?: string },
+  ) {
+    const report = await Report.findById(reportId).exec();
+    if (!report) throw new NotFoundException("Report not found");
+    if (!report.reportedUserId) {
+      throw new BadRequestException(
+        "This report has no target user available for moderation action",
+      );
+    }
+
+    const targetUserId = report.reportedUserId.toString();
+    const note = payload.note?.trim() || undefined;
+
+    if (payload.action === "warn") {
+      await notificationService.create({
+        userId: targetUserId,
+        type: "report_warning",
+        title: "Account warning",
+        body: "You received a warning from admin after a report review.",
+        payload: {
+          reportId: report._id.toString(),
+          action: payload.action,
+          note: note ?? null,
+        },
+      });
+    }
+
+    if (payload.action === "disable_user") {
+      await this.updateUserModerationStatus(
+        targetUserId,
+        USER_STATUS.BLOCKED,
+        adminId,
+        note ?? "Disabled by administrator through report action",
+      );
+      await notificationService.create({
+        userId: targetUserId,
+        type: "account_disabled",
+        title: "Account disabled",
+        body: "Your account has been disabled by admin after report review.",
+        payload: {
+          reportId: report._id.toString(),
+          action: payload.action,
+          note: note ?? null,
+        },
+      });
+    }
+
+    if (payload.action === "recover_user") {
+      await this.updateUserModerationStatus(
+        targetUserId,
+        USER_STATUS.ACTIVE,
+        adminId,
+        note,
+      );
+      await notificationService.create({
+        userId: targetUserId,
+        type: "account_recovered",
+        title: "Account recovered",
+        body: "Your account has been recovered by admin after report review.",
+        payload: {
+          reportId: report._id.toString(),
+          action: payload.action,
+          note: note ?? null,
+        },
+      });
+    }
+
+    report.status = "resolved";
+    report.adminNote = note ?? `Admin action: ${payload.action}`;
+    report.resolvedBy = adminId as any;
+    report.resolvedAt = new Date();
+    await report.save();
+
+    await notificationService.create({
+      userId: report.reporterId.toString(),
+      type: "report_status_updated",
+      title: "Report updated",
+      body: "An admin has completed an action on your report.",
+      payload: {
+        reportId: report._id.toString(),
+        status: report.status,
+        action: payload.action,
+      },
+    });
+
+    return this.getByIdHydrated(report._id.toString());
+  }
+
   private async listCommon(filterInput: Record<string, unknown>) {
     const page = Number(filterInput.page ?? PAGINATION.DEFAULT_PAGE);
     const limit = Number(filterInput.limit ?? PAGINATION.DEFAULT_LIMIT);
@@ -123,8 +215,8 @@ export class ReportService {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("reporterId", "fullName profileImageUrl email")
-        .populate("reportedUserId", "fullName profileImageUrl email")
+        .populate("reporterId", "fullName profileImageUrl email status")
+        .populate("reportedUserId", "fullName profileImageUrl email status")
         .exec(),
       Report.countDocuments(filter),
     ]);
@@ -144,8 +236,8 @@ export class ReportService {
 
   private async getByIdHydrated(reportId: string) {
     const report = await Report.findById(reportId)
-      .populate("reporterId", "fullName profileImageUrl email")
-      .populate("reportedUserId", "fullName profileImageUrl email")
+      .populate("reporterId", "fullName profileImageUrl email status")
+      .populate("reportedUserId", "fullName profileImageUrl email status")
       .exec();
 
     if (!report) {
@@ -208,6 +300,7 @@ export class ReportService {
     fullName: string | null;
     email: string | null;
     profileImageUrl: string | null;
+    status: string | null;
   } | null {
     if (!userRef) return null;
 
@@ -217,6 +310,7 @@ export class ReportService {
         fullName: null,
         email: null,
         profileImageUrl: null,
+        status: null,
       };
     }
 
@@ -226,6 +320,7 @@ export class ReportService {
         fullName?: unknown;
         email?: unknown;
         profileImageUrl?: unknown;
+        status?: unknown;
       };
 
       const idValue = user._id
@@ -240,6 +335,7 @@ export class ReportService {
         email: typeof user.email === "string" ? user.email : null,
         profileImageUrl:
           typeof user.profileImageUrl === "string" ? user.profileImageUrl : null,
+        status: typeof user.status === "string" ? user.status : null,
       };
     }
 
@@ -283,5 +379,39 @@ export class ReportService {
         entityType: reportDoc.entityType,
       },
     };
+  }
+
+  private async updateUserModerationStatus(
+    userId: string,
+    status: string,
+    adminId: string,
+    reason?: string,
+  ) {
+    const update: Record<string, unknown> = { status };
+    if (status === USER_STATUS.BLOCKED) {
+      update.blockedReason = reason ?? null;
+      update.blockedAt = new Date();
+      update.blockedBy = adminId as any;
+    } else if (status === USER_STATUS.ACTIVE) {
+      update.blockedReason = null;
+      update.blockedAt = null;
+      update.blockedBy = null;
+    }
+
+    const user = await User.findByIdAndUpdate(userId, update, { new: true }).exec();
+    if (!user) throw new NotFoundException("User not found");
+
+    await AdminAuditLog.create({
+      adminId,
+      action:
+        status === USER_STATUS.BLOCKED ? "user_blocked" : "user_unblocked",
+      entityType: "user",
+      entityId: user._id,
+      meta: {
+        status,
+        reason: reason ?? null,
+        source: "report_moderation",
+      },
+    });
   }
 }

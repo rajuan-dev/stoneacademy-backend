@@ -6,7 +6,7 @@ import adminRouter from "@/modules/admin/admin.route";
 import adminAuthRouter from "@/modules/admin-auth/admin-auth.route";
 import categoryRouter from "@/modules/category/category.route";
 import eventRouter from "@/modules/event/event.route";
-import reportRouter from "@/modules/report/report.route";
+import reportRouter, { adminReportRouter } from "@/modules/report/report.route";
 import reviewRouter from "@/modules/review/review.route";
 import subscriptionRouter from "@/modules/subscription/subscription.route";
 import messageRouter from "@/modules/message/message.route";
@@ -87,6 +87,10 @@ const moduleRoutes = [
   {
     path: "/reports",
     route: reportRouter,
+  },
+  {
+    path: "/admin/reports",
+    route: adminReportRouter,
   },
   {
     path: "/reviews",

@@ -1,6 +1,10 @@
 import { URL } from "url";
 import { env } from "@/env";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 
@@ -65,6 +69,16 @@ export class S3Service {
   ): Promise<StorageUploadResult[]> {
     const uploads = files.map((file) => this.uploadFile(file, options));
     return Promise.all(uploads);
+  }
+
+  async deleteFile(key: string): Promise<void> {
+    if (!key) return;
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      }),
+    );
   }
 
   private buildKey(prefix: string, originalName: string): string {

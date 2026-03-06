@@ -72,8 +72,6 @@ const adminAccountSchema = BaseSchemaUtil.createSchema<IAdminAccount>(
   },
 );
 
-adminAccountSchema.index({ email: 1 }, { unique: true });
-
 export const AdminAccount = model<IAdminAccount>("Admin", adminAccountSchema, "admin");
 
 const adminRefreshTokenBlacklistSchema = new Schema(

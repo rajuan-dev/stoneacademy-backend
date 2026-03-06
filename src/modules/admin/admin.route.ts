@@ -15,6 +15,7 @@ router.use(
 router.get("/profile", controller.getMyProfile);
 router.patch("/profile", upload.single("photo"), controller.updateMyProfile);
 router.get("/dashboard/overview", controller.dashboardOverview);
+router.get("/dashboard/metrics", controller.dashboardOverview);
 router.get("/dashboard/analytics", controller.dashboardAnalytics);
 router.get("/users", controller.listUsers);
 router.get("/users/search", controller.searchUsers);
@@ -33,5 +34,11 @@ router.get("/subscriptions/fees", controller.getSubscriptionFees);
 router.patch("/subscriptions/fees", controller.updateSubscriptionFees);
 router.get("/event-creators/premium", controller.listPremiumEventCreators);
 router.get("/event-creators/premium/:id", controller.getPremiumEventCreatorDetails);
+router.get("/event-creators", controller.listEventCreators);
+router.get("/event-creators/:id", controller.getEventCreatorDetails);
+router.post("/event-creators/:id/payout", controller.processEventCreatorPayout);
+router.get("/earnings/transactions", controller.listEarningTransactions);
+router.get("/earnings/transactions/:id", controller.getEarningTransactionDetails);
+router.post("/earnings/transactions/:id/invoice", controller.generateEarningInvoice);
 
 export default router;
