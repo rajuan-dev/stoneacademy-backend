@@ -51,6 +51,34 @@ export class StripeService {
     return this.stripe.paymentIntents.confirm(paymentIntentId, params);
   }
 
+  async createConnectedExpressAccount(params: {
+    email: string;
+    metadata?: Record<string, string>;
+  }) {
+    return this.stripe.accounts.create({
+      type: "express",
+      email: params.email,
+      metadata: params.metadata,
+    });
+  }
+
+  async retrieveConnectedAccount(accountId: string) {
+    return this.stripe.accounts.retrieve(accountId);
+  }
+
+  async createConnectedAccountOnboardingLink(params: {
+    accountId: string;
+    refreshUrl: string;
+    returnUrl: string;
+  }) {
+    return this.stripe.accountLinks.create({
+      account: params.accountId,
+      refresh_url: params.refreshUrl,
+      return_url: params.returnUrl,
+      type: "account_onboarding",
+    });
+  }
+
   constructWebhookEvent(
     payload: Buffer,
     signature: string,

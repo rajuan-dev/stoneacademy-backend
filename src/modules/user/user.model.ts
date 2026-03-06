@@ -175,6 +175,17 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
       onboardingSkippedAt: {
         type: Date,
       },
+      stripeAccountId: {
+        type: String,
+        trim: true,
+        sparse: true,
+        index: true,
+      },
+      stripeOnboardingCompleted: {
+        type: Boolean,
+        default: false,
+        index: true,
+      },
       passwordChangedAt: {
         type: Date,
       },

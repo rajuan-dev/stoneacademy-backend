@@ -2,6 +2,9 @@ import { ROLES } from "@/constants/app.constants";
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { stripeService } from "@/services/stripe.service";
+import { Event } from "@/modules/event/event.model";
+import { User } from "@/modules/user/user.model";
+import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
 import { Router, type Request, type Response } from "express";
@@ -129,6 +132,20 @@ billingRouter.post(
       eventId,
       payerId: userId,
     });
+    const event = await Event.findById(eventId).select("creatorId").lean();
+    if (!event?.creatorId) {
+      throw new NotFoundException("Event host not found");
+    }
+
+    const host = await User.findById(event.creatorId)
+      .select("stripeAccountId stripeOnboardingCompleted")
+      .lean();
+
+    if (!host?.stripeAccountId || !host?.stripeOnboardingCompleted) {
+      throw new BadRequestException(
+        "Host Stripe onboarding is incomplete. Ticket payment is not available yet.",
+      );
+    }
 
     if (!env.STRIPE_SECRET_KEY) {
       return ApiResponse.success(
@@ -142,14 +159,22 @@ billingRouter.post(
       );
     }
 
+    // Stripe Connect destination charge:
+    // - platform keeps `application_fee_amount` (10%)
+    // - remaining amount is transferred to host connected account (90%)
     const intent = await stripeService.createPaymentIntent({
       amount: Math.round(transaction.grossAmount * 100),
       currency: (transaction.currency || "usd").toLowerCase(),
+      application_fee_amount: Math.round(transaction.platformFeeAmount * 100),
+      transfer_data: {
+        destination: host.stripeAccountId,
+      },
       metadata: {
         paymentType: "event_ticket",
         transactionId: transaction._id.toString(),
         eventId: eventId,
         payerId: userId,
+        hostStripeAccountId: host.stripeAccountId,
       },
       automatic_payment_methods: { enabled: true },
     });

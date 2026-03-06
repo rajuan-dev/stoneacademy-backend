@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stone Academy - Stripe Connect Host Onboarding Tester</title>
+  <style>
+    :root {
+      --bg: #f3f7fb;
+      --panel: #ffffff;
+      --ink: #10233a;
+      --muted: #5c6f82;
+      --line: #d4e1ee;
+      --accent: #0f766e;
+      --accent-2: #115e59;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at 0 0, #e6f4ff, transparent 42%), var(--bg);
+      color: var(--ink);
+    }
+    .container {
+      max-width: 980px;
+      margin: 24px auto;
+      padding: 0 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(16, 35, 58, 0.08);
+      margin-bottom: 14px;
+    }
+    h1, h2 { margin: 0 0 10px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 16px; }
+    .muted { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .grid-1 { display: grid; gap: 10px; grid-template-columns: 1fr; }
+    label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, textarea, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--ink);
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .btn-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: var(--accent);
+      border: 0;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: var(--accent-2); }
+    button.secondary {
+      background: #fff;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+    .status {
+      background: #0d1b2a;
+      color: #d4e8ff;
+      border-radius: 10px;
+      min-height: 140px;
+      padding: 10px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .error { color: #ffd7d7; }
+    .warn { color: #ffe8a3; }
+    @media (max-width: 760px) {
+      .grid, .btn-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Stripe Connect Host Onboarding Tester</h1>
+      <p class="muted">Flow: Login host -> Create account -> Generate onboarding link -> Open Stripe onboarding -> Complete KYC -> Sync status -> Verify <code>stripeOnboardingCompleted</code>.</p>
+      <div class="grid">
+        <div>
+          <label>API Base URL</label>
+          <input id="baseUrl" value="http://localhost:5191/api/v1" />
+        </div>
+        <div>
+          <label>JWT Access Token</label>
+          <input id="token" placeholder="Paste host access token" />
+        </div>
+      </div>
+      <div class="grid" style="margin-top: 10px;">
+        <div>
+          <label>Email (optional override)</label>
+          <input id="email" placeholder="host@example.com" />
+        </div>
+        <div>
+          <label>Saved Stripe Account ID</label>
+          <input id="stripeAccountId" placeholder="acct_..." />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Onboarding URLs</h2>
+      <div class="grid">
+        <div>
+          <label>Refresh URL (optional)</label>
+          <input id="refreshUrl" value="http://localhost:5191/onboarding/refresh" />
+        </div>
+        <div>
+          <label>Return URL (optional)</label>
+          <input id="returnUrl" value="http://localhost:5191/onboarding/success" />
+        </div>
+      </div>
+      <div class="grid-1" style="margin-top: 10px;">
+        <div>
+          <label>Saved Onboarding URL</label>
+          <input id="onboardingUrl" placeholder="https://connect.stripe.com/..." />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button id="createAccountBtn">1) Create Stripe Account</button>
+        <button id="createOnboardingBtn">2) Create Onboarding Link</button>
+      </div>
+      <div class="btn-row">
+        <button class="secondary" id="openOnboardingBtn">3) Open Onboarding URL</button>
+        <button class="secondary" id="syncStatusBtn">4) Sync Status From Stripe</button>
+      </div>
+      <div class="btn-row">
+        <button class="secondary" id="profileBtn">5) Check /users/me</button>
+        <button class="secondary" id="showCliBtn">Webhook CLI Help</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Webhook Test (Optional)</h2>
+      <p class="muted">You do not need manual signatures now. Use "Sync Status From Stripe" above, or use Stripe CLI for webhook testing.</p>
+      <div class="grid">
+        <div>
+          <label>Stripe Signature (for real event test)</label>
+          <input id="stripeSignature" placeholder="t=...,v1=..." />
+        </div>
+        <div>
+          <label>Charges Enabled</label>
+          <input id="chargesEnabled" value="true" />
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top: 10px;">
+        <button class="secondary" id="sendWebhookBtn">Send account.updated Webhook Payload</button>
+        <button class="secondary" id="clearLogBtn">Clear Log</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Status</h2>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById("status");
+
+    function log(message, tone) {
+      const ts = new Date().toISOString();
+      const line = `[${ts}] ${message}`;
+      if (tone === "error") {
+        statusEl.innerHTML = `<span class="error">${line}</span>\n` + statusEl.innerHTML;
+      } else if (tone === "warn") {
+        statusEl.innerHTML = `<span class="warn">${line}</span>\n` + statusEl.innerHTML;
+      } else {
+        statusEl.textContent = line + "\n" + statusEl.textContent;
+      }
+    }
+
+    function getBaseUrl() {
+      return document.getElementById("baseUrl").value.trim().replace(/\/$/, "");
+    }
+
+    function getHeaders(extra = {}) {
+      const token = document.getElementById("token").value.trim();
+      return {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...extra,
+      };
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(`${getBaseUrl()}${path}`, options);
+      const json = await response.json().catch(() => ({}));
+      if (!response.ok || json.success === false) {
+        throw new Error(json.message || `HTTP ${response.status}`);
+      }
+      return json;
+    }
+
+    document.getElementById("createAccountBtn").addEventListener("click", async () => {
+      try {
+        const email = document.getElementById("email").value.trim();
+        const payload = email ? { email } : {};
+        const res = await request("/hosts/create-stripe-account", {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const accountId = res?.data?.stripeAccountId || "";
+        if (accountId) {
+          document.getElementById("stripeAccountId").value = accountId;
+        }
+        log(`Connected account ready: ${accountId}`);
+      } catch (err) {
+        log(`Create account failed: ${err.message}`, "error");
+      }
+    });
+
+    document.getElementById("createOnboardingBtn").addEventListener("click", async () => {
+      try {
+        const refreshUrl = document.getElementById("refreshUrl").value.trim();
+        const returnUrl = document.getElementById("returnUrl").value.trim();
+        const payload = {};
+        if (refreshUrl) payload.refreshUrl = refreshUrl;
+        if (returnUrl) payload.returnUrl = returnUrl;
+
+        const res = await request("/hosts/create-onboarding-link", {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const url = res?.data?.url || "";
+        const accountId = res?.data?.stripeAccountId || "";
+        if (url) document.getElementById("onboardingUrl").value = url;
+        if (accountId) document.getElementById("stripeAccountId").value = accountId;
+        log(`Onboarding link created. Expires at epoch: ${res?.data?.expiresAt}`);
+      } catch (err) {
+        log(`Create onboarding link failed: ${err.message}`, "error");
+      }
+    });
+
+    document.getElementById("openOnboardingBtn").addEventListener("click", () => {
+      const url = document.getElementById("onboardingUrl").value.trim();
+      if (!url) {
+        log("No onboarding URL available. Create link first.", "warn");
+        return;
+      }
+      window.open(url, "_blank", "noopener,noreferrer");
+      log("Opened Stripe onboarding URL in new tab.");
+    });
+
+    document.getElementById("profileBtn").addEventListener("click", async () => {
+      try {
+        const res = await request("/users/me", {
+          method: "GET",
+          headers: getHeaders(),
+        });
+        const profile = res?.data || {};
+        log(`Profile stripeAccountId=${profile.stripeAccountId || "null"}, stripeOnboardingCompleted=${String(profile.stripeOnboardingCompleted)}`);
+      } catch (err) {
+        log(`Profile check failed: ${err.message}`, "error");
+      }
+    });
+
+    document.getElementById("syncStatusBtn").addEventListener("click", async () => {
+      try {
+        const res = await request("/hosts/sync-onboarding-status", {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify({}),
+        });
+        log(`Synced: chargesEnabled=${String(res?.data?.chargesEnabled)}, detailsSubmitted=${String(res?.data?.detailsSubmitted)}, payoutsEnabled=${String(res?.data?.payoutsEnabled)}, stripeOnboardingCompleted=${String(res?.data?.stripeOnboardingCompleted)}`);
+      } catch (err) {
+        log(`Sync status failed: ${err.message}`, "error");
+      }
+    });
+
+    document.getElementById("sendWebhookBtn").addEventListener("click", async () => {
+      try {
+        const stripeAccountId = document.getElementById("stripeAccountId").value.trim();
+        if (!stripeAccountId) throw new Error("Missing stripeAccountId");
+
+        const signature = document.getElementById("stripeSignature").value.trim();
+        const chargesEnabled = String(document.getElementById("chargesEnabled").value.trim()).toLowerCase() === "true";
+
+        const payload = {
+          id: "evt_test_account_updated",
+          type: "account.updated",
+          data: {
+            object: {
+              id: stripeAccountId,
+              object: "account",
+              charges_enabled: chargesEnabled,
+            },
+          },
+        };
+
+        await request("/stripe/webhook", {
+          method: "POST",
+          headers: getHeaders(signature ? { "stripe-signature": signature } : {}),
+          body: JSON.stringify(payload),
+        });
+
+        log("Webhook request accepted.");
+      } catch (err) {
+        log(`Webhook call failed (expected without valid signature): ${err.message}`, "warn");
+      }
+    });
+
+    document.getElementById("showCliBtn").addEventListener("click", () => {
+      const baseUrl = getBaseUrl();
+      log(`Stripe CLI:\nstripe listen --events account.updated --forward-to ${baseUrl}/stripe/webhook\nstripe trigger account.updated`);
+    });
+
+    document.getElementById("clearLogBtn").addEventListener("click", () => {
+      statusEl.textContent = "";
+    });
+
+    log("Tester loaded. Start with Create Stripe Account.");
+  </script>
+</body>
+</html>

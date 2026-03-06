@@ -1,0 +1,252 @@
+{
+  "info": {
+    "_postman_id": "8f5f7f43-9d0a-4de3-82f3-2f6e4a2f1f9c",
+    "name": "StoneAcademy - Stripe Connect Host Onboarding",
+    "description": "Flow: host login -> create Stripe Express account -> create onboarding link -> open link -> complete KYC on Stripe -> Stripe sends account.updated webhook -> verify stripeOnboardingCompleted from /users/me.\n\nLocal webhook test with Stripe CLI:\n1) stripe listen --events account.updated --forward-to http://localhost:3000/api/v1/stripe/webhook\n2) stripe trigger account.updated",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": "host@example.com"
+    },
+    {
+      "key": "password",
+      "value": "Password123!"
+    },
+    {
+      "key": "stripeAccountId",
+      "value": ""
+    },
+    {
+      "key": "onboardingUrl",
+      "value": ""
+    },
+    {
+      "key": "refreshUrl",
+      "value": "https://stoneacademy.com/onboarding/refresh"
+    },
+    {
+      "key": "returnUrl",
+      "value": "https://stoneacademy.com/onboarding/success"
+    },
+    {
+      "key": "stripeSignature",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Login Host (Save accessToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const token = res?.data?.accessToken;",
+                  "if (token) pm.collectionVariables.set('accessToken', token);",
+                  "pm.test('accessToken exists', function () {",
+                  "  pm.expect(token).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Host Stripe Onboarding",
+      "item": [
+        {
+          "name": "Create Stripe Connected Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const accountId = res?.data?.stripeAccountId;",
+                  "if (accountId) pm.collectionVariables.set('stripeAccountId', accountId);",
+                  "pm.test('stripeAccountId exists', function () {",
+                  "  pm.expect(accountId).to.be.a('string').and.match(/^acct_/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hosts/create-stripe-account",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hosts",
+                "create-stripe-account"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Stripe Onboarding Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const url = res?.data?.url;",
+                  "if (url) pm.collectionVariables.set('onboardingUrl', url);",
+                  "pm.test('onboarding URL exists', function () {",
+                  "  pm.expect(url).to.be.a('string').and.include('stripe.com');",
+                  "});",
+                  "console.log('Open onboarding URL in browser:', url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshUrl\": \"{{refreshUrl}}\",\n  \"returnUrl\": \"{{returnUrl}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hosts/create-onboarding-link",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hosts",
+                "create-onboarding-link"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile (Check Stripe fields)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Webhook",
+      "item": [
+        {
+          "name": "Stripe Connect Webhook (Requires Valid Signature)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "stripe-signature",
+                "value": "{{stripeSignature}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test_account_updated\",\n  \"type\": \"account.updated\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{stripeAccountId}}\",\n      \"object\": \"account\",\n      \"charges_enabled\": true\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/stripe/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stripe",
+                "webhook"
+              ]
+            },
+            "description": "Use this only with real Stripe signature. For local development, forward real events using Stripe CLI."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

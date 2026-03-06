@@ -72,6 +72,8 @@ export class UserService {
       profileImage: user.profileImageUrl || undefined,
       onboardingCompletedAt: user.onboardingCompletedAt,
       onboardingSkippedAt: user.onboardingSkippedAt,
+      stripeAccountId: user.stripeAccountId || null,
+      stripeOnboardingCompleted: Boolean(user.stripeOnboardingCompleted),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

@@ -46,6 +46,8 @@ export type UserResponse = {
   profileImage?: string;
   onboardingCompletedAt?: Date;
   onboardingSkippedAt?: Date;
+  stripeAccountId?: string | null;
+  stripeOnboardingCompleted?: boolean;
 
   createdAt: Date;
   updatedAt: Date;
