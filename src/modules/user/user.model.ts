@@ -10,6 +10,35 @@ import { BaseSchemaUtil } from "@/utils/base-schema.utils";
 import { model, Query, Schema } from "mongoose";
 import type { IUser } from "./user.interface";
 
+const pointSchema = new Schema(
+  {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number],
+      default: undefined,
+    },
+  },
+  { _id: false }
+);
+
+const locationSchema = new Schema(
+  {
+    label: {
+      type: String,
+      trim: true,
+    },
+    coordinates: {
+      type: pointSchema,
+      default: undefined,
+    },
+  },
+  { _id: false }
+);
+
 const userSchema = BaseSchemaUtil.createSchema<IUser>({
   ...BaseSchemaUtil.mergeDefinitions(
     BaseSchemaUtil.emailField(true),
@@ -86,21 +115,8 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         },
       },
       location: {
-        label: {
-          type: String,
-          trim: true,
-        },
-        coordinates: {
-          type: {
-            type: String,
-            enum: ["Point"],
-            default: "Point",
-          },
-          coordinates: {
-            type: [Number],
-            default: undefined,
-          },
-        },
+        type: locationSchema,
+        default: undefined,
       },
       profilePhoto: {
         type: Schema.Types.ObjectId,
