@@ -74,6 +74,14 @@ app.get<object>("/", (_req, res) => {
   });
 });
 
+app.get("/healthz", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "OK",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Temporary public fallback pages for Stripe Connect onboarding redirects.
 // These let you test the flow before mobile/web frontend screens are ready.
 app.get("/onboarding/success", (_req, res) => {

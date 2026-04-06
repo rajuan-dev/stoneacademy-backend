@@ -1,1 +1,10 @@
 node_modules
+dist
+.git
+.vscode
+.env
+coverage
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

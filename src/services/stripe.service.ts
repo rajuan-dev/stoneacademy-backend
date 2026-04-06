@@ -64,7 +64,7 @@ export class StripeService {
     email: string;
     metadata?: Record<string, string>;
   }) {
-    return this.stripe.accounts.create({
+    return this.getClient().accounts.create({
       type: "express",
       email: params.email,
       metadata: params.metadata,
@@ -72,7 +72,7 @@ export class StripeService {
   }
 
   async retrieveConnectedAccount(accountId: string) {
-    return this.stripe.accounts.retrieve(accountId);
+    return this.getClient().accounts.retrieve(accountId);
   }
 
   async createConnectedAccountOnboardingLink(params: {
@@ -80,7 +80,7 @@ export class StripeService {
     refreshUrl: string;
     returnUrl: string;
   }) {
-    return this.stripe.accountLinks.create({
+    return this.getClient().accountLinks.create({
       account: params.accountId,
       refresh_url: params.refreshUrl,
       return_url: params.returnUrl,
