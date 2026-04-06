@@ -21,6 +21,7 @@ import { pinoLogger } from "./middlewares/pino-logger.js";
 import { requestBodyLogger } from "./middlewares/request-body-logger.middleware.js";
 
 const app: Application = express();
+app.set("trust proxy", 1);
 
 app.use(
   cors({
@@ -78,6 +79,8 @@ app.get("/healthz", (_req, res) => {
   res.status(200).json({
     success: true,
     message: "OK",
+    status: "ok",
+    uptime: process.uptime(),
     timestamp: new Date().toISOString(),
   });
 });
