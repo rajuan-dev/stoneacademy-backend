@@ -33,6 +33,43 @@ export class StripeService {
     return this.getClient().paymentIntents.retrieve(paymentIntentId);
   }
 
+  async createCustomer(params: Stripe.CustomerCreateParams) {
+    return this.getClient().customers.create(params);
+  }
+
+  async createProduct(params: Stripe.ProductCreateParams) {
+    return this.getClient().products.create(params);
+  }
+
+  async retrieveCustomer(customerId: string) {
+    return this.getClient().customers.retrieve(customerId);
+  }
+
+  async createSubscription(params: Stripe.SubscriptionCreateParams) {
+    return this.getClient().subscriptions.create(params);
+  }
+
+  async retrieveSubscription(
+    subscriptionId: string,
+    params?: Stripe.SubscriptionRetrieveParams,
+  ) {
+    return this.getClient().subscriptions.retrieve(subscriptionId, params);
+  }
+
+  async updateSubscription(
+    subscriptionId: string,
+    params: Stripe.SubscriptionUpdateParams,
+  ) {
+    return this.getClient().subscriptions.update(subscriptionId, params);
+  }
+
+  async retrieveInvoice(
+    invoiceId: string,
+    params?: Stripe.InvoiceRetrieveParams,
+  ) {
+    return this.getClient().invoices.retrieve(invoiceId, params);
+  }
+
   async retrieveCheckoutSession(
     sessionId: string,
     params?: Stripe.Checkout.SessionRetrieveParams,

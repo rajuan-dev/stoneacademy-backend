@@ -47,6 +47,7 @@ export type UserResponse = {
   onboardingCompletedAt?: Date;
   onboardingSkippedAt?: Date;
   stripeAccountId?: string | null;
+  stripeCustomerId?: string | null;
   stripeOnboardingCompleted?: boolean;
 
   createdAt: Date;

@@ -197,6 +197,12 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         sparse: true,
         index: true,
       },
+      stripeCustomerId: {
+        type: String,
+        trim: true,
+        sparse: true,
+        index: true,
+      },
       stripeOnboardingCompleted: {
         type: Boolean,
         default: false,
