@@ -1,5 +1,4 @@
 import { env } from "@/env";
-import { SubscriptionService } from "@/modules/subscription/subscription.service";
 import { stripeService } from "@/services/stripe.service";
 import {
   BadRequestException,
@@ -8,18 +7,11 @@ import {
 import { User } from "../user/user.model";
 
 export class HostStripeService {
-  private subscriptionService: SubscriptionService;
-
-  constructor() {
-    this.subscriptionService = new SubscriptionService();
-  }
-
   async createConnectedAccountForHost(
     hostId: string,
     payload?: { email?: string },
   ) {
     this.ensureStripeConfigured();
-    await this.assertHasActiveSubscription(hostId);
 
     const host = await User.findById(hostId).exec();
     if (!host) {
@@ -58,7 +50,6 @@ export class HostStripeService {
     payload?: { refreshUrl?: string; returnUrl?: string },
   ) {
     this.ensureStripeConfigured();
-    await this.assertHasActiveSubscription(hostId);
 
     const host = await User.findById(hostId).exec();
     if (!host) {
@@ -122,7 +113,6 @@ export class HostStripeService {
 
   async syncOnboardingStatusForHost(hostId: string) {
     this.ensureStripeConfigured();
-    await this.assertHasActiveSubscription(hostId);
 
     const host = await User.findById(hostId).exec();
     if (!host) {
@@ -155,15 +145,6 @@ export class HostStripeService {
   private ensureStripeConfigured() {
     if (!env.STRIPE_SECRET_KEY) {
       throw new BadRequestException("Stripe is not configured");
-    }
-  }
-
-  private async assertHasActiveSubscription(userId: string) {
-    const hasActive = await this.subscriptionService.hasActiveSubscription(userId);
-    if (!hasActive) {
-      throw new BadRequestException(
-        "Active monthly/yearly subscription is required for host Stripe onboarding.",
-      );
     }
   }
 
