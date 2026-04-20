@@ -48,9 +48,12 @@ export const EVENT_STATUS = {
 } as const;
 
 export const SUBSCRIPTION_STATUS = {
+  PENDING: "pending",
   PAID: "paid",
   ACTIVE: "paid",
   EXPIRED: "expired",
+  PAST_DUE: "past_due",
+  UNPAID: "unpaid",
   CANCELLED: "cancelled",
 } as const;
 

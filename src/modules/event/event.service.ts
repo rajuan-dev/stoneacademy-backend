@@ -20,7 +20,6 @@ import { EventParticipant } from "./event-participant.model";
 import { PaymentTransaction } from "./payment-transaction.model";
 import { EventQrToken } from "./event-qr-token.model";
 import { ChatService } from "../chat/chat.service";
-import { SubscriptionService } from "../subscription/subscription.service";
 
 type ListQuery = {
   q?: string;
@@ -41,11 +40,9 @@ const EARTH_RADIUS_MILES = 3958.8;
 
 export class EventService {
   private chatService: ChatService;
-  private subscriptionService: SubscriptionService;
 
   constructor() {
     this.chatService = new ChatService();
-    this.subscriptionService = new SubscriptionService();
   }
 
   async list(query: ListQuery) {
@@ -202,16 +199,6 @@ export class EventService {
     const creator = await User.findById(payload.creatorId).exec();
     if (!creator) {
       throw new NotFoundException("User not found");
-    }
-
-    const hasSubscription = await this.subscriptionService.hasActiveSubscription(
-      payload.creatorId,
-    );
-
-    if (!hasSubscription) {
-      throw new ForbiddenException(
-        "Active subscription is required to create events",
-      );
     }
 
     const normalizedPriceType = payload.priceType || "free";

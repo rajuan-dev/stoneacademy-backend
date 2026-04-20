@@ -32,7 +32,7 @@
         </div>
         <div>
           <label>Stripe Publishable Key</label>
-          <input id="publishableKey" placeholder="pk_test_..." />
+          <input id="publishableKey" value="pk_test_51Sj2dXEuf4ZHOjkvBoYzpoqRsUNUf0f3Q9UPMEkGFBkRF50xjQ10Z8L74aeYSNbVdzXK6S9hfXYi7ztisdIDfQTu008t0JLLPZ" />
         </div>
       </div>
       <div class="row">
@@ -60,7 +60,7 @@
         </div>
       </div>
       <div id="subscriptionCardElement" style="margin:10px 0;"></div>
-      <button id="paySubscriptionBtn">Pay Subscription and Activate</button>
+      <button id="paySubscriptionBtn">Start Subscription</button>
     </div>
 
     <div class="card">
@@ -146,13 +146,13 @@
         button.disabled = true;
         ensureStripe();
         const plan = document.getElementById("subPlan").value;
-        setStatus("Creating subscription checkout intent...");
+        setStatus("Creating auto-renew subscription...");
 
         const checkout = await post("/subscriptions/checkout-intent", { plan });
-        const clientSecret = checkout.paymentIntentClientSecret;
+        const clientSecret = checkout.clientSecret;
         if (!clientSecret) throw new Error("No subscription client secret returned");
 
-        setStatus("Confirming Stripe payment for subscription...");
+        setStatus("Confirming first invoice payment for subscription...");
         const email = document.getElementById("email").value.trim();
         const result = await stripe.confirmCardPayment(clientSecret, {
           payment_method: {
@@ -166,11 +166,9 @@
           throw new Error("Subscription payment did not succeed");
         }
 
-        setStatus("Confirming subscription activation in backend...");
-        await post("/subscriptions/confirm-payment", {
-          paymentIntentId: result.paymentIntent.id,
-        });
-        setStatus("Subscription activated successfully.");
+        setStatus("First invoice paid. Waiting for webhook sync...");
+        await waitForSubscriptionActivation();
+        setStatus("Subscription is active and will auto-renew.");
       } catch (error) {
         setStatus(`Subscription flow failed: ${error.message}`);
       } finally {
@@ -216,6 +214,32 @@
         button.disabled = false;
       }
     });
+
+    async function fetchSubscriptionStatus() {
+      const baseUrl = document.getElementById("baseUrl").value.trim();
+      const response = await fetch(`${baseUrl}/subscriptions/me`, {
+        headers: {
+          Authorization: `Bearer ${document.getElementById("token").value.trim()}`,
+        },
+      });
+      const json = await response.json();
+      if (!response.ok || !json.success) {
+        throw new Error(json.message || `Request failed: ${response.status}`);
+      }
+      return json.data;
+    }
+
+    async function waitForSubscriptionActivation() {
+      for (let attempt = 1; attempt <= 10; attempt++) {
+        const result = await fetchSubscriptionStatus();
+        if (result.isSubscribed) {
+          return result;
+        }
+        setStatus(`Subscription not active yet. Retry ${attempt}/10...`);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+      throw new Error("Webhook did not activate the subscription in time");
+    }
   </script>
 </body>
 </html>

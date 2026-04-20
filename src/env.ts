@@ -51,6 +51,8 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional().default(""),
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
   STRIPE_CONNECT_WEBHOOK_SECRET: z.string().optional().default(""),
+  STRIPE_MONTHLY_PRICE_ID: z.string().optional().default(""),
+  STRIPE_YEARLY_PRICE_ID: z.string().optional().default(""),
   STRIPE_CHECKOUT_SUCCESS_URL: z.string().optional(),
   STRIPE_CHECKOUT_CANCEL_URL: z.string().optional(),
   STRIPE_CONNECT_ONBOARDING_REFRESH_URL: z.string().optional().default(""),

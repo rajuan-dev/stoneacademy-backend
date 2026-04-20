@@ -3,6 +3,7 @@ import { stripeService } from "@/services/stripe.service";
 import { env } from "@/env";
 import { BillingService } from "./billing.service";
 import { SubscriptionService } from "../subscription/subscription.service";
+import Stripe from "stripe";
 
 const router = Router();
 const billingService = new BillingService();
@@ -29,22 +30,36 @@ router.post("/", async (req, res) => {
     );
 
     if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object;
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
       const paymentType = paymentIntent.metadata?.paymentType;
 
       if (paymentType === "subscription") {
-        const subscriptionPaymentId = paymentIntent.metadata?.subscriptionPaymentId;
-        if (subscriptionPaymentId) {
-          await subscriptionService.markPaymentSucceededAndActivate(
-            subscriptionPaymentId,
-          );
-        }
+        await subscriptionService.confirmPayment(
+          paymentIntent.metadata?.userId || "",
+          paymentIntent.id,
+        );
       } else {
         await billingService.markTransactionSucceededByProviderRef(
           paymentIntent.id,
           "stripe",
         );
       }
+    } else if (event.type === "invoice.payment_succeeded") {
+      await subscriptionService.handleInvoicePaymentSucceeded(
+        event.data.object as Stripe.Invoice,
+      );
+    } else if (event.type === "invoice.payment_failed") {
+      await subscriptionService.handleInvoicePaymentFailed(
+        event.data.object as Stripe.Invoice,
+      );
+    } else if (
+      event.type === "customer.subscription.created"
+      || event.type === "customer.subscription.updated"
+      || event.type === "customer.subscription.deleted"
+    ) {
+      await subscriptionService.syncSubscriptionFromStripeWebhook(
+        event.data.object as Stripe.Subscription,
+      );
     }
 
     return res.status(200).json({ success: true });

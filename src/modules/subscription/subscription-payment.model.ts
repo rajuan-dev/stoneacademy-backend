@@ -11,6 +11,9 @@ export interface ISubscriptionPayment {
   status: (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
   provider: string;
   providerReference?: string;
+  externalSubscriptionId?: string;
+  invoiceId?: string;
+  paymentIntentId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,9 +59,24 @@ const subscriptionPaymentSchema =
       trim: true,
       index: true,
     },
+    externalSubscriptionId: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+    invoiceId: {
+      type: String,
+      trim: true,
+    },
+    paymentIntentId: {
+      type: String,
+      trim: true,
+      index: true,
+    },
   });
 
 subscriptionPaymentSchema.index({ userId: 1, createdAt: -1 });
+subscriptionPaymentSchema.index({ invoiceId: 1 }, { unique: true, sparse: true });
 
 export const SubscriptionPayment = model<ISubscriptionPayment>(
   "SubscriptionPayment",
