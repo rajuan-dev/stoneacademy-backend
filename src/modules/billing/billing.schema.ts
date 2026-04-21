@@ -16,6 +16,14 @@ export const createPayoutRequestSchema = z.object({
   }),
 });
 
+export const createSelfWithdrawalSchema = z.object({
+  body: z.object({
+    amount: z.coerce.number().min(0.01).optional(),
+    currency: z.string().trim().min(3).max(10).optional(),
+    note: z.string().trim().max(2000).optional(),
+  }),
+});
+
 export const payoutRequestIdSchema = z.object({
   params: z.object({
     id: z.string().trim().min(1),

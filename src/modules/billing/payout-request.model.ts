@@ -7,6 +7,9 @@ export interface IPayoutRequest {
   amount: number;
   currency: string;
   status: "requested" | "approved" | "rejected" | "paid";
+  payoutMethod: "admin_request" | "self_withdrawal";
+  provider?: string;
+  providerPayoutId?: string | null;
   note?: string;
   reviewedBy?: Types.ObjectId;
   reviewedAt?: Date;
@@ -36,6 +39,24 @@ const payoutRequestSchema = BaseSchemaUtil.createSchema<IPayoutRequest>({
     type: String,
     enum: ["requested", "approved", "rejected", "paid"],
     default: "requested",
+    index: true,
+  },
+  payoutMethod: {
+    type: String,
+    enum: ["admin_request", "self_withdrawal"],
+    default: "admin_request",
+    index: true,
+  },
+  provider: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  providerPayoutId: {
+    type: String,
+    trim: true,
+    default: null,
+    sparse: true,
     index: true,
   },
   note: {

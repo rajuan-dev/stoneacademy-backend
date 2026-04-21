@@ -112,6 +112,21 @@ export class StripeService {
     return this.getClient().accounts.retrieve(accountId);
   }
 
+  async createConnectedAccountLoginLink(accountId: string) {
+    return this.getClient().accounts.createLoginLink(accountId);
+  }
+
+  async retrieveConnectedAccountBalance(accountId: string) {
+    return this.getClient().balance.retrieve({}, { stripeAccount: accountId });
+  }
+
+  async createConnectedAccountPayout(
+    accountId: string,
+    params: Stripe.PayoutCreateParams,
+  ) {
+    return this.getClient().payouts.create(params, { stripeAccount: accountId });
+  }
+
   async createConnectedAccountOnboardingLink(params: {
     accountId: string;
     refreshUrl: string;

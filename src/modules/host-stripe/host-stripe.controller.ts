@@ -39,6 +39,14 @@ export class HostStripeController {
     ApiResponse.success(res, result, "Stripe onboarding link created");
   });
 
+  createDashboardLoginLink = asyncHandler(
+    async (req: Request, res: Response) => {
+      const hostId = req.user?.userId as string;
+      const result = await this.service.createDashboardLoginLinkForHost(hostId);
+      ApiResponse.success(res, result, "Stripe dashboard login link created");
+    },
+  );
+
   syncOnboardingStatus = asyncHandler(async (req: Request, res: Response) => {
     const hostId = req.user?.userId as string;
     const result = await this.service.syncOnboardingStatusForHost(hostId);

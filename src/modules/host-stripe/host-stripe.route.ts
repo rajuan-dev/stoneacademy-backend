@@ -18,6 +18,12 @@ router.post(
 );
 
 router.post(
+  "/create-dashboard-login-link",
+  authMiddleware.verifyToken,
+  controller.createDashboardLoginLink,
+);
+
+router.post(
   "/sync-onboarding-status",
   authMiddleware.verifyToken,
   controller.syncOnboardingStatus,

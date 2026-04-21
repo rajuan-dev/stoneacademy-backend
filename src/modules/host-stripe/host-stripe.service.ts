@@ -96,6 +96,44 @@ export class HostStripeService {
     };
   }
 
+  async createDashboardLoginLinkForHost(hostId: string) {
+    this.ensureStripeConfigured();
+
+    const host = await User.findById(hostId).exec();
+    if (!host) {
+      throw new NotFoundException("Host not found");
+    }
+
+    if (!host.stripeAccountId) {
+      throw new BadRequestException(
+        "Stripe account is not connected yet. Create Stripe account first.",
+      );
+    }
+
+    const account = await stripeService.retrieveConnectedAccount(host.stripeAccountId)
+      .catch((error: any) => {
+        this.handleStripeConnectSetupError(error);
+      });
+
+    if (!account.details_submitted) {
+      throw new BadRequestException(
+        "Stripe onboarding is not complete yet. Complete onboarding before opening the dashboard.",
+      );
+    }
+
+    const loginLink = await stripeService.createConnectedAccountLoginLink(
+      host.stripeAccountId,
+    ).catch((error: any) => {
+      this.handleStripeConnectSetupError(error);
+    });
+
+    return {
+      stripeAccountId: host.stripeAccountId,
+      url: loginLink.url,
+      createdAt: new Date(),
+    };
+  }
+
   async syncOnboardingStatusFromStripeAccountUpdated(params: {
     stripeAccountId: string;
     chargesEnabled: boolean;

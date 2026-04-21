@@ -11,6 +11,7 @@ import { Router, type Request, type Response } from "express";
 import { env } from "@/env";
 import {
   createPayoutRequestSchema,
+  createSelfWithdrawalSchema,
   listBillingSchema,
   payoutRequestIdSchema,
   updatePayoutStatusSchema,
@@ -43,6 +44,17 @@ billingRouter.get(
     const userId = req.user?.userId as string;
     const summary = await service.creatorEarningsSummary(userId);
     ApiResponse.success(res, summary, "Earnings fetched successfully");
+  }),
+);
+
+billingRouter.post(
+  "/payouts/withdraw",
+  authMiddleware.verifyToken,
+  asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(createSelfWithdrawalSchema, req);
+    const userId = req.user?.userId as string;
+    const payout = await service.createSelfWithdrawal(userId, validated.body);
+    ApiResponse.created(res, payout, "Withdrawal processed successfully");
   }),
 );
 
