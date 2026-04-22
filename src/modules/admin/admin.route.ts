@@ -17,6 +17,7 @@ router.patch("/profile", upload.single("photo"), controller.updateMyProfile);
 router.get("/dashboard/overview", controller.dashboardOverview);
 router.get("/dashboard/metrics", controller.dashboardOverview);
 router.get("/dashboard/analytics", controller.dashboardAnalytics);
+router.get("/dashboard/bootstrap", controller.dashboardBootstrap);
 router.get("/users", controller.listUsers);
 router.get("/users/search", controller.searchUsers);
 router.get("/users/blocked", controller.listBlockedUsers);

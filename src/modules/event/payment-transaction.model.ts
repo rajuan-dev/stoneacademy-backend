@@ -81,6 +81,8 @@ const paymentTransactionSchema = BaseSchemaUtil.createSchema<IPaymentTransaction
 
 paymentTransactionSchema.index({ eventId: 1, payerId: 1 });
 paymentTransactionSchema.index({ createdAt: -1 });
+paymentTransactionSchema.index({ status: 1, createdAt: -1 });
+paymentTransactionSchema.index({ status: 1, eventId: 1, createdAt: -1 });
 
 export const PaymentTransaction = model<IPaymentTransaction>(
   "PaymentTransaction",

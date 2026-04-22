@@ -72,6 +72,9 @@ const adminAccountSchema = BaseSchemaUtil.createSchema<IAdminAccount>(
   },
 );
 
+adminAccountSchema.index({ createdAt: -1 });
+adminAccountSchema.index({ role: 1, status: 1, createdAt: -1 });
+
 export const AdminAccount = model<IAdminAccount>("Admin", adminAccountSchema, "admin");
 
 const adminRefreshTokenBlacklistSchema = new Schema(

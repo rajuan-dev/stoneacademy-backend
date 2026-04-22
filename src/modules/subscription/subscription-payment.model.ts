@@ -76,6 +76,7 @@ const subscriptionPaymentSchema =
   });
 
 subscriptionPaymentSchema.index({ userId: 1, createdAt: -1 });
+subscriptionPaymentSchema.index({ status: 1, createdAt: -1 });
 subscriptionPaymentSchema.index({ invoiceId: 1 }, { unique: true, sparse: true });
 
 export const SubscriptionPayment = model<ISubscriptionPayment>(

@@ -200,22 +200,27 @@ billingRouter.post(
     // Stripe Connect destination charge:
     // - platform keeps `application_fee_amount` (10%)
     // - remaining amount is transferred to host connected account (90%)
-    const intent = await stripeService.createPaymentIntent({
-      amount: Math.round(transaction.grossAmount * 100),
-      currency: (transaction.currency || "usd").toLowerCase(),
-      application_fee_amount: Math.round(transaction.platformFeeAmount * 100),
-      transfer_data: {
-        destination: host.stripeAccountId,
+    const intent = await stripeService.createPaymentIntent(
+      {
+        amount: Math.round(transaction.grossAmount * 100),
+        currency: (transaction.currency || "usd").toLowerCase(),
+        application_fee_amount: Math.round(transaction.platformFeeAmount * 100),
+        transfer_data: {
+          destination: host.stripeAccountId,
+        },
+        metadata: {
+          paymentType: "event_ticket",
+          transactionId: transaction._id.toString(),
+          eventId: eventId,
+          payerId: userId,
+          hostStripeAccountId: host.stripeAccountId,
+        },
+        payment_method_types: ["card"],
       },
-      metadata: {
-        paymentType: "event_ticket",
-        transactionId: transaction._id.toString(),
-        eventId: eventId,
-        payerId: userId,
-        hostStripeAccountId: host.stripeAccountId,
+      {
+        idempotencyKey: `event-ticket-${transaction._id.toString()}`,
       },
-      payment_method_types: ["card"],
-    });
+    );
 
     transaction.provider = "stripe";
     transaction.providerReference = intent.id;

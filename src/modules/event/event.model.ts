@@ -131,5 +131,8 @@ const eventSchema = BaseSchemaUtil.createSchema<IEvent>({
 
 eventSchema.index({ "location.coordinates": "2dsphere" });
 eventSchema.index({ startAt: 1 });
+eventSchema.index({ createdAt: -1 });
+eventSchema.index({ status: 1, createdAt: -1 });
+eventSchema.index({ creatorId: 1, createdAt: -1 });
 
 export const Event = model<IEvent>("Event", eventSchema);

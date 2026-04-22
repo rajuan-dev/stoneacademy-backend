@@ -2,6 +2,7 @@
 import type { Application } from "express";
 
 import cookieParser from "cookie-parser";
+import compression from "compression";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
@@ -9,6 +10,7 @@ import morgan from "morgan";
 
 import { errorHandler } from "@/middlewares/error-handler.middleware";
 import { notFound } from "@/middlewares/not-found.middleware";
+import { responseCache } from "@/middlewares/response-cache.middleware";
 import billingWebhookRouter from "@/modules/billing/billing-webhook.route.js";
 import stripeConnectWebhookRouter from "@/modules/host-stripe/stripe-connect-webhook.route.js";
 import rootRouter from "@/routes/index.route.js";
@@ -45,6 +47,7 @@ app.use(express.json());
 app.use(pinoLogger());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(compression());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(requestBodyLogger);
@@ -135,7 +138,7 @@ app.get("/onboarding/refresh", (_req, res) => {
 </html>`);
 });
 
-app.use(env.BASE_URL, rootRouter);
+app.use(env.BASE_URL, responseCache, rootRouter);
 
 app.use(notFound);
 app.use(errorHandler);

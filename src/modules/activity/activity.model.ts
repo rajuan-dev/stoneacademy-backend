@@ -106,5 +106,8 @@ const activitySchema = BaseSchemaUtil.createSchema<IActivity>({
 activitySchema.index({ "location.coordinates": "2dsphere" });
 activitySchema.index({ startAt: 1 });
 activitySchema.index({ hostId: 1 });
+activitySchema.index({ createdAt: -1 });
+activitySchema.index({ status: 1, createdAt: -1 });
+activitySchema.index({ hostId: 1, createdAt: -1 });
 
 export const Activity = model<IActivity>("Activity", activitySchema);

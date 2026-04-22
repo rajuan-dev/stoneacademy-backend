@@ -21,8 +21,11 @@ export class StripeService {
     return this.stripe;
   }
 
-  async createPaymentIntent(params: Stripe.PaymentIntentCreateParams) {
-    return this.getClient().paymentIntents.create(params);
+  async createPaymentIntent(
+    params: Stripe.PaymentIntentCreateParams,
+    options?: Stripe.RequestOptions,
+  ) {
+    return this.getClient().paymentIntents.create(params, options);
   }
 
   async createCheckoutSession(params: Stripe.Checkout.SessionCreateParams) {

@@ -1,4 +1,9 @@
-import { ACTIVITY_STATUS, PAGINATION, USER_STATUS } from "@/constants/app.constants";
+import {
+  ACTIVITY_STATUS,
+  PAGINATION,
+  PAYMENT_STATUS,
+  USER_STATUS,
+} from "@/constants/app.constants";
 import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
 import { PipelineStage, Types } from "mongoose";
 import { User } from "../user/user.model";
@@ -87,14 +92,36 @@ type AdminUserDetail = {
 };
 
 export class AdminService {
+  private readonly successfulPaymentStatuses = [
+    PAYMENT_STATUS.SUCCEEDED,
+    "succeeded",
+  ];
+
   private settingsService: SettingsService;
   private userService: UserService;
   private adminAccountService: AdminAccountService;
+  private cache = new Map<string, { expiresAt: number; value: unknown }>();
 
   constructor() {
     this.settingsService = new SettingsService();
     this.userService = new UserService();
     this.adminAccountService = new AdminAccountService();
+  }
+
+  private async remember<T>(
+    key: string,
+    ttlMs: number,
+    loader: () => Promise<T>,
+  ): Promise<T> {
+    const now = Date.now();
+    const cached = this.cache.get(key);
+    if (cached && cached.expiresAt > now) {
+      return cached.value as T;
+    }
+
+    const value = await loader();
+    this.cache.set(key, { value, expiresAt: now + ttlMs });
+    return value;
   }
 
   private deriveUsername(email?: string | null): string | null {
@@ -407,52 +434,80 @@ export class AdminService {
       ];
     }
 
-    const [users, admins] = await Promise.all([
-      User.find(userMatch)
-        .select(
-          "_id fullName email role status createdAt blockedReason blockedAt profileImageUrl",
-        )
-        .lean(),
-      AdminAccount.find(adminMatch)
-        .select("_id fullName email role status createdAt profileImageUrl")
-        .lean(),
-    ]);
+    const pipeline: PipelineStage[] = [
+      { $match: userMatch },
+      {
+        $project: {
+          _id: 1,
+          fullName: 1,
+          email: 1,
+          role: 1,
+          status: 1,
+          createdAt: 1,
+          blockedReason: { $ifNull: ["$blockedReason", null] },
+          blockedAt: { $ifNull: ["$blockedAt", null] },
+          blockedBy: { $literal: null },
+          avatarUrl: { $ifNull: ["$profileImageUrl", null] },
+          source: { $literal: "user" },
+        },
+      },
+      {
+        $unionWith: {
+          coll: AdminAccount.collection.name,
+          pipeline: [
+            { $match: adminMatch },
+            {
+              $project: {
+                _id: 1,
+                fullName: 1,
+                email: 1,
+                role: 1,
+                status: 1,
+                createdAt: 1,
+                blockedReason: { $literal: null },
+                blockedAt: { $literal: null },
+                blockedBy: { $literal: null },
+                avatarUrl: { $ifNull: ["$profileImageUrl", null] },
+                source: { $literal: "admin" },
+              },
+            },
+          ],
+        },
+      },
+      { $sort: { createdAt: -1, _id: -1 } },
+      {
+        $facet: {
+          data: [{ $skip: skip }, { $limit: limit }],
+          totalItems: [{ $count: "value" }],
+        },
+      },
+      {
+        $project: {
+          data: 1,
+          totalItems: {
+            $ifNull: [{ $arrayElemAt: ["$totalItems.value", 0] }, 0],
+          },
+        },
+      },
+    ];
 
-    const merged = [
-      ...users.map((item) => ({
-        _id: item._id,
-        fullName: item.fullName,
-        email: item.email,
-        role: item.role,
-        status: item.status,
-        createdAt: item.createdAt,
-        blockedReason: item.blockedReason ?? null,
-        blockedAt: item.blockedAt ?? null,
-        blockedBy: null as null,
-        avatarUrl: item.profileImageUrl ?? null,
-        source: "user" as const,
-      })),
-      ...admins.map((item) => ({
-        _id: item._id,
-        fullName: item.fullName,
-        email: item.email,
-        role: item.role,
-        status: item.status,
-        createdAt: item.createdAt,
-        blockedReason: null,
-        blockedAt: null,
-        blockedBy: null as null,
-        avatarUrl: item.profileImageUrl ?? null,
-        source: "admin" as const,
-      })),
-    ].sort((a, b) => {
-      const left = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const right = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return right - left;
-    });
+    const [result] = await User.aggregate(pipeline).exec();
+    const rows = (result?.data || []) as Array<{
+      _id: Types.ObjectId;
+      fullName: string;
+      email: string;
+      role: string;
+      status: string;
+      createdAt?: Date;
+      blockedReason?: string | null;
+      blockedAt?: Date | null;
+      blockedBy?: null;
+      avatarUrl?: string | null;
+      source: "user" | "admin";
+    }>;
+    const totalItems = result?.totalItems ?? 0;
 
-    const paged = merged.slice(skip, skip + limit);
-    const data = paged.map((item, index) => {
+    const data = rows.map((item, index) => {
       const isBlocked = item.status === USER_STATUS.BLOCKED;
       return {
         serial: skip + index + 1,
@@ -481,7 +536,7 @@ export class AdminService {
       pagination: this.buildPaginationMeta({
         page,
         limit,
-        totalItems: merged.length,
+        totalItems,
         serialStart: data.length ? skip + 1 : 0,
       }),
     };
@@ -648,71 +703,74 @@ export class AdminService {
   }
 
   async dashboardOverview() {
-    const [
-      totalUsers,
-      totalActivities,
-      totalEvents,
-      openReports,
-      openSupportTickets,
-      paymentSummary,
-      subscriptionRevenueSummary,
-    ] = await Promise.all([
-      User.countDocuments({ isDeleted: false }),
-      Activity.countDocuments({}),
-      Event.countDocuments({}),
-      Report.countDocuments({ status: { $in: ["open", "under_review"] } }),
-      SupportTicket.countDocuments({ status: { $in: ["open", "in_progress"] } }),
-      PaymentTransaction.aggregate([
-        { $match: { status: "succeeded" } },
-        {
-          $group: {
-            _id: null,
-            gross: { $sum: "$grossAmount" },
-            platformFee: { $sum: "$platformFeeAmount" },
-            creatorShare: { $sum: "$creatorShareAmount" },
+    return this.remember("dashboard:overview", 15000, async () => {
+      const [
+        totalUsers,
+        totalActivities,
+        totalEvents,
+        openReports,
+        openSupportTickets,
+        paymentSummary,
+        subscriptionRevenueSummary,
+      ] = await Promise.all([
+        User.countDocuments({ isDeleted: false }),
+        Activity.countDocuments({}),
+        Event.countDocuments({}),
+        Report.countDocuments({ status: { $in: ["open", "under_review"] } }),
+        SupportTicket.countDocuments({ status: { $in: ["open", "in_progress"] } }),
+        PaymentTransaction.aggregate([
+          { $match: { status: { $in: this.successfulPaymentStatuses } } },
+          {
+            $group: {
+              _id: null,
+              gross: { $sum: "$grossAmount" },
+              platformFee: { $sum: "$platformFeeAmount" },
+              creatorShare: { $sum: "$creatorShareAmount" },
+            },
           },
-        },
-      ]),
-      SubscriptionPayment.aggregate([
-        { $match: { status: "succeeded" } },
-        {
-          $group: {
-            _id: null,
-            totalSubscriptionRevenue: { $sum: "$amount" },
+        ]),
+        SubscriptionPayment.aggregate([
+          { $match: { status: { $in: this.successfulPaymentStatuses } } },
+          {
+            $group: {
+              _id: null,
+              totalSubscriptionRevenue: { $sum: "$amount" },
+            },
           },
+        ]),
+      ]);
+
+      const eventPlatformFeeRevenue = Number(
+        (paymentSummary?.[0]?.platformFee || 0).toFixed(2),
+      );
+      const subscriptionRevenue = Number(
+        (subscriptionRevenueSummary?.[0]?.totalSubscriptionRevenue || 0).toFixed(2),
+      );
+      const totalRevenue = Number(
+        (eventPlatformFeeRevenue + subscriptionRevenue).toFixed(2),
+      );
+
+      return {
+        totalUsers,
+        totalActivities,
+        totalEvents,
+        openReports,
+        openSupportTickets,
+        totalRevenue,
+        eventPlatformFeeRevenue,
+        subscriptionRevenue,
+        payments: paymentSummary[0] || {
+          gross: 0,
+          platformFee: 0,
+          creatorShare: 0,
         },
-      ]),
-    ]);
-
-    const eventPlatformFeeRevenue = Number(
-      (paymentSummary?.[0]?.platformFee || 0).toFixed(2),
-    );
-    const subscriptionRevenue = Number(
-      (subscriptionRevenueSummary?.[0]?.totalSubscriptionRevenue || 0).toFixed(2),
-    );
-    const totalRevenue = Number(
-      (eventPlatformFeeRevenue + subscriptionRevenue).toFixed(2),
-    );
-
-    return {
-      totalUsers,
-      totalActivities,
-      totalEvents,
-      openReports,
-      openSupportTickets,
-      totalRevenue,
-      eventPlatformFeeRevenue,
-      subscriptionRevenue,
-      payments: paymentSummary[0] || {
-        gross: 0,
-        platformFee: 0,
-        creatorShare: 0,
-      },
-    };
+      };
+    });
   }
 
   async dashboardAnalytics(query?: { year?: number }) {
     const selectedYear = query?.year ?? new Date().getFullYear();
+    return this.remember(`dashboard:analytics:${selectedYear}`, 15000, async () => {
     const startOfYear = new Date(selectedYear, 0, 1);
     const startOfNextYear = new Date(selectedYear + 1, 0, 1);
     const monthLabels = [
@@ -770,7 +828,7 @@ export class AdminService {
         PaymentTransaction.aggregate([
           {
             $match: {
-              status: "succeeded",
+              status: { $in: this.successfulPaymentStatuses },
               createdAt: { $gte: startOfYear, $lt: startOfNextYear },
             },
           },
@@ -827,6 +885,21 @@ export class AdminService {
         month,
         gross: revenueByMonth.get(index + 1) || 0,
       })),
+    };
+    });
+  }
+
+  async dashboardBootstrap(query?: { year?: number }) {
+    const [overview, analytics, recentUsers] = await Promise.all([
+      this.dashboardOverview(),
+      this.dashboardAnalytics(query),
+      this.listUsers({ page: 1, limit: 5 }),
+    ]);
+
+    return {
+      overview,
+      analytics,
+      recentUsers: recentUsers.data,
     };
   }
 
@@ -1258,7 +1331,7 @@ export class AdminService {
         },
       ]),
       PaymentTransaction.aggregate([
-        { $match: { status: "succeeded" } },
+        { $match: { status: { $in: this.successfulPaymentStatuses } } },
         {
           $lookup: {
             from: "events",
@@ -1419,7 +1492,7 @@ export class AdminService {
 
     const [earningStats, payoutStats] = await Promise.all([
       PaymentTransaction.aggregate([
-        { $match: { status: "succeeded" } },
+        { $match: { status: { $in: this.successfulPaymentStatuses } } },
         {
           $lookup: {
             from: "events",
@@ -1523,7 +1596,7 @@ export class AdminService {
         .exec(),
       Event.countDocuments({ creatorId }),
       PaymentTransaction.aggregate([
-        { $match: { status: "succeeded" } },
+        { $match: { status: { $in: this.successfulPaymentStatuses } } },
         {
           $lookup: {
             from: "events",
@@ -1616,7 +1689,7 @@ export class AdminService {
 
     const [paymentSummary, payoutSummary] = await Promise.all([
       PaymentTransaction.aggregate([
-        { $match: { status: "succeeded" } },
+        { $match: { status: { $in: this.successfulPaymentStatuses } } },
         {
           $lookup: {
             from: "events",
@@ -1713,9 +1786,13 @@ export class AdminService {
     const skip = (page - 1) * limit;
 
     const status = query.status || "succeeded";
+    const eventStatusFilter =
+      status === "succeeded"
+        ? { $in: this.successfulPaymentStatuses }
+        : status;
 
     const [eventRows, subscriptionRows] = await Promise.all([
-      PaymentTransaction.find({ status })
+      PaymentTransaction.find({ status: eventStatusFilter })
         .sort({ createdAt: -1 })
         .populate("payerId", "fullName email profileImageUrl")
         .populate("eventId", "title")

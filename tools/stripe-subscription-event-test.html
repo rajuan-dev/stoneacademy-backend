@@ -567,11 +567,15 @@
 
       if (status.isJoined) {
         setOverall("Joined", "good");
+        ids.paymentMeta.textContent = status.providerReference
+          ? `Event joined. Payment verified: ${status.providerReference}.`
+          : "Event joined.";
         ids.payBtn.disabled = true;
         ids.joinBtn.disabled = true;
       } else if (status.paymentVerified && status.providerReference) {
         setOverall("Payment verified", "good");
         state.paymentIntentId = status.providerReference;
+        ids.paymentMeta.textContent = `Payment verified by backend: ${status.providerReference}. You can join the event.`;
         ids.joinBtn.disabled = false;
       }
       return status;
@@ -706,6 +710,7 @@
         return;
       }
 
+      ids.paymentMeta.textContent = `Payment verified by backend: ${paymentIntent.id}. Joining event now.`;
       ids.joinBtn.disabled = false;
       await joinEvent();
     }
@@ -740,6 +745,9 @@
       log("Event joined successfully.", joined);
       await refreshJoinStatus(false);
       setOverall("Joined", "good");
+      ids.paymentMeta.textContent = providerReference
+        ? `Event joined. Payment verified: ${providerReference}.`
+        : "Event joined.";
       ids.payBtn.disabled = true;
       ids.joinBtn.disabled = true;
     }

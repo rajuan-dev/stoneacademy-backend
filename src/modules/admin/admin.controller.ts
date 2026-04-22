@@ -177,6 +177,12 @@ export class AdminController {
     ApiResponse.success(res, result, "Dashboard analytics fetched successfully");
   });
 
+  dashboardBootstrap = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(dashboardAnalyticsSchema, req);
+    const result = await this.service.dashboardBootstrap(validated.query);
+    ApiResponse.success(res, result, "Dashboard bootstrap fetched successfully");
+  });
+
   listActivities = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(listActivitiesSchema, req);
     const result = await this.service.listActivities(validated.query);

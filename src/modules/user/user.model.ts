@@ -228,6 +228,8 @@ userSchema.index({ email: 1, isDeleted: 1 });
 userSchema.index({ role: 1, accountStatus: 1, isDeleted: 1 });
 userSchema.index({ createdAt: -1, isDeleted: 1 });
 userSchema.index({ status: 1, role: 1 });
+userSchema.index({ status: 1, isDeleted: 1, createdAt: -1 });
+userSchema.index({ role: 1, status: 1, isDeleted: 1, createdAt: -1 });
 userSchema.index({ "location.coordinates": "2dsphere" });
 
 userSchema.pre(/^find/, function (this: Query<any, IUser>) {
