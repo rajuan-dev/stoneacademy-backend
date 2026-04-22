@@ -13,7 +13,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}",
+            "value": "Bearer {{accessToken}}",
             "type": "text"
           }
         ],
@@ -48,7 +48,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}",
+            "value": "Bearer {{accessToken}}",
             "type": "text"
           }
         ],
@@ -83,7 +83,7 @@
       "value": "http://localhost:5191/api/v1"
     },
     {
-      "key": "user_token",
+      "key": "accessToken",
       "value": ""
     },
     {

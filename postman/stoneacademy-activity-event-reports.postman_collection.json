@@ -11,7 +11,7 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Authorization", "value": "Bearer {{userToken}}" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
           { "key": "Content-Type", "value": "application/json" }
         ],
         "body": {
@@ -30,7 +30,7 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Authorization", "value": "Bearer {{userToken}}" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
           { "key": "Content-Type", "value": "application/json" }
         ],
         "body": {
@@ -49,7 +49,7 @@
       "request": {
         "method": "GET",
         "header": [
-          { "key": "Authorization", "value": "Bearer {{userToken}}" }
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
         ],
         "url": {
           "raw": "{{baseUrl}}/reports/me?page=1&limit=10",
@@ -67,7 +67,7 @@
       "request": {
         "method": "GET",
         "header": [
-          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
         ],
         "url": {
           "raw": "{{baseUrl}}/reports/admin?page=1&limit=10&entityType=activity&status=open",
@@ -87,7 +87,7 @@
       "request": {
         "method": "PATCH",
         "header": [
-          { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
           { "key": "Content-Type", "value": "application/json" }
         ],
         "body": {
@@ -104,8 +104,7 @@
   ],
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
-    { "key": "userToken", "value": "" },
-    { "key": "adminToken", "value": "" },
+    { "key": "accessToken", "value": "" },
     { "key": "activityId", "value": "" },
     { "key": "eventId", "value": "" },
     { "key": "reportId", "value": "" }

@@ -13,7 +13,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}"
+            "value": "Bearer {{accessToken}}"
           }
         ],
         "url": "{{base_url}}/admin/subscriptions/fees"
@@ -26,7 +26,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}"
+            "value": "Bearer {{accessToken}}"
           },
           {
             "key": "Content-Type",
@@ -47,7 +47,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}"
+            "value": "Bearer {{accessToken}}"
           },
           {
             "key": "Content-Type",
@@ -82,7 +82,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}"
+            "value": "Bearer {{accessToken}}"
           },
           {
             "key": "Content-Type",
@@ -103,7 +103,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}"
+            "value": "Bearer {{accessToken}}"
           }
         ],
         "url": "{{base_url}}/subscriptions/me"
@@ -116,7 +116,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}"
+            "value": "Bearer {{accessToken}}"
           }
         ],
         "url": "{{base_url}}/subscriptions/cancel"
@@ -129,7 +129,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}"
+            "value": "Bearer {{accessToken}}"
           }
         ],
         "url": "{{base_url}}/billing/events/{{event_id}}/checkout-intent"
@@ -156,7 +156,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{user_token}}"
+            "value": "Bearer {{accessToken}}"
           },
           {
             "key": "Content-Type",
@@ -177,7 +177,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}"
+            "value": "Bearer {{accessToken}}"
           }
         ],
         "url": "{{base_url}}/admin/subscriptions?page=1&limit=10&search="
@@ -190,7 +190,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}"
+            "value": "Bearer {{accessToken}}"
           }
         ],
         "url": "{{base_url}}/admin/event-creators/premium?page=1&limit=10&paymentStatus=all&q="
@@ -203,7 +203,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}"
+            "value": "Bearer {{accessToken}}"
           }
         ],
         "url": "{{base_url}}/admin/event-creators/premium/{{creator_id}}"
@@ -216,11 +216,7 @@
       "value": "http://localhost:3000/api/v1"
     },
     {
-      "key": "admin_token",
-      "value": ""
-    },
-    {
-      "key": "user_token",
+      "key": "accessToken",
       "value": ""
     },
     {

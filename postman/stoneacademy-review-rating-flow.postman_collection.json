@@ -11,8 +11,7 @@
     { "key": "hostPassword", "value": "Password123!" },
     { "key": "participantEmail", "value": "participant@example.com" },
     { "key": "participantPassword", "value": "Password123!" },
-    { "key": "hostAccessToken", "value": "" },
-    { "key": "participantAccessToken", "value": "" },
+    { "key": "accessToken", "value": "" },
     { "key": "activityId", "value": "" },
     { "key": "eventId", "value": "" },
     { "key": "hostUserId", "value": "" }
@@ -22,7 +21,7 @@
       "name": "1) Auth Setup",
       "item": [
         {
-          "name": "Host Login (Save hostAccessToken + hostUserId)",
+          "name": "Host Login (Save accessToken + hostUserId)",
           "event": [
             {
               "listen": "test",
@@ -32,7 +31,7 @@
                   "const res = pm.response.json();",
                   "const token = res?.data?.accessToken;",
                   "const userId = res?.data?.user?._id || res?.data?.user?.id || '';",
-                  "if (token) pm.collectionVariables.set('hostAccessToken', token);",
+                  "if (token) pm.collectionVariables.set('accessToken', token);",
                   "if (userId) pm.collectionVariables.set('hostUserId', userId);"
                 ]
               }
@@ -52,7 +51,7 @@
           "response": []
         },
         {
-          "name": "Participant Login (Save participantAccessToken)",
+          "name": "Participant Login (Save accessToken)",
           "event": [
             {
               "listen": "test",
@@ -61,7 +60,7 @@
                 "exec": [
                   "const res = pm.response.json();",
                   "const token = res?.data?.accessToken;",
-                  "if (token) pm.collectionVariables.set('participantAccessToken', token);"
+                  "if (token) pm.collectionVariables.set('accessToken', token);"
                 ]
               }
             }
@@ -102,7 +101,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{hostAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "POST",
             "body": {
@@ -138,7 +137,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{hostAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "POST",
             "body": {
@@ -168,7 +167,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "POST",
             "url": "{{baseUrl}}/activities/{{activityId}}/join"
@@ -180,7 +179,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "GET",
             "url": "{{baseUrl}}/activities/{{activityId}}"
@@ -192,7 +191,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "POST",
             "url": "{{baseUrl}}/events/{{eventId}}/join"
@@ -204,7 +203,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "GET",
             "url": "{{baseUrl}}/events/{{eventId}}"
@@ -221,7 +220,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "POST",
             "header": [
@@ -240,7 +239,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{participantAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "POST",
             "header": [
@@ -264,7 +263,7 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{hostAccessToken}}", "type": "string" }]
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
             },
             "method": "GET",
             "url": "{{baseUrl}}/users/me/ratings?page=1&limit=20"

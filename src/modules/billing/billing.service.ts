@@ -1,4 +1,4 @@
-import { PAGINATION } from "@/constants/app.constants";
+import { PAGINATION, PAYMENT_STATUS } from "@/constants/app.constants";
 import { notificationService } from "@/modules/notification/notification.service";
 import { stripeService } from "@/services/stripe.service";
 import {
@@ -12,6 +12,11 @@ import { User } from "../user/user.model";
 import { PayoutRequest } from "./payout-request.model";
 
 export class BillingService {
+  private readonly successfulPaymentStatuses = [
+    PAYMENT_STATUS.SUCCEEDED,
+    "succeeded",
+  ];
+
   async listMyTransactions(
     userId: string,
     query: { page?: number; limit?: number; status?: string },
@@ -39,7 +44,7 @@ export class BillingService {
       {
         $match: {
           "event.creatorId": new Types.ObjectId(creatorId),
-          status: "succeeded",
+          status: { $in: this.successfulPaymentStatuses },
         },
       },
       {
@@ -279,7 +284,7 @@ export class BillingService {
   ) {
     return PaymentTransaction.findOneAndUpdate(
       { providerReference, provider },
-      { status: "succeeded" },
+      { status: PAYMENT_STATUS.SUCCEEDED },
       { new: true },
     ).exec();
   }
@@ -290,6 +295,15 @@ export class BillingService {
   }) {
     const event = await Event.findById(params.eventId).exec();
     if (!event) throw new NotFoundException("Event not found");
+
+    const paid = await PaymentTransaction.findOne({
+      eventId: params.eventId,
+      payerId: params.payerId,
+      status: { $in: this.successfulPaymentStatuses },
+    }).sort({ createdAt: -1 }).exec();
+    if (paid) {
+      throw new BadRequestException("This event ticket is already paid.");
+    }
 
     const existing = await PaymentTransaction.findOne({
       eventId: params.eventId,
@@ -411,7 +425,12 @@ export class BillingService {
     const skip = (page - 1) * limit;
     const filter: Record<string, any> = {};
     if (input.payerId) filter.payerId = input.payerId;
-    if (input.status) filter.status = input.status;
+    if (input.status) {
+      filter.status =
+        input.status === "succeeded"
+          ? { $in: this.successfulPaymentStatuses }
+          : input.status;
+    }
 
     const [data, totalItems] = await Promise.all([
       PaymentTransaction.find(filter)

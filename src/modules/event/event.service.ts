@@ -404,7 +404,7 @@ export class EventService {
       PaymentTransaction.findOne({
         eventId: event._id,
         payerId: userId,
-        status: PAYMENT_STATUS.SUCCEEDED,
+        status: { $in: [PAYMENT_STATUS.SUCCEEDED, "succeeded"] },
       })
         .sort({ createdAt: -1 })
         .select("_id providerReference status createdAt")
@@ -602,7 +602,7 @@ export class EventService {
         eventId: event._id,
         payerId: userId,
         providerReference: payload.providerReference,
-        status: PAYMENT_STATUS.SUCCEEDED,
+        status: { $in: [PAYMENT_STATUS.SUCCEEDED, "succeeded"] },
       })
         .sort({ createdAt: -1 })
         .exec();

@@ -171,6 +171,32 @@ billingRouter.post(
       );
     }
 
+    if (transaction.provider === "stripe" && transaction.providerReference) {
+      const existingIntent = await stripeService.retrievePaymentIntent(
+        transaction.providerReference,
+      );
+
+      if (existingIntent.status === "succeeded") {
+        await service.markTransactionSucceededByProviderRef(existingIntent.id, "stripe");
+        throw new BadRequestException("This event ticket is already paid.");
+      }
+
+      if (
+        ["requires_payment_method", "requires_confirmation", "requires_action", "processing"]
+          .includes(existingIntent.status)
+      ) {
+        return ApiResponse.success(
+          res,
+          {
+            paymentIntentClientSecret: existingIntent.client_secret,
+            paymentIntentId: existingIntent.id,
+            transaction,
+          },
+          "Existing checkout intent returned successfully",
+        );
+      }
+    }
+
     // Stripe Connect destination charge:
     // - platform keeps `application_fee_amount` (10%)
     // - remaining amount is transferred to host connected account (90%)
@@ -188,7 +214,7 @@ billingRouter.post(
         payerId: userId,
         hostStripeAccountId: host.stripeAccountId,
       },
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ["card"],
     });
 
     transaction.provider = "stripe";

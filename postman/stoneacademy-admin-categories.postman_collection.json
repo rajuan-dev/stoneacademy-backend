@@ -34,7 +34,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}",
+            "value": "Bearer {{accessToken}}",
             "type": "text"
           }
         ],
@@ -77,7 +77,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}",
+            "value": "Bearer {{accessToken}}",
             "type": "text"
           },
           {
@@ -109,7 +109,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}",
+            "value": "Bearer {{accessToken}}",
             "type": "text"
           },
           {
@@ -142,7 +142,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}",
+            "value": "Bearer {{accessToken}}",
             "type": "text"
           }
         ],
@@ -166,7 +166,7 @@
       "value": "http://localhost:5191/api/v1"
     },
     {
-      "key": "admin_token",
+      "key": "accessToken",
       "value": ""
     },
     {
