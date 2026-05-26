@@ -107,7 +107,7 @@ export class EventService {
     }
 
     const queryBuilder = Event.find(filter)
-      .populate("creatorId", "fullName email")
+      .populate("creatorId", "fullName email profileImageUrl rating")
       .populate("media", "url");
     if (sort) {
       queryBuilder.sort(sort);
@@ -122,6 +122,7 @@ export class EventService {
       const coordinates = item.location?.coordinates?.coordinates as
         | [number, number]
         | undefined;
+      const creator = item.creatorId as any;
       const distanceMilesAway = hasGeo && coordinates
         ? this.getDistanceMiles(query.lat!, query.lng!, coordinates[1], coordinates[0])
         : null;
@@ -133,14 +134,21 @@ export class EventService {
       return {
         kind: "event",
         id: item._id.toString(),
-        hostId: item.creatorId?._id?.toString?.() || item.creatorId?.toString?.() || null,
-        creatorId: item.creatorId?._id?.toString?.() || item.creatorId?.toString?.() || null,
+        hostId: creator?._id?.toString?.() || creator?.toString?.() || null,
+        creatorId: creator?._id?.toString?.() || creator?.toString?.() || null,
         name: item.title,
+        title: item.title,
         type: item.type,
-        creatorName: item.creatorId?.fullName || null,
-        creatorUsername: item.creatorId?.email
-          ? String(item.creatorId.email).split("@")[0]
+        description: item.description || null,
+        creatorName: creator?.fullName || null,
+        creatorUsername: creator?.email
+          ? String(creator.email).split("@")[0]
           : null,
+        creatorProfileImageUrl: creator?.profileImageUrl || null,
+        creatorRating: creator?.rating || { avg: 0, count: 0 },
+        rating: creator?.rating || { avg: 0, count: 0 },
+        ratingAvg: creator?.rating?.avg ?? 0,
+        ratingCount: creator?.rating?.count ?? 0,
         startAt: item.startAt,
         createdAt: item.createdAt,
         location: item.location?.label || null,
@@ -308,7 +316,10 @@ export class EventService {
     return {
       kind: "event",
       id: event._id.toString(),
+      hostId: creator?._id?.toString?.() || null,
+      creatorId: creator?._id?.toString?.() || null,
       name: event.title,
+      title: event.title,
       type: event.type,
       description: event.description || null,
       startAt: event.startAt,
@@ -324,6 +335,13 @@ export class EventService {
       discountPercentage: event.discountPercentage || 0,
       payableTicketPrice,
       currency: event.currency || "USD",
+      creatorName: creator?.fullName || null,
+      creatorUsername: creator?.email ? String(creator.email).split("@")[0] : null,
+      creatorProfileImageUrl: creator?.profileImageUrl || null,
+      creatorRating: creator?.rating || { avg: 0, count: 0 },
+      rating: creator?.rating || { avg: 0, count: 0 },
+      ratingAvg: creator?.rating?.avg ?? 0,
+      ratingCount: creator?.rating?.count ?? 0,
       host: creator
         ? {
             id: creator._id?.toString?.() || null,

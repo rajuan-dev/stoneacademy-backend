@@ -115,6 +115,14 @@
                 "type": "text/javascript",
                 "exec": [
                   "const res = pm.response.json();",
+                  "pm.test('Activity details include description and rating fields', function () {",
+                  "  pm.expect(res?.data).to.be.an('object');",
+                  "  pm.expect(res?.data).to.have.property('description');",
+                  "  pm.expect(res?.data).to.have.property('rating');",
+                  "  pm.expect(res?.data).to.have.property('ratingAvg');",
+                  "  pm.expect(res?.data).to.have.property('ratingCount');",
+                  "  pm.expect(res?.data).to.have.property('creatorName');",
+                  "});",
                   "const hostUserId = res?.data?.host?.id;",
                   "if (hostUserId) pm.collectionVariables.set('hostUserId', hostUserId);"
                 ]
@@ -186,6 +194,14 @@
                 "type": "text/javascript",
                 "exec": [
                   "const res = pm.response.json();",
+                  "pm.test('Event details include description and rating fields', function () {",
+                  "  pm.expect(res?.data).to.be.an('object');",
+                  "  pm.expect(res?.data).to.have.property('description');",
+                  "  pm.expect(res?.data).to.have.property('rating');",
+                  "  pm.expect(res?.data).to.have.property('ratingAvg');",
+                  "  pm.expect(res?.data).to.have.property('ratingCount');",
+                  "  pm.expect(res?.data).to.have.property('creatorName');",
+                  "});",
                   "const hostUserId = res?.data?.host?.id;",
                   "if (hostUserId) pm.collectionVariables.set('hostUserId', hostUserId);"
                 ]
@@ -267,6 +283,14 @@
                 "type": "text/javascript",
                 "exec": [
                   "const res = pm.response.json();",
+                  "pm.test('Paid event details include description and rating fields', function () {",
+                  "  pm.expect(res?.data).to.be.an('object');",
+                  "  pm.expect(res?.data).to.have.property('description');",
+                  "  pm.expect(res?.data).to.have.property('rating');",
+                  "  pm.expect(res?.data).to.have.property('ratingAvg');",
+                  "  pm.expect(res?.data).to.have.property('ratingCount');",
+                  "  pm.expect(res?.data).to.have.property('creatorName');",
+                  "});",
                   "const hostUserId = res?.data?.host?.id;",
                   "if (hostUserId) pm.collectionVariables.set('hostUserId', hostUserId);"
                 ]
