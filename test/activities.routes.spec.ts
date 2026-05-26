@@ -8,7 +8,7 @@ vi.mock("../src/modules/activity/activity.service", () => {
       data: [{ _id: "a1", title: "Morning Run" }],
       pagination: { currentPage: 1, itemsPerPage: 10, totalItems: 1 },
     });
-    getById = vi.fn().mockResolvedValue({ _id: "a1", title: "Morning Run" });
+    getByIdForUser = vi.fn().mockResolvedValue({ _id: "a1", title: "Morning Run" });
   }
 
   return { ActivityService };

@@ -102,7 +102,7 @@ export class ActivityService {
     }
 
     const queryBuilder = Activity.find(filter)
-      .populate("hostId", "fullName email")
+      .populate("hostId", "fullName email profileImageUrl rating")
       .populate("media", "url");
     if (sort) {
       queryBuilder.sort(sort);
@@ -117,6 +117,7 @@ export class ActivityService {
       const coordinates = item.location?.coordinates?.coordinates as
         | [number, number]
         | undefined;
+      const host = item.hostId as any;
       const distanceMilesAway = hasGeo && coordinates
         ? this.getDistanceMiles(query.lat!, query.lng!, coordinates[1], coordinates[0])
         : null;
@@ -128,13 +129,20 @@ export class ActivityService {
       return {
         kind: "activity",
         id: item._id.toString(),
-        hostId: item.hostId?._id?.toString?.() || item.hostId?.toString?.() || null,
+        hostId: host?._id?.toString?.() || host?.toString?.() || null,
         name: item.title,
+        title: item.title,
         type: item.type,
-        creatorName: item.hostId?.fullName || null,
-        creatorUsername: item.hostId?.email
-          ? String(item.hostId.email).split("@")[0]
+        description: item.description || null,
+        creatorName: host?.fullName || null,
+        creatorUsername: host?.email
+          ? String(host.email).split("@")[0]
           : null,
+        creatorProfileImageUrl: host?.profileImageUrl || null,
+        creatorRating: host?.rating || { avg: 0, count: 0 },
+        rating: host?.rating || { avg: 0, count: 0 },
+        ratingAvg: host?.rating?.avg ?? 0,
+        ratingCount: host?.rating?.count ?? 0,
         startAt: item.startAt,
         createdAt: item.createdAt,
         location: item.location?.label || null,
@@ -272,7 +280,9 @@ export class ActivityService {
     return {
       kind: "activity",
       id: activity._id.toString(),
+      hostId: host?._id?.toString?.() || null,
       name: activity.title,
+      title: activity.title,
       type: activity.type,
       description: activity.description || null,
       startAt: activity.startAt,
@@ -284,6 +294,13 @@ export class ActivityService {
       joinedCount,
       isJoined,
       distanceMiles: activity.distanceMiles ?? null,
+      creatorName: host?.fullName || null,
+      creatorUsername: host?.email ? String(host.email).split("@")[0] : null,
+      creatorProfileImageUrl: host?.profileImageUrl || null,
+      creatorRating: host?.rating || { avg: 0, count: 0 },
+      rating: host?.rating || { avg: 0, count: 0 },
+      ratingAvg: host?.rating?.avg ?? 0,
+      ratingCount: host?.rating?.count ?? 0,
       host: host
         ? {
             id: host._id?.toString?.() || null,
