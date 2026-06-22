@@ -801,7 +801,7 @@ export class UserService {
       throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
     }
 
-    const source = query.source ?? "created";
+    const source = query.source ?? "all";
     const mediaType = query.mediaType ?? "all";
     const includeActivity = source === "activity" || source === "all" || source === "created";
     const includeEvent = source === "event" || source === "all" || source === "created";
@@ -816,7 +816,13 @@ export class UserService {
         : Promise.resolve([]),
     ]);
 
-    const profileMediaIds = includeProfile ? (user.gallery || []) : [];
+    const profileMediaIds = includeProfile
+      ? [
+          ...(user.gallery || []),
+          ...(user.profilePhoto ? [user.profilePhoto] : []),
+          ...(user.coverPhoto ? [user.coverPhoto] : []),
+        ]
+      : [];
 
     const sourceMap = new Map<string, Set<string>>();
     const addSource = (ids: Array<any>, label: string) => {
@@ -832,7 +838,15 @@ export class UserService {
 
     addSource(activityMediaIds as any[], "activity");
     addSource(eventMediaIds as any[], "event");
-    addSource(profileMediaIds as any[], "profile");
+    if (includeProfile) {
+      addSource(user.gallery || [], "profile");
+      if (user.profilePhoto) {
+        addSource([user.profilePhoto], "profilePhoto");
+      }
+      if (user.coverPhoto) {
+        addSource([user.coverPhoto], "coverPhoto");
+      }
+    }
 
     const allIds = Array.from(sourceMap.keys());
     if (!allIds.length) {

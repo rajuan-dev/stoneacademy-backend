@@ -117,7 +117,7 @@ router.post(
  * /users/me/gallery:
  *   get:
  *     tags: [Users]
- *     summary: Get my gallery (from created activities/events)
+ *     summary: Get my gallery (activities, events, and profile media)
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -126,7 +126,7 @@ router.post(
  *         schema:
  *           type: string
  *           enum: [created, activity, event, profile, all]
- *         description: created=activities+events, profile=manual uploads
+ *         description: default=all, created=activities+events, profile=profile gallery + profile photo + cover photo
  *       - in: query
  *         name: page
  *         schema:
