@@ -1,0 +1,345 @@
+{
+  "info": {
+    "name": "StoneAcademy - Profile Section Full",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Profile section APIs for overview, photos, videos, joined/created activities and events, reviews, and profile editing."
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5191/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "mediaId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Rajuan Hossen (user)\",\n  \"email\": \"quantumerrors@gmail.com\",\n  \"password\": \"12345678\",\n  \"confirmPassword\": \"12345678\",\n  \"dob\": \"1997-11-28\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123!\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile Core",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users/me",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Rajuan Hossen\",\n  \"bio\": \"Builder, learner, and community contributor.\",\n  \"location\": {\n    \"label\": \"Dhaka, Bangladesh\"\n  },\n  \"phoneNumber\": \"+8801700000000\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Upload Profile Photo",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/users/me/profile-photo"
+          }
+        },
+        {
+          "name": "Upload Cover Photo",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/users/me/cover-photo"
+          }
+        },
+        {
+          "name": "Get Profile Overview",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/overview?recentLimit=10&mediaLimit=6",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "overview"],
+              "query": [
+                { "key": "recentLimit", "value": "10" },
+                { "key": "mediaLimit", "value": "6" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "item": [
+        {
+          "name": "Get Gallery",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/gallery?source=all&mediaType=all&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "gallery"],
+              "query": [
+                { "key": "source", "value": "all" },
+                { "key": "mediaType", "value": "all" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Gallery Media",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/users/me/gallery"
+          }
+        },
+        {
+          "name": "Get Photos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/photos?source=all&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "photos"],
+              "query": [
+                { "key": "source", "value": "all" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Videos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/videos?source=all&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "videos"],
+              "query": [
+                { "key": "source", "value": "all" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Videos",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/users/me/videos"
+          }
+        },
+        {
+          "name": "Delete Gallery Media",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/users/me/gallery/{{mediaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get My Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/ratings?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "ratings"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activities",
+      "item": [
+        {
+          "name": "Get Joined Activities",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/joined/activities?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "joined", "activities"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Created Activities",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/hosted/activities?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "hosted", "activities"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Get Joined Events",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/joined/events?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "joined", "events"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Created Events",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/me/hosted/events?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "hosted", "events"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public Profiles",
+      "item": [
+        {
+          "name": "Get Public Profile",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/users/{{userId}}/public"
+          }
+        },
+        {
+          "name": "Get Host Profile",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/host-profile?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "host-profile"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -64,6 +64,7 @@ export const updateProfileSchema = z.object({
       gender: z
         .enum(Object.values(GENDERS) as [string, ...string[]])
         .optional(),
+      bio: z.string().trim().max(1000).optional(),
       location: z
         .object({
           label: z.string().trim().min(1).max(200).optional(),
@@ -84,6 +85,7 @@ export const updateProfileSchema = z.object({
         data.phoneNumber ||
         data.dob ||
         data.gender ||
+        data.bio !== undefined ||
         data.location,
       { message: "At least one field must be provided for update" }
     ),
@@ -94,6 +96,7 @@ export const listMyGallerySchema = z.object({
     page: z.coerce.number().min(1).optional(),
     limit: z.coerce.number().min(1).max(100).optional(),
     source: z.enum(["activity", "event", "profile", "all", "created"]).optional(),
+    mediaType: z.enum(["image", "video", "all"]).optional(),
   }),
 });
 
@@ -108,6 +111,20 @@ export const listHostedContentSchema = z.object({
   query: z.object({
     page: z.coerce.number().min(1).optional(),
     limit: z.coerce.number().min(1).max(100).optional(),
+  }),
+});
+
+export const listJoinedContentSchema = z.object({
+  query: z.object({
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+  }),
+});
+
+export const listOverviewSchema = z.object({
+  query: z.object({
+    recentLimit: z.coerce.number().min(1).max(20).optional(),
+    mediaLimit: z.coerce.number().min(1).max(20).optional(),
   }),
 });
 

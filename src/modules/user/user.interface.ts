@@ -29,7 +29,9 @@ export interface IUser extends Document {
       coordinates: [number, number];
     };
   };
+  bio?: string;
   profilePhoto?: Types.ObjectId | null;
+  coverPhoto?: Types.ObjectId | null;
   gallery?: Types.ObjectId[];
   creatorStatus?: {
     subscriptionActive?: boolean;
@@ -41,6 +43,7 @@ export interface IUser extends Document {
   };
   blockedUsers?: Types.ObjectId[];
   profileImageUrl?: string | null;
+  coverImageUrl?: string | null;
   cleanerPercentage?: number;
   emailVerified: boolean;
   emailVerifiedAt?: Date | null;

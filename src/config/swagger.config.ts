@@ -41,6 +41,7 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
         type: "object",
         required: ["email", "password", "confirmPassword", "fullName"],
         properties: {
+          fullName: { type: "string", example: "Jane Client" },
           email: {
             type: "string",
             format: "email",
@@ -52,7 +53,11 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
             minLength: 8,
             example: "StrongP@ssw0rd",
           },
-          fullName: { type: "string", example: "Jane Client" },
+          dob: {
+            type: "string",
+            format: "date",
+            example: "1997-11-28",
+          },
           role: { type: "string", enum: ["user"], example: "user" },
         },
       },

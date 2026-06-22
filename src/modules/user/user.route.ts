@@ -104,6 +104,13 @@ router.post(
   upload.single("photo"),
   userController.uploadProfilePhoto,
 );
+router.post(
+  "/me/cover-photo",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.USER, ROLES.CREATOR, ROLES.CLIENT, ROLES.CLEANER),
+  upload.single("photo"),
+  userController.uploadCoverPhoto,
+);
 
 /**
  * @openapi
@@ -163,6 +170,22 @@ router.post(
   upload.array("media", 10),
   userController.uploadGallery,
 );
+router.get(
+  "/me/photos",
+  authMiddleware.verifyToken,
+  userController.getMyPhotos,
+);
+router.get(
+  "/me/videos",
+  authMiddleware.verifyToken,
+  userController.getMyVideos,
+);
+router.post(
+  "/me/videos",
+  authMiddleware.verifyToken,
+  upload.array("media", 10),
+  userController.uploadMyVideos,
+);
 
 /**
  * @openapi
@@ -210,6 +233,17 @@ router.delete(
  *         description: Ratings list
  */
 router.get("/me/ratings", authMiddleware.verifyToken, userController.getMyRatings);
+router.get("/me/overview", authMiddleware.verifyToken, userController.getMyOverview);
+router.get(
+  "/me/joined/activities",
+  authMiddleware.verifyToken,
+  userController.getMyJoinedActivities,
+);
+router.get(
+  "/me/joined/events",
+  authMiddleware.verifyToken,
+  userController.getMyJoinedEvents,
+);
 router.get(
   "/me/hosted/activities",
   authMiddleware.verifyToken,

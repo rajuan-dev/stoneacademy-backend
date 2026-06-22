@@ -23,7 +23,9 @@ export type UserResponse = {
       coordinates: [number, number];
     };
   };
+  bio?: string | null;
   profilePhoto?: string | null;
+  coverPhoto?: string | null;
   gallery?: string[];
   role: (typeof ROLES)[keyof typeof ROLES];
   accountStatus?: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
@@ -44,6 +46,7 @@ export type UserResponse = {
   blockedUsers?: string[];
   lastLoginAt?: Date;
   profileImage?: string;
+  coverImage?: string | null;
   onboardingCompletedAt?: Date;
   onboardingSkippedAt?: Date;
   stripeAccountId?: string | null;
@@ -133,7 +136,9 @@ export type JWTPayload = {
 export type PublicProfileResponse = {
   _id: string;
   fullName: string;
+  bio?: string | null;
   profilePhoto?: string | null;
+  coverPhoto?: string | null;
   gallery?: string[];
   rating?: {
     avg?: number;

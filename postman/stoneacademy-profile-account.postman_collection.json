@@ -16,6 +16,18 @@
       "name": "Auth",
       "item": [
         {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Rajuan Hossen (user)\",\n  \"email\": \"quantumerrors@gmail.com\",\n  \"password\": \"12345678\",\n  \"confirmPassword\": \"12345678\",\n  \"dob\": \"1997-11-28\"\n}"
+            }
+          }
+        },
+        {
           "name": "Login",
           "request": {
             "method": "POST",

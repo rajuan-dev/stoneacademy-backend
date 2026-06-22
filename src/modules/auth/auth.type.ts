@@ -12,6 +12,7 @@ export type RegisterPayload = {
   password: string;
   confirmPassword?: string;
   fullName: string;
+  dob?: Date;
   role?: (typeof ROLES)["USER"];
   meta?: {
     ip?: string;

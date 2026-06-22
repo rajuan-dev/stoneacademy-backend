@@ -240,6 +240,7 @@ export class AuthService {
       {
         email,
         fullName: payload.fullName,
+        dob: payload.dob,
         passwordHash,
         role: ROLES.USER,
         expiresAt: otp.expiresAt,
@@ -351,6 +352,7 @@ export class AuthService {
           email: pending.email,
           passwordHash: pending.passwordHash,
           fullName: pending.fullName,
+          dob: pending.dob,
           role: pending.role,
           status: USER_STATUS.ACTIVE,
           emailVerifiedAt: new Date(),

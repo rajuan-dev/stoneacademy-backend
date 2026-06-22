@@ -15,8 +15,10 @@ import {
   createCleanerSchema,
   galleryRemoveSchema,
   listCleanersSchema,
+  listJoinedContentSchema,
   listMyGallerySchema,
   listMyRatingsSchema,
+  listOverviewSchema,
   listHostedContentSchema,
   hostProfileSchema,
   userIdSchema,
@@ -76,6 +78,7 @@ export class UserController {
       "phoneNumber",
       "dob",
       "gender",
+      "bio",
       "location",
     ]);
 
@@ -158,6 +161,31 @@ export class UserController {
     ApiResponse.success(res, profile, "Profile photo updated successfully");
   });
 
+  uploadCoverPhoto = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const file = req.file;
+    if (!file) {
+      throw new BadRequestException("Cover photo file is required");
+    }
+
+    const uploadInput: StorageUploadInput = {
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      originalName: file.originalname,
+    };
+
+    const profile = await this.userService.updateCoverPhoto(
+      userId,
+      uploadInput,
+    );
+
+    ApiResponse.success(res, profile, "Cover photo updated successfully");
+  });
+
   uploadGallery = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.userId;
     if (!userId) {
@@ -208,6 +236,57 @@ export class UserController {
     ApiResponse.paginated(res, result.data, result.pagination, "Gallery fetched successfully");
   });
 
+  getMyPhotos = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listMyGallerySchema, req);
+    const result = await this.userService.getMyGalleryMedia(userId, {
+      ...validated.query,
+      mediaType: "image",
+    });
+    ApiResponse.paginated(res, result.data, result.pagination, "Photos fetched successfully");
+  });
+
+  getMyVideos = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listMyGallerySchema, req);
+    const result = await this.userService.getMyGalleryMedia(userId, {
+      ...validated.query,
+      mediaType: "video",
+    });
+    ApiResponse.paginated(res, result.data, result.pagination, "Videos fetched successfully");
+  });
+
+  uploadMyVideos = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const files = (req.files as Express.Multer.File[]) || [];
+    if (!files.length) {
+      throw new BadRequestException("Video files are required");
+    }
+
+    const uploads: StorageUploadInput[] = files.map((file) => ({
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      originalName: file.originalname,
+    }));
+
+    const profile = await this.userService.addGallery(userId, uploads, {
+      allowedType: "video",
+    });
+    ApiResponse.success(res, profile, "Videos uploaded successfully");
+  });
+
   getMyRatings = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.userId;
     if (!userId) {
@@ -248,6 +327,48 @@ export class UserController {
       validated.query,
     );
     ApiResponse.paginated(res, result.data, result.pagination, "Hosted events fetched successfully");
+  });
+
+  getMyJoinedActivities = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listJoinedContentSchema, req);
+    const result = await this.userService.listJoinedActivities(
+      userId,
+      validated.query,
+    );
+    ApiResponse.paginated(res, result.data, result.pagination, "Joined activities fetched successfully");
+  });
+
+  getMyJoinedEvents = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listJoinedContentSchema, req);
+    const result = await this.userService.listJoinedEvents(
+      userId,
+      validated.query,
+    );
+    ApiResponse.paginated(res, result.data, result.pagination, "Joined events fetched successfully");
+  });
+
+  getMyOverview = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
+    }
+
+    const validated = await zParse(listOverviewSchema, req);
+    const result = await this.userService.getMyProfileOverview(
+      userId,
+      validated.query,
+    );
+    ApiResponse.success(res, result, "Profile overview fetched successfully");
   });
 
   getPublicProfile = asyncHandler(async (req: Request, res: Response) => {

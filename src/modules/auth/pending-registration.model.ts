@@ -5,6 +5,7 @@ import { model, type Document } from "mongoose";
 export interface IPendingRegistration extends Document {
   email: string;
   fullName: string;
+  dob?: Date;
   passwordHash: string;
   role: (typeof ROLES)[keyof typeof ROLES];
   expiresAt: Date;
@@ -30,6 +31,9 @@ const pendingRegistrationSchema =
       type: String,
       required: true,
       trim: true,
+    },
+    dob: {
+      type: Date,
     },
     passwordHash: {
       type: String,

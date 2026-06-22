@@ -118,7 +118,17 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         type: locationSchema,
         default: undefined,
       },
+      bio: {
+        type: String,
+        trim: true,
+        maxlength: 1000,
+      },
       profilePhoto: {
+        type: Schema.Types.ObjectId,
+        ref: "Media",
+        default: null,
+      },
+      coverPhoto: {
         type: Schema.Types.ObjectId,
         ref: "Media",
         default: null,
@@ -147,6 +157,11 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         default: null,
         sparse: true,
         index: true,
+      },
+      coverImageUrl: {
+        type: String,
+        default: null,
+        sparse: true,
       },
       cleanerPercentage: {
         type: Number,

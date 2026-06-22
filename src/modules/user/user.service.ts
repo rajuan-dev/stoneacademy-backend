@@ -6,6 +6,7 @@ import {
   ACCOUNT_STATUS,
   MESSAGES,
   PAGINATION,
+  PARTICIPANT_STATUS,
   ROLES,
   USER_STATUS,
 } from "@/constants/app.constants";
@@ -22,7 +23,9 @@ import { generateRandomPassword, hashPassword } from "@/utils/password.utils";
 import type { IUser } from "./user.interface";
 import { UserRepository } from "./user.repository";
 import { Activity } from "@/modules/activity/activity.model";
+import { ActivityParticipant } from "@/modules/activity/activity-participant.model";
 import { Event } from "@/modules/event/event.model";
+import { EventParticipant } from "@/modules/event/event-participant.model";
 import { Review } from "@/modules/review/review.model";
 import type {
   CleanerCreatePayload,
@@ -53,8 +56,12 @@ export class UserService {
       dob: user.dob,
       gender: user.gender,
       location: user.location,
+      bio: user.bio || null,
       profilePhoto: user.profilePhoto
         ? user.profilePhoto.toString()
+        : null,
+      coverPhoto: user.coverPhoto
+        ? user.coverPhoto.toString()
         : null,
       gallery: (user.gallery || []).map((id) => id.toString()),
       role: user.role,
@@ -70,9 +77,11 @@ export class UserService {
       blockedUsers: (user.blockedUsers || []).map((id) => id.toString()),
       lastLoginAt: user.lastLoginAt,
       profileImage: user.profileImageUrl || undefined,
+      coverImage: user.coverImageUrl || null,
       onboardingCompletedAt: user.onboardingCompletedAt,
       onboardingSkippedAt: user.onboardingSkippedAt,
       stripeAccountId: user.stripeAccountId || null,
+      stripeCustomerId: user.stripeCustomerId || null,
       stripeOnboardingCompleted: Boolean(user.stripeOnboardingCompleted),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -87,8 +96,12 @@ export class UserService {
     return {
       _id: user._id.toString(),
       fullName: user.fullName,
+      bio: user.bio || null,
       profilePhoto: user.profilePhoto
         ? user.profilePhoto.toString()
+        : null,
+      coverPhoto: user.coverPhoto
+        ? user.coverPhoto.toString()
         : null,
       gallery: (user.gallery || []).map((id) => id.toString()),
       rating: user.rating,
@@ -116,18 +129,40 @@ export class UserService {
       throw new NotFoundException("User not found");
     }
 
-    const media = await Media.create({
-      ownerId: user._id,
-      type: file.mimeType?.startsWith("video/") ? "video" : "image",
-      s3Bucket: env.AWS_S3_BUCKET,
-      s3Key: upload.key,
-      url: upload.url,
-      mimeType: file.mimeType,
-      sizeBytes: file.buffer.length,
-    });
+    const media = await this.createMediaDocument(user._id.toString(), file, upload);
 
     user.profilePhoto = media._id;
     user.profileImageUrl = upload.url;
+    await user.save();
+
+    return this.toUserResponse(user);
+  }
+
+  async updateCoverPhoto(
+    userId: string,
+    file: StorageUploadInput,
+  ): Promise<UserResponse> {
+    if (!file || !file.buffer) {
+      throw new BadRequestException("Cover photo file is required");
+    }
+
+    if (!file.mimeType?.startsWith("image/")) {
+      throw new BadRequestException("Cover photo must be an image");
+    }
+
+    const upload = await s3Service.uploadFile(file, {
+      prefix: `covers/${userId}`,
+    });
+
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    const media = await this.createMediaDocument(user._id.toString(), file, upload);
+
+    user.coverPhoto = media._id;
+    user.coverImageUrl = upload.url;
     await user.save();
 
     return this.toUserResponse(user);
@@ -244,6 +279,7 @@ export class UserService {
     email: string;
     passwordHash: string;
     fullName: string;
+    dob?: Date;
     role: (typeof ROLES)[keyof typeof ROLES];
     status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];
     emailVerifiedAt?: Date | null;
@@ -257,6 +293,7 @@ export class UserService {
       email: payload.email.toLowerCase(),
       passwordHash: payload.passwordHash,
       fullName: payload.fullName,
+      dob: payload.dob,
       role: payload.role,
       status: payload.status ?? USER_STATUS.ACTIVE,
       emailVerified: Boolean(payload.emailVerifiedAt),
@@ -489,6 +526,7 @@ export class UserService {
       phoneNumber?: string;
       dob?: Date;
       gender?: string;
+      bio?: string;
       location?: {
         label?: string;
         coordinates?: {
@@ -533,6 +571,10 @@ export class UserService {
 
     if (payload.gender !== undefined) {
       user.gender = payload.gender as any;
+    }
+
+    if (payload.bio !== undefined) {
+      user.bio = payload.bio.trim();
     }
 
     if (payload.location !== undefined) {
@@ -604,7 +646,9 @@ export class UserService {
         _id: user._id.toString(),
         fullName: user.fullName,
         username: user.email ? String(user.email).split("@")[0] : null,
+        bio: user.bio || null,
         profilePhotoUrl: user.profileImageUrl || profilePhoto?.url || null,
+        coverPhotoUrl: user.coverImageUrl || null,
         rating: {
           avg: user.rating?.avg || 0,
           count: user.rating?.count || 0,
@@ -681,9 +725,22 @@ export class UserService {
   async addGallery(
     userId: string,
     files: StorageUploadInput[],
+    options?: { allowedType?: "image" | "video" },
   ): Promise<UserResponse> {
     if (!files || files.length === 0) {
       throw new BadRequestException("Gallery files are required");
+    }
+
+    if (options?.allowedType) {
+      const invalidFile = files.find((file) => {
+        const expectedPrefix = `${options.allowedType}/`;
+        return !file.mimeType?.startsWith(expectedPrefix);
+      });
+      if (invalidFile) {
+        throw new BadRequestException(
+          `Only ${options.allowedType} files are allowed for this upload`,
+        );
+      }
     }
 
     const user = await this.userRepository.findById(userId);
@@ -732,7 +789,12 @@ export class UserService {
 
   async getMyGalleryMedia(
     userId: string,
-    query: { page?: number; limit?: number; source?: "activity" | "event" | "profile" | "all" | "created" },
+    query: {
+      page?: number;
+      limit?: number;
+      source?: "activity" | "event" | "profile" | "all" | "created";
+      mediaType?: "image" | "video" | "all";
+    },
   ) {
     const user = await this.userRepository.findById(userId);
     if (!user) {
@@ -740,6 +802,7 @@ export class UserService {
     }
 
     const source = query.source ?? "created";
+    const mediaType = query.mediaType ?? "all";
     const includeActivity = source === "activity" || source === "all" || source === "created";
     const includeEvent = source === "event" || source === "all" || source === "created";
     const includeProfile = source === "profile" || source === "all";
@@ -789,14 +852,18 @@ export class UserService {
     const page = query.page ?? PAGINATION.DEFAULT_PAGE;
     const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
+    const mediaFilter: Record<string, any> = { _id: { $in: allIds } };
+    if (mediaType !== "all") {
+      mediaFilter.type = mediaType;
+    }
 
     const [data, totalItems] = await Promise.all([
-      Media.find({ _id: { $in: allIds } })
+      Media.find(mediaFilter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
-      Media.countDocuments({ _id: { $in: allIds } }),
+      Media.countDocuments(mediaFilter),
     ]);
 
     return {
@@ -999,6 +1066,299 @@ export class UserService {
     };
   }
 
+  async listJoinedActivities(
+    userId: string,
+    query: { page?: number; limit?: number },
+  ) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const filter = { userId, status: PARTICIPANT_STATUS.JOINED };
+    const [participants, totalItems] = await Promise.all([
+      ActivityParticipant.find(filter)
+        .sort({ joinedAt: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: "activityId",
+          populate: [
+            { path: "media", select: "url type mimeType" },
+            { path: "hostId", select: "fullName email profileImageUrl rating" },
+          ],
+        })
+        .lean(),
+      ActivityParticipant.countDocuments(filter),
+    ]);
+
+    const data = participants
+      .map((item: any) => {
+        const activity = item.activityId;
+        if (!activity?._id) return null;
+
+        const host = activity.hostId as any;
+        return {
+          joinedAt: item.joinedAt || item.createdAt || null,
+          activity: this.formatActivityCard(activity, host),
+        };
+      })
+      .filter(Boolean);
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async listJoinedEvents(
+    userId: string,
+    query: { page?: number; limit?: number },
+  ) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const filter = { userId, status: PARTICIPANT_STATUS.JOINED };
+    const [participants, totalItems] = await Promise.all([
+      EventParticipant.find(filter)
+        .sort({ joinedAt: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: "eventId",
+          populate: [
+            { path: "media", select: "url type mimeType" },
+            { path: "creatorId", select: "fullName email profileImageUrl rating" },
+          ],
+        })
+        .lean(),
+      EventParticipant.countDocuments(filter),
+    ]);
+
+    const data = participants
+      .map((item: any) => {
+        const event = item.eventId;
+        if (!event?._id) return null;
+
+        const creator = event.creatorId as any;
+        return {
+          joinedAt: item.joinedAt || item.createdAt || null,
+          event: this.formatEventCard(event, creator),
+        };
+      })
+      .filter(Boolean);
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async getMyProfileOverview(
+    userId: string,
+    query?: { recentLimit?: number; mediaLimit?: number },
+  ) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+    }
+
+    const recentLimit = query?.recentLimit ?? 10;
+    const mediaLimit = query?.mediaLimit ?? 6;
+
+    const [
+      reviewCount,
+      createdActivityCount,
+      createdEventCount,
+      joinedActivityCount,
+      joinedEventCount,
+      activityMediaIds,
+      eventMediaIds,
+      recentProfileMedia,
+      recentJoinedActivities,
+      recentJoinedEvents,
+      recentCreatedActivities,
+      recentCreatedEvents,
+      recentReviews,
+    ] = await Promise.all([
+      Review.countDocuments({ targetUserId: userId }),
+      Activity.countDocuments({ hostId: userId }),
+      Event.countDocuments({ creatorId: userId }),
+      ActivityParticipant.countDocuments({ userId, status: PARTICIPANT_STATUS.JOINED }),
+      EventParticipant.countDocuments({ userId, status: PARTICIPANT_STATUS.JOINED }),
+      Activity.distinct("media", { hostId: userId }),
+      Event.distinct("media", { creatorId: userId }),
+      user.gallery?.length
+        ? Media.find({ _id: { $in: user.gallery } })
+            .sort({ createdAt: -1 })
+            .limit(recentLimit)
+            .lean()
+        : Promise.resolve([]),
+      ActivityParticipant.find({ userId, status: PARTICIPANT_STATUS.JOINED })
+        .sort({ joinedAt: -1, createdAt: -1 })
+        .limit(recentLimit)
+        .populate({ path: "activityId", select: "title type startAt createdAt media status" })
+        .lean(),
+      EventParticipant.find({ userId, status: PARTICIPANT_STATUS.JOINED })
+        .sort({ joinedAt: -1, createdAt: -1 })
+        .limit(recentLimit)
+        .populate({ path: "eventId", select: "title type startAt createdAt media status priceType ticketPrice discountPercentage currency" })
+        .lean(),
+      Activity.find({ hostId: userId })
+        .sort({ createdAt: -1 })
+        .limit(recentLimit)
+        .select("title type startAt createdAt media status")
+        .lean(),
+      Event.find({ creatorId: userId })
+        .sort({ createdAt: -1 })
+        .limit(recentLimit)
+        .select("title type startAt createdAt media status priceType ticketPrice discountPercentage currency")
+        .lean(),
+      Review.find({ targetUserId: userId })
+        .sort({ createdAt: -1 })
+        .limit(recentLimit)
+        .populate("reviewerId", "fullName profileImageUrl")
+        .lean(),
+    ]);
+
+    const allMediaIds = new Set<string>();
+    (user.gallery || []).forEach((id) => allMediaIds.add(id.toString()));
+    (activityMediaIds || []).forEach((id: any) => allMediaIds.add(id.toString()));
+    (eventMediaIds || []).forEach((id: any) => allMediaIds.add(id.toString()));
+
+    const mediaMatch = { _id: { $in: Array.from(allMediaIds) } };
+    const [photosCount, videosCount, mediaPreview] = allMediaIds.size
+      ? await Promise.all([
+          Media.countDocuments({ ...mediaMatch, type: "image" }),
+          Media.countDocuments({ ...mediaMatch, type: "video" }),
+          Media.find(mediaMatch)
+            .sort({ createdAt: -1 })
+            .limit(mediaLimit)
+            .lean(),
+        ])
+      : [0, 0, []];
+
+    const recentActivity = [
+      ...recentProfileMedia.map((media: any) => ({
+        type: media.type === "video" ? "video_uploaded" : "photo_uploaded",
+        occurredAt: media.createdAt,
+        title: media.type === "video" ? "Uploaded a video" : "Uploaded a photo",
+        description: null,
+        media: this.formatMediaItem(media),
+      })),
+      ...recentJoinedActivities.map((row: any) => ({
+        type: "activity_joined",
+        occurredAt: row.joinedAt || row.createdAt,
+        title: row.activityId?.title || "Joined an activity",
+        description: row.activityId?.type || null,
+        target: row.activityId?._id
+          ? {
+              kind: "activity",
+              id: row.activityId._id.toString(),
+            }
+          : null,
+      })),
+      ...recentJoinedEvents.map((row: any) => ({
+        type: "event_joined",
+        occurredAt: row.joinedAt || row.createdAt,
+        title: row.eventId?.title || "Joined an event",
+        description: row.eventId?.type || null,
+        target: row.eventId?._id
+          ? {
+              kind: "event",
+              id: row.eventId._id.toString(),
+            }
+          : null,
+      })),
+      ...recentCreatedActivities.map((row: any) => ({
+        type: "activity_created",
+        occurredAt: row.createdAt,
+        title: row.title || "Created an activity",
+        description: row.type || null,
+        target: {
+          kind: "activity",
+          id: row._id.toString(),
+        },
+      })),
+      ...recentCreatedEvents.map((row: any) => ({
+        type: "event_created",
+        occurredAt: row.createdAt,
+        title: row.title || "Created an event",
+        description: row.type || null,
+        target: {
+          kind: "event",
+          id: row._id.toString(),
+        },
+      })),
+      ...recentReviews.map((row: any) => ({
+        type: "review_received",
+        occurredAt: row.createdAt,
+        title: "Received a review",
+        description: row.comment || null,
+        rating: row.rating,
+        reviewer: row.reviewerId
+          ? {
+              id: row.reviewerId._id?.toString?.() || null,
+              fullName: row.reviewerId.fullName || null,
+              profileImageUrl: row.reviewerId.profileImageUrl || null,
+            }
+          : null,
+      })),
+    ]
+      .sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime())
+      .slice(0, recentLimit);
+
+    return {
+      profile: {
+        ...this.toUserResponse(user),
+      },
+      socialSnapshot: {
+        reviews: reviewCount,
+        photos: photosCount,
+        videos: videosCount,
+        joinedActivities: joinedActivityCount,
+        createdActivities: createdActivityCount,
+        joinedEvents: joinedEventCount,
+        createdEvents: createdEventCount,
+      },
+      metrics: {
+        activity: {
+          checkIns: 0,
+          joined: joinedActivityCount,
+          created: createdActivityCount,
+          total: joinedActivityCount + createdActivityCount,
+        },
+        event: {
+          joined: joinedEventCount,
+          created: createdEventCount,
+          total: joinedEventCount + createdEventCount,
+        },
+      },
+      recentActivity: {
+        total: recentActivity.length,
+        items: recentActivity,
+      },
+      mediaPreview: {
+        total: photosCount + videosCount,
+        items: mediaPreview.map((media) => this.formatMediaItem(media)),
+      },
+    };
+  }
+
   async deleteAccount(userId: string): Promise<void> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
@@ -1009,6 +1369,118 @@ export class UserService {
     user.isDeleted = true as any;
     user.deletedAt = new Date() as any;
     await user.save();
+  }
+
+  private async createMediaDocument(
+    ownerId: string,
+    file: StorageUploadInput,
+    upload: { key: string; url: string },
+  ) {
+    return Media.create({
+      ownerId,
+      type: file.mimeType?.startsWith("video/") ? "video" : "image",
+      s3Bucket: env.AWS_S3_BUCKET,
+      s3Key: upload.key,
+      url: upload.url,
+      mimeType: file.mimeType,
+      sizeBytes: file.buffer.length,
+    });
+  }
+
+  private formatMediaItem(media: any) {
+    return {
+      _id: media._id.toString(),
+      url: media.url,
+      type: media.type,
+      mimeType: media.mimeType,
+      sizeBytes: media.sizeBytes ?? null,
+      createdAt: media.createdAt,
+    };
+  }
+
+  private formatActivityCard(activity: any, host?: any) {
+    return {
+      _id: activity._id.toString(),
+      title: activity.title,
+      type: activity.type,
+      description: activity.description || null,
+      startAt: activity.startAt,
+      endAt: activity.endAt || null,
+      location: activity.location?.label || null,
+      locationCoordinates: activity.location?.coordinates?.coordinates || null,
+      participantLimit: activity.participantLimit ?? null,
+      status: activity.status,
+      stats: {
+        joinedCount: activity.stats?.joinedCount ?? 0,
+      },
+      host: host
+        ? {
+            _id: host._id?.toString?.() || null,
+            fullName: host.fullName || null,
+            username: host.email ? String(host.email).split("@")[0] : null,
+            profileImageUrl: host.profileImageUrl || null,
+            rating: host.rating || { avg: 0, count: 0 },
+          }
+        : null,
+      gallery: Array.isArray(activity.media)
+        ? activity.media.map((media: any) => ({
+            _id: media._id?.toString?.() || null,
+            url: media.url || null,
+            type: media.type || null,
+            mimeType: media.mimeType || null,
+          }))
+        : [],
+      createdAt: activity.createdAt,
+      updatedAt: activity.updatedAt,
+    };
+  }
+
+  private formatEventCard(event: any, creator?: any) {
+    const ticketPrice = event.ticketPrice ?? 0;
+    const discountPercentage = event.discountPercentage ?? 0;
+
+    return {
+      _id: event._id.toString(),
+      title: event.title,
+      type: event.type,
+      description: event.description || null,
+      startAt: event.startAt,
+      endAt: event.endAt || null,
+      location: event.location?.label || null,
+      locationCoordinates: event.location?.coordinates?.coordinates || null,
+      participantLimit: event.participantLimit ?? null,
+      status: event.status,
+      priceType: event.priceType || "free",
+      ticketPrice,
+      discountPercentage,
+      payableTicketPrice: this.calculatePayablePrice(
+        ticketPrice,
+        discountPercentage,
+      ),
+      currency: event.currency || "USD",
+      stats: {
+        joinedCount: event.stats?.joinedCount ?? 0,
+      },
+      creator: creator
+        ? {
+            _id: creator._id?.toString?.() || null,
+            fullName: creator.fullName || null,
+            username: creator.email ? String(creator.email).split("@")[0] : null,
+            profileImageUrl: creator.profileImageUrl || null,
+            rating: creator.rating || { avg: 0, count: 0 },
+          }
+        : null,
+      gallery: Array.isArray(event.media)
+        ? event.media.map((media: any) => ({
+            _id: media._id?.toString?.() || null,
+            url: media.url || null,
+            type: media.type || null,
+            mimeType: media.mimeType || null,
+          }))
+        : [],
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
+    };
   }
 
   private calculatePayablePrice(ticketPrice: number, discountPercentage: number) {
