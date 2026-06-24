@@ -7,6 +7,16 @@ const controller = new NotificationController();
 
 router.get("/", authMiddleware.verifyToken, controller.list);
 router.get(
+  "/preferences",
+  authMiddleware.verifyToken,
+  controller.getPreferences,
+);
+router.patch(
+  "/preferences",
+  authMiddleware.verifyToken,
+  controller.updatePreferences,
+);
+router.get(
   "/unread-count",
   authMiddleware.verifyToken,
   controller.unreadCount,

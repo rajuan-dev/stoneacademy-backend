@@ -479,18 +479,33 @@ export class EventService {
       throw new ForbiddenException("Only creator can edit this event");
     }
 
-    if (payload.title !== undefined) event.title = payload.title;
-    if (payload.type !== undefined) event.type = payload.type;
-    if (payload.description !== undefined) event.description = payload.description;
+    const changedFields: string[] = [];
+
+    if (payload.title !== undefined) {
+      event.title = payload.title;
+      changedFields.push("title");
+    }
+    if (payload.type !== undefined) {
+      event.type = payload.type;
+      changedFields.push("type");
+    }
+    if (payload.description !== undefined) {
+      event.description = payload.description;
+      changedFields.push("description");
+    }
     if (payload.startAt !== undefined) {
       event.startAt = payload.startAt;
+      changedFields.push("startAt");
       if (payload.endAt === undefined && payload.durationMinutes === undefined && event.durationMinutes) {
         event.endAt = new Date(
           event.startAt.getTime() + event.durationMinutes * 60 * 1000,
         );
       }
     }
-    if (payload.endAt !== undefined) event.endAt = payload.endAt;
+    if (payload.endAt !== undefined) {
+      event.endAt = payload.endAt;
+      changedFields.push("endAt");
+    }
     if (payload.location !== undefined) {
       event.location = {
         label:
@@ -501,12 +516,20 @@ export class EventService {
           coordinates: payload.location.coordinates,
         },
       };
+      changedFields.push("location");
     }
     if (payload.participantLimit !== undefined) {
       event.participantLimit = payload.participantLimit;
+      changedFields.push("participantLimit");
     }
-    if (payload.mediaIds !== undefined) event.media = payload.mediaIds as any;
-    if (payload.status !== undefined) event.status = payload.status as any;
+    if (payload.mediaIds !== undefined) {
+      event.media = payload.mediaIds as any;
+      changedFields.push("media");
+    }
+    if (payload.status !== undefined) {
+      event.status = payload.status as any;
+      changedFields.push("status");
+    }
 
     const nextPriceType = payload.priceType ?? event.priceType ?? "free";
     const nextTicketPrice =
@@ -529,18 +552,42 @@ export class EventService {
     event.priceType = nextPriceType;
     event.ticketPrice = nextPriceType === "free" ? 0 : nextTicketPrice;
     event.discountPercentage = nextPriceType === "free" ? 0 : nextDiscount;
+    if (payload.priceType !== undefined) changedFields.push("priceType");
+    if (payload.ticketPrice !== undefined) changedFields.push("ticketPrice");
+    if (payload.discountPercentage !== undefined) changedFields.push("discountPercentage");
 
     if (payload.durationMinutes !== undefined) {
       event.durationMinutes = payload.durationMinutes;
+      changedFields.push("durationMinutes");
       if (payload.endAt === undefined) {
         event.endAt = new Date(
           event.startAt.getTime() + payload.durationMinutes * 60 * 1000,
         );
       }
     }
-    if (payload.currency !== undefined) event.currency = payload.currency;
+    if (payload.currency !== undefined) {
+      event.currency = payload.currency;
+      changedFields.push("currency");
+    }
 
     await event.save();
+
+    if (changedFields.length > 0) {
+      await this.notifyParticipants(
+        event._id.toString(),
+        userId,
+        "event_updated",
+        "Event updated",
+        `The event "${event.title}" was updated.`,
+        {
+          eventId: event._id.toString(),
+          entityType: "event",
+          entityId: event._id.toString(),
+          changedFields,
+        },
+      );
+    }
+
     return event;
   }
 
@@ -557,6 +604,19 @@ export class EventService {
       { eventId: event._id, status: PARTICIPANT_STATUS.JOINED },
       { status: PARTICIPANT_STATUS.CANCELLED },
     ).exec();
+
+    await this.notifyParticipants(
+      event._id.toString(),
+      userId,
+      "event_cancelled",
+      "Event cancelled",
+      `The event "${event.title}" has been cancelled.`,
+      {
+        eventId: event._id.toString(),
+        entityType: "event",
+        entityId: event._id.toString(),
+      },
+    );
 
     return event;
   }
@@ -657,14 +717,36 @@ export class EventService {
     event.stats = { joinedCount: updatedCount };
     await event.save();
 
+    const actor = await this.getActorSummary(userId);
     await notificationService.create({
       userId: event.creatorId.toString(),
       type: "event_joined",
       title: "New event ticket",
-      body: "A user joined your event.",
+      body: `${actor.fullName || "A user"} joined your event.`,
       payload: {
         eventId: event._id.toString(),
         participantId: participant._id.toString(),
+        entityType: "event",
+        entityId: event._id.toString(),
+        joinedUserId: actor.id,
+        joinedUserName: actor.fullName,
+        joinedUserAvatar: actor.profileImageUrl,
+      },
+    });
+
+    await notificationService.create({
+      userId,
+      type: "event_join_success",
+      title: "Joined event successfully",
+      body: `You joined "${event.title}".`,
+      payload: {
+        eventId: event._id.toString(),
+        participantId: participant._id.toString(),
+        entityType: "event",
+        entityId: event._id.toString(),
+        creatorId: event.creatorId.toString(),
+        joinedAt: participant.joinedAt,
+        priceType: event.priceType,
       },
     });
 
@@ -691,6 +773,27 @@ export class EventService {
     await Event.findByIdAndUpdate(eventId, {
       "stats.joinedCount": updatedCount,
     }).exec();
+
+    const event = await Event.findById(eventId).select("creatorId title").lean();
+    const creatorId = event?.creatorId?.toString() || null;
+    if (creatorId && creatorId !== userId) {
+      const actor = await this.getActorSummary(userId);
+      await notificationService.create({
+        userId: creatorId,
+        type: "event_left",
+        title: "Participant left event",
+        body: `${actor.fullName || "A participant"} left your event.`,
+        payload: {
+          eventId,
+          entityType: "event",
+          entityId: eventId,
+          participantId: participant._id.toString(),
+          leftUserId: actor.id,
+          leftUserName: actor.fullName,
+          leftUserAvatar: actor.profileImageUrl,
+        },
+      });
+    }
 
     return participant;
   }
@@ -811,6 +914,51 @@ export class EventService {
     );
 
     return mediaDocs.map((doc) => doc._id.toString());
+  }
+
+  private async notifyParticipants(
+    eventId: string,
+    actorUserId: string,
+    type: string,
+    title: string,
+    body: string,
+    payload?: Record<string, unknown>,
+  ) {
+    const participants = await EventParticipant.find({
+      eventId,
+      status: PARTICIPANT_STATUS.JOINED,
+      userId: { $ne: actorUserId as any },
+    })
+      .select("userId")
+      .lean();
+
+    const userIds = participants
+      .map((participant: any) => participant.userId?.toString?.() || null)
+      .filter(Boolean) as string[];
+
+    if (userIds.length === 0) return;
+
+    await notificationService.createMany(
+      userIds.map((participantUserId) => ({
+        userId: participantUserId,
+        type,
+        title,
+        body,
+        payload,
+      })),
+    );
+  }
+
+  private async getActorSummary(userId: string) {
+    const user = await User.findById(userId)
+      .select("fullName profileImageUrl")
+      .lean();
+
+    return {
+      id: userId,
+      fullName: user?.fullName || null,
+      profileImageUrl: user?.profileImageUrl || null,
+    };
   }
 
   async messageHost(

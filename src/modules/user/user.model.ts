@@ -223,6 +223,72 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         default: false,
         index: true,
       },
+      notificationPreferences: {
+        activityJoined: {
+          type: Boolean,
+          default: true,
+        },
+        activityLeft: {
+          type: Boolean,
+          default: true,
+        },
+        activityUpdated: {
+          type: Boolean,
+          default: true,
+        },
+        activityCancelled: {
+          type: Boolean,
+          default: true,
+        },
+        eventJoined: {
+          type: Boolean,
+          default: true,
+        },
+        eventLeft: {
+          type: Boolean,
+          default: true,
+        },
+        eventUpdated: {
+          type: Boolean,
+          default: true,
+        },
+        eventCancelled: {
+          type: Boolean,
+          default: true,
+        },
+        messages: {
+          type: Boolean,
+          default: true,
+        },
+        reviews: {
+          type: Boolean,
+          default: true,
+        },
+        support: {
+          type: Boolean,
+          default: true,
+        },
+        payouts: {
+          type: Boolean,
+          default: true,
+        },
+        reportStatusUpdated: {
+          type: Boolean,
+          default: true,
+        },
+        reportModeration: {
+          type: Boolean,
+          default: true,
+        },
+        contentReported: {
+          type: Boolean,
+          default: true,
+        },
+        system: {
+          type: Boolean,
+          default: true,
+        },
+      },
       passwordChangedAt: {
         type: Date,
       },

@@ -66,6 +66,24 @@ export class ReportService {
       },
     });
 
+    if (
+      reportedUserId
+      && reportedUserId !== reporterId
+      && (payload.entityType === "activity" || payload.entityType === "event")
+    ) {
+      await notificationService.create({
+        userId: reportedUserId,
+        type: "content_reported",
+        title: "Content reported",
+        body: `One of your ${payload.entityType}s was reported and is under review.`,
+        payload: {
+          entityType: payload.entityType,
+          entityId: payload.entityId,
+          reportId: report._id.toString(),
+        },
+      });
+    }
+
     return this.getByIdHydrated(report._id.toString());
   }
 
@@ -80,6 +98,23 @@ export class ReportService {
     query: { page?: number; limit?: number; status?: string; entityType?: string },
   ) {
     return this.listCommon(query);
+  }
+
+  async getMineById(reportId: string, userId: string) {
+    const report = await Report.findOne({ _id: reportId, reporterId: userId })
+      .populate("reporterId", "fullName profileImageUrl email status")
+      .populate("reportedUserId", "fullName profileImageUrl email status")
+      .exec();
+
+    if (!report) {
+      throw new NotFoundException("Report not found");
+    }
+
+    return this.serializeReport(report as any);
+  }
+
+  async getByIdForAdmin(reportId: string) {
+    return this.getByIdHydrated(reportId);
   }
 
   async updateStatus(
@@ -222,7 +257,9 @@ export class ReportService {
     ]);
 
     return {
-      data: data.map((report) => this.serializeReport(report as any)),
+      data: await Promise.all(
+        data.map((report) => this.serializeReport(report as any)),
+      ),
       pagination: {
         currentPage: page,
         itemsPerPage: limit,
@@ -342,7 +379,7 @@ export class ReportService {
     return null;
   }
 
-  private serializeReport(reportDoc: {
+  private async serializeReport(reportDoc: {
     toObject: () => Record<string, any>;
     _id: { toString: () => string };
     reporterId: unknown;
@@ -350,34 +387,124 @@ export class ReportService {
     entityType: ReportEntityType;
     entityId: { toString: () => string } | string;
     reason: string;
+    details?: string;
+    adminNote?: string;
     status: ReportStatus;
     createdAt: Date;
   }) {
     const base = reportDoc.toObject();
     const reportFrom = this.normalizeUser(reportDoc.reporterId);
     const reportTo = this.normalizeUser(reportDoc.reportedUserId || null);
+    const entityId =
+      typeof reportDoc.entityId === "string"
+        ? reportDoc.entityId
+        : reportDoc.entityId.toString();
+    const entitySnapshot = await this.buildEntitySnapshot(
+      reportDoc.entityType,
+      entityId,
+    );
 
     return {
       ...base,
       id: reportDoc._id.toString(),
       reporterId: reportFrom?.id || null,
       reportedUserId: reportTo?.id || null,
-      entityId:
-        typeof reportDoc.entityId === "string"
-          ? reportDoc.entityId
-          : reportDoc.entityId.toString(),
+      entityId,
       reportFrom,
       reportTo,
       reportReason: reportDoc.reason,
+      reportMessage: reportDoc.details || null,
+      adminNote: reportDoc.adminNote || null,
+      entitySnapshot,
       dateTime: reportDoc.createdAt,
       adminTable: {
         reportFrom,
         reportTo,
         reportReason: reportDoc.reason,
+        reportMessage: reportDoc.details || null,
         dateTime: reportDoc.createdAt,
         status: reportDoc.status,
         entityType: reportDoc.entityType,
+        entitySnapshot,
       },
+    };
+  }
+
+  private async buildEntitySnapshot(
+    entityType: ReportEntityType,
+    entityId: string,
+  ) {
+    if (entityType === "activity") {
+      const activity = await Activity.findById(entityId)
+        .select("title type description status hostId startAt endAt participantLimit")
+        .populate("hostId", "fullName email profileImageUrl")
+        .lean();
+
+      if (!activity) return null;
+
+      return {
+        kind: "activity",
+        id: activity._id.toString(),
+        title: activity.title || null,
+        type: activity.type || null,
+        description: activity.description || null,
+        status: activity.status || null,
+        startAt: activity.startAt || null,
+        endAt: activity.endAt || null,
+        participantLimit: activity.participantLimit ?? null,
+        owner: this.normalizeUser(activity.hostId),
+      };
+    }
+
+    if (entityType === "event") {
+      const event = await Event.findById(entityId)
+        .select(
+          "title type description status creatorId startAt endAt participantLimit priceType ticketPrice discountPercentage currency",
+        )
+        .populate("creatorId", "fullName email profileImageUrl")
+        .lean();
+
+      if (!event) return null;
+
+      return {
+        kind: "event",
+        id: event._id.toString(),
+        title: event.title || null,
+        type: event.type || null,
+        description: event.description || null,
+        status: event.status || null,
+        startAt: event.startAt || null,
+        endAt: event.endAt || null,
+        participantLimit: event.participantLimit ?? null,
+        priceType: event.priceType || null,
+        ticketPrice: event.ticketPrice ?? 0,
+        discountPercentage: event.discountPercentage ?? 0,
+        currency: event.currency || null,
+        owner: this.normalizeUser(event.creatorId),
+      };
+    }
+
+    if (entityType === "user") {
+      const user = await User.findById(entityId)
+        .select("fullName email profileImageUrl status")
+        .lean();
+
+      return user ? this.normalizeUser(user) : null;
+    }
+
+    const message = await Message.findById(entityId)
+      .select("text senderId createdAt")
+      .populate("senderId", "fullName email profileImageUrl status")
+      .lean();
+
+    if (!message) return null;
+
+    return {
+      kind: "message",
+      id: message._id.toString(),
+      text: message.text || null,
+      createdAt: message.createdAt || null,
+      owner: this.normalizeUser(message.senderId),
     };
   }
 
