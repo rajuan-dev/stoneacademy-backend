@@ -118,6 +118,27 @@ export class EventService {
       Event.countDocuments(filter),
     ]);
 
+    const eventIds = data.map((item: any) => item._id);
+    const participants = eventIds.length
+      ? await EventParticipant.find({
+          eventId: { $in: eventIds },
+          status: PARTICIPANT_STATUS.JOINED,
+        })
+          .select("eventId userId")
+          .lean()
+      : [];
+
+    const joinedUserIdsByEvent = new Map<string, string[]>();
+    for (const participant of participants as Array<{
+      eventId: { toString(): string };
+      userId: { toString(): string };
+    }>) {
+      const eventId = participant.eventId.toString();
+      const existing = joinedUserIdsByEvent.get(eventId) || [];
+      existing.push(participant.userId.toString());
+      joinedUserIdsByEvent.set(eventId, existing);
+    }
+
     const mapped = data.map((item: any) => {
       const coordinates = item.location?.coordinates?.coordinates as
         | [number, number]
@@ -155,6 +176,7 @@ export class EventService {
         distanceMilesAway,
         participantLimit: item.participantLimit ?? null,
         joinedCount: item.stats?.joinedCount ?? 0,
+        joinedUserIds: joinedUserIdsByEvent.get(item._id.toString()) || [],
         imageUrl: firstImageUrl,
         priceType: item.priceType || "free",
         ticketPrice: item.ticketPrice ?? 0,
