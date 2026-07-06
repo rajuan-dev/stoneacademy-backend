@@ -113,6 +113,27 @@ export class ActivityService {
       Activity.countDocuments(filter),
     ]);
 
+    const activityIds = data.map((item: any) => item._id);
+    const participants = activityIds.length
+      ? await ActivityParticipant.find({
+          activityId: { $in: activityIds },
+          status: PARTICIPANT_STATUS.JOINED,
+        })
+          .select("activityId userId")
+          .lean()
+      : [];
+
+    const joinedUserIdsByActivity = new Map<string, string[]>();
+    for (const participant of participants as Array<{
+      activityId: { toString(): string };
+      userId: { toString(): string };
+    }>) {
+      const activityId = participant.activityId.toString();
+      const existing = joinedUserIdsByActivity.get(activityId) || [];
+      existing.push(participant.userId.toString());
+      joinedUserIdsByActivity.set(activityId, existing);
+    }
+
     const mapped = data.map((item: any) => {
       const coordinates = item.location?.coordinates?.coordinates as
         | [number, number]
@@ -149,6 +170,7 @@ export class ActivityService {
         distanceMilesAway,
         participantLimit: item.participantLimit ?? null,
         joinedCount: item.stats?.joinedCount ?? 0,
+        joinedUserIds: joinedUserIdsByActivity.get(item._id.toString()) || [],
         imageUrl: firstImageUrl,
         status: item.status,
       };
