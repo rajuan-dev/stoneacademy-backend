@@ -10,6 +10,7 @@ import {
   adminResolveReportSchema,
   listReportSchema,
   createReportSchema,
+  reportIdSchema,
   updateReportStatusSchema,
 } from "./report.schema";
 import { ReportService } from "./report.service";
@@ -88,6 +89,17 @@ adminReportRouter.get(
   }),
 );
 
+adminReportRouter.get(
+  "/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(reportIdSchema, req);
+    const report = await service.getByIdForAdmin(validated.params.id);
+    ApiResponse.success(res, report, "Report fetched successfully");
+  }),
+);
+
 adminReportRouter.post(
   "/:id/resolve",
   authMiddleware.verifyToken,
@@ -156,5 +168,16 @@ adminReportRouter.post(
       note: validated.body.note,
     });
     ApiResponse.success(res, report, "Report action applied successfully");
+  }),
+);
+
+reportRouter.get(
+  "/:id",
+  authMiddleware.verifyToken,
+  asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(reportIdSchema, req);
+    const userId = req.user?.userId as string;
+    const report = await service.getMineById(validated.params.id, userId);
+    ApiResponse.success(res, report, "Report fetched successfully");
   }),
 );

@@ -5,6 +5,7 @@ import type { Request, Response } from "express";
 import {
   listNotificationsSchema,
   notificationIdSchema,
+  updateNotificationPreferencesSchema,
 } from "./notification.schema";
 import { NotificationService } from "./notification.service";
 
@@ -51,5 +52,18 @@ export class NotificationController {
     const userId = req.user?.userId as string;
     const result = await this.service.remove(userId, validated.params.id);
     ApiResponse.success(res, result, "Notification deleted successfully");
+  });
+
+  getPreferences = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId as string;
+    const result = await this.service.getPreferences(userId);
+    ApiResponse.success(res, result, "Notification preferences fetched successfully");
+  });
+
+  updatePreferences = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(updateNotificationPreferencesSchema, req);
+    const userId = req.user?.userId as string;
+    const result = await this.service.updatePreferences(userId, validated.body);
+    ApiResponse.success(res, result, "Notification preferences updated successfully");
   });
 }

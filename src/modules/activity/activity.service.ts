@@ -410,12 +410,28 @@ export class ActivityService {
       throw new ForbiddenException("Only host can edit this activity");
     }
 
-    if (payload.title !== undefined) activity.title = payload.title;
-    if (payload.type !== undefined) activity.type = payload.type;
-    if (payload.description !== undefined)
+    const changedFields: string[] = [];
+
+    if (payload.title !== undefined) {
+      activity.title = payload.title;
+      changedFields.push("title");
+    }
+    if (payload.type !== undefined) {
+      activity.type = payload.type;
+      changedFields.push("type");
+    }
+    if (payload.description !== undefined) {
+      changedFields.push("description");
       activity.description = payload.description;
-    if (payload.startAt !== undefined) activity.startAt = payload.startAt;
-    if (payload.endAt !== undefined) activity.endAt = payload.endAt;
+    }
+    if (payload.startAt !== undefined) {
+      activity.startAt = payload.startAt;
+      changedFields.push("startAt");
+    }
+    if (payload.endAt !== undefined) {
+      activity.endAt = payload.endAt;
+      changedFields.push("endAt");
+    }
     if (payload.location !== undefined) {
       activity.location = {
         label: payload.location.label,
@@ -424,16 +440,43 @@ export class ActivityService {
           coordinates: payload.location.coordinates,
         },
       };
+      changedFields.push("location");
     }
-    if (payload.participantLimit !== undefined)
+    if (payload.participantLimit !== undefined) {
       activity.participantLimit = payload.participantLimit;
-    if (payload.distanceMiles !== undefined)
+      changedFields.push("participantLimit");
+    }
+    if (payload.distanceMiles !== undefined) {
       activity.distanceMiles = payload.distanceMiles;
-    if (payload.mediaIds !== undefined) activity.media = payload.mediaIds as any;
-    if (payload.status !== undefined)
+      changedFields.push("distanceMiles");
+    }
+    if (payload.mediaIds !== undefined) {
+      activity.media = payload.mediaIds as any;
+      changedFields.push("media");
+    }
+    if (payload.status !== undefined) {
       activity.status = payload.status as any;
+      changedFields.push("status");
+    }
 
     await activity.save();
+
+    if (changedFields.length > 0) {
+      await this.notifyParticipants(
+        activity._id.toString(),
+        userId,
+        "activity_updated",
+        "Activity updated",
+        `The activity "${activity.title}" was updated.`,
+        {
+          activityId: activity._id.toString(),
+          entityType: "activity",
+          entityId: activity._id.toString(),
+          changedFields,
+        },
+      );
+    }
+
     return activity;
   }
 
@@ -451,6 +494,19 @@ export class ActivityService {
       { status: PARTICIPANT_STATUS.CANCELLED },
     ).exec();
 
+    await this.notifyParticipants(
+      activity._id.toString(),
+      userId,
+      "activity_cancelled",
+      "Activity cancelled",
+      `The activity "${activity.title}" has been cancelled.`,
+      {
+        activityId: activity._id.toString(),
+        entityType: "activity",
+        entityId: activity._id.toString(),
+      },
+    );
+
     return activity;
   }
 
@@ -464,6 +520,10 @@ export class ActivityService {
     const blocked = await this.isBlocked(userId, activity.hostId.toString());
     if (blocked) {
       throw new ForbiddenException("You cannot join this activity");
+    }
+
+    if (activity.hostId.toString() === userId) {
+      throw new BadRequestException("Host cannot join own activity");
     }
 
     if (activity.startAt < new Date()) {
@@ -521,17 +581,38 @@ export class ActivityService {
     await activity.save();
 
     if (activity.hostId.toString() !== userId) {
+      const actor = await this.getActorSummary(userId);
       await notificationService.create({
         userId: activity.hostId.toString(),
         type: "activity_joined",
         title: "New activity join",
-        body: "A user joined your activity.",
+        body: `${actor.fullName || "A user"} joined your activity.`,
         payload: {
           activityId: activity._id.toString(),
           participantId: participant._id.toString(),
+          entityType: "activity",
+          entityId: activity._id.toString(),
+          joinedUserId: actor.id,
+          joinedUserName: actor.fullName,
+          joinedUserAvatar: actor.profileImageUrl,
         },
       });
     }
+
+    await notificationService.create({
+      userId,
+      type: "activity_join_success",
+      title: "Joined activity successfully",
+      body: `You joined "${activity.title}".`,
+      payload: {
+        activityId: activity._id.toString(),
+        participantId: participant._id.toString(),
+        entityType: "activity",
+        entityId: activity._id.toString(),
+        hostId: activity.hostId.toString(),
+        joinedAt: participant.joinedAt,
+      },
+    });
 
     return participant;
   }
@@ -556,6 +637,27 @@ export class ActivityService {
     await Activity.findByIdAndUpdate(activityId, {
       "stats.joinedCount": updatedCount,
     }).exec();
+
+    const activity = await Activity.findById(activityId).select("hostId title").lean();
+    const hostId = activity?.hostId?.toString() || null;
+    if (hostId && hostId !== userId) {
+      const actor = await this.getActorSummary(userId);
+      await notificationService.create({
+        userId: hostId,
+        type: "activity_left",
+        title: "Participant left activity",
+        body: `${actor.fullName || "A participant"} left your activity.`,
+        payload: {
+          activityId,
+          entityType: "activity",
+          entityId: activityId,
+          participantId: participant._id.toString(),
+          leftUserId: actor.id,
+          leftUserName: actor.fullName,
+          leftUserAvatar: actor.profileImageUrl,
+        },
+      });
+    }
 
     return participant;
   }
@@ -679,6 +781,51 @@ export class ActivityService {
     );
 
     return mediaDocs.map((doc) => doc._id.toString());
+  }
+
+  private async notifyParticipants(
+    activityId: string,
+    actorUserId: string,
+    type: string,
+    title: string,
+    body: string,
+    payload?: Record<string, unknown>,
+  ) {
+    const participants = await ActivityParticipant.find({
+      activityId,
+      status: PARTICIPANT_STATUS.JOINED,
+      userId: { $ne: actorUserId as any },
+    })
+      .select("userId")
+      .lean();
+
+    const userIds = participants
+      .map((participant: any) => participant.userId?.toString?.() || null)
+      .filter(Boolean) as string[];
+
+    if (userIds.length === 0) return;
+
+    await notificationService.createMany(
+      userIds.map((participantUserId) => ({
+        userId: participantUserId,
+        type,
+        title,
+        body,
+        payload,
+      })),
+    );
+  }
+
+  private async getActorSummary(userId: string) {
+    const user = await User.findById(userId)
+      .select("fullName profileImageUrl")
+      .lean();
+
+    return {
+      id: userId,
+      fullName: user?.fullName || null,
+      profileImageUrl: user?.profileImageUrl || null,
+    };
   }
 
   private getDefaultFutureStartAt(): Date {
