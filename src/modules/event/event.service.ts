@@ -97,7 +97,7 @@ export class EventService {
       };
     }
 
-    let sort: Record<string, any> | undefined = { startAt: 1 };
+    let sort: Record<string, any> | undefined = { createdAt: -1 };
     if (query.sort === "popular") {
       sort = { "stats.joinedCount": -1, startAt: 1 };
     } else if (query.sort === "time") {
