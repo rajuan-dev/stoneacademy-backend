@@ -313,10 +313,19 @@ export class EventService {
       throw new NotFoundException("Event not found");
     }
 
-    const joinedCount = await EventParticipant.countDocuments({
+    const joinedParticipants = await EventParticipant.find({
       eventId: event._id,
       status: PARTICIPANT_STATUS.JOINED,
-    });
+    })
+      .select("userId")
+      .lean();
+
+    const joinedUserIds = joinedParticipants.map((participant: any) =>
+      participant.userId?._id?.toString?.()
+      || participant.userId?.toString?.()
+      || null,
+    ).filter(Boolean);
+    const joinedCount = joinedUserIds.length;
 
     let isJoined = false;
     if (userId) {
@@ -351,6 +360,7 @@ export class EventService {
       locationCoordinates: event.location?.coordinates?.coordinates || null,
       participantLimit: event.participantLimit ?? null,
       joinedCount,
+      joinedUserIds,
       isJoined,
       priceType: event.priceType,
       ticketPrice: event.ticketPrice,

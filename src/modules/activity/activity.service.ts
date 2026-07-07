@@ -281,10 +281,19 @@ export class ActivityService {
       throw new NotFoundException("Activity not found");
     }
 
-    const joinedCount = await ActivityParticipant.countDocuments({
+    const joinedParticipants = await ActivityParticipant.find({
       activityId: activity._id,
       status: PARTICIPANT_STATUS.JOINED,
-    });
+    })
+      .select("userId")
+      .lean();
+
+    const joinedUserIds = joinedParticipants.map((participant: any) =>
+      participant.userId?._id?.toString?.()
+      || participant.userId?.toString?.()
+      || null,
+    ).filter(Boolean);
+    const joinedCount = joinedUserIds.length;
 
     let isJoined = false;
     if (userId) {
@@ -314,6 +323,7 @@ export class ActivityService {
       locationCoordinates: activity.location?.coordinates?.coordinates || null,
       participantLimit: activity.participantLimit ?? null,
       joinedCount,
+      joinedUserIds,
       isJoined,
       distanceMiles: activity.distanceMiles ?? null,
       creatorName: host?.fullName || null,
