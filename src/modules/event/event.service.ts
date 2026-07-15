@@ -20,6 +20,11 @@ import { EventParticipant } from "./event-participant.model";
 import { PaymentTransaction } from "./payment-transaction.model";
 import { EventQrToken } from "./event-qr-token.model";
 import { ChatService } from "../chat/chat.service";
+import {
+  buildGeographyFilter,
+  getUserGeography,
+  normalizeGeography,
+} from "@/utils/geography.utils";
 
 type ListQuery = {
   q?: string;
@@ -29,10 +34,13 @@ type ListQuery = {
   lat?: number;
   lng?: number;
   radiusMiles?: number;
+  state?: string;
+  city?: string;
   paid?: "free" | "paid";
   sort?: "distance" | "time" | "popular";
   page?: number;
   limit?: number;
+  viewerUserId?: string;
 };
 
 const MILES_TO_METERS = 1609.34;
@@ -53,6 +61,12 @@ export class EventService {
     const filter: FilterQuery<any> = {
       status: ACTIVITY_STATUS.APPROVED,
     };
+    const viewerGeography = await getUserGeography(query.viewerUserId);
+    Object.assign(filter, buildGeographyFilter({
+      country: viewerGeography.country,
+      state: query.state,
+      city: query.city,
+    }));
 
     if (query.q) {
       const pattern = new RegExp(query.q, "i");
@@ -173,6 +187,9 @@ export class EventService {
         startAt: item.startAt,
         createdAt: item.createdAt,
         location: item.location?.label || null,
+        country: item.country || null,
+        state: item.state || null,
+        city: item.city || null,
         distanceMilesAway,
         participantLimit: item.participantLimit ?? null,
         joinedCount: item.stats?.joinedCount ?? 0,
@@ -211,6 +228,9 @@ export class EventService {
     startAt?: Date;
     endAt?: Date;
     location?: { label?: string; coordinates: [number, number] };
+    country: string;
+    state?: string;
+    city?: string;
     participantLimit?: number;
     mediaIds?: string[];
     mediaFiles?: Express.Multer.File[];
@@ -230,6 +250,8 @@ export class EventService {
     if (!creator) {
       throw new NotFoundException("User not found");
     }
+
+    const geography = normalizeGeography(payload);
 
     const normalizedPriceType = payload.priceType || "free";
     const normalizedTicketPrice =
@@ -264,6 +286,9 @@ export class EventService {
       title: payload.title || "Untitled Event",
       type: payload.type || "general",
       description: payload.description,
+      country: geography.country!,
+      state: geography.state,
+      city: geography.city,
       startAt,
       endAt: computedEndAt,
       location: payload.location
@@ -357,6 +382,9 @@ export class EventService {
       endAt: event.endAt || null,
       createdAt: event.createdAt,
       location: event.location?.label || null,
+      country: event.country || null,
+      state: event.state || null,
+      city: event.city || null,
       locationCoordinates: event.location?.coordinates?.coordinates || null,
       participantLimit: event.participantLimit ?? null,
       joinedCount,
@@ -495,6 +523,9 @@ export class EventService {
       startAt?: Date;
       endAt?: Date;
       location?: { label?: string; coordinates: [number, number] };
+      country?: string;
+      state?: string;
+      city?: string;
       participantLimit?: number;
       mediaIds?: string[];
       status?: string;
@@ -549,6 +580,19 @@ export class EventService {
         },
       };
       changedFields.push("location");
+    }
+    const geography = normalizeGeography(payload);
+    if (payload.country !== undefined) {
+      event.country = geography.country!;
+      changedFields.push("country");
+    }
+    if (payload.state !== undefined) {
+      event.state = geography.state;
+      changedFields.push("state");
+    }
+    if (payload.city !== undefined) {
+      event.city = geography.city;
+      changedFields.push("city");
     }
     if (payload.participantLimit !== undefined) {
       event.participantLimit = payload.participantLimit;

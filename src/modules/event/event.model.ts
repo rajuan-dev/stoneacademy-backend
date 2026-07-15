@@ -10,6 +10,9 @@ export interface IEvent {
   description?: string;
   startAt: Date;
   endAt?: Date;
+  country?: string;
+  state?: string;
+  city?: string;
   location?: {
     label?: string;
     coordinates?: {
@@ -61,6 +64,22 @@ const eventSchema = BaseSchemaUtil.createSchema<IEvent>({
   },
   endAt: {
     type: Date,
+  },
+  country: {
+    type: String,
+    required: true,
+    trim: true,
+    index: true,
+  },
+  state: {
+    type: String,
+    trim: true,
+    index: true,
+  },
+  city: {
+    type: String,
+    trim: true,
+    index: true,
   },
   location: {
     label: {
@@ -134,5 +153,6 @@ eventSchema.index({ startAt: 1 });
 eventSchema.index({ createdAt: -1 });
 eventSchema.index({ status: 1, createdAt: -1 });
 eventSchema.index({ creatorId: 1, createdAt: -1 });
+eventSchema.index({ country: 1, state: 1, city: 1, status: 1, createdAt: -1 });
 
 export const Event = model<IEvent>("Event", eventSchema);

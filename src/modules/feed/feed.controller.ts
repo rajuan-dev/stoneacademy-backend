@@ -14,13 +14,19 @@ export class FeedController {
 
   list = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(listFeedSchema, req);
-    const result = await this.service.list(validated.query);
+    const result = await this.service.list({
+      ...validated.query,
+      userId: req.user!.userId,
+    });
     ApiResponse.paginated(res, result.data, result.pagination, "Feed fetched");
   });
 
   searchFilter = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(searchFilterSchema, req);
-    const result = await this.service.searchFilter(validated.query);
+    const result = await this.service.searchFilter({
+      ...validated.query,
+      userId: req.user!.userId,
+    });
     ApiResponse.paginated(
       res,
       result.data,

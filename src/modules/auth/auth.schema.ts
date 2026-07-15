@@ -12,6 +12,7 @@ export const registerSchema = z.object({
     password: z.string().min(8, MESSAGES.VALIDATION.PASSWORD_TOO_SHORT),
     confirmPassword: z.string().min(8, MESSAGES.VALIDATION.PASSWORD_TOO_SHORT),
     fullName: z.string().min(2).max(100),
+    country: z.string().trim().min(2).max(100),
     dob: z.coerce.date().optional(),
     role: z.enum([ROLES.USER]).optional().default(ROLES.USER),
   }).refine((data) => data.password === data.confirmPassword, {

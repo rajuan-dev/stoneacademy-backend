@@ -1,5 +1,6 @@
 import { PAGINATION } from "@/constants/app.constants";
 import { NotFoundException } from "@/utils/app-error.utils";
+import { buildGeographyFilter, normalizeGeography } from "@/utils/geography.utils";
 import { Ad } from "./ads.model";
 
 export class AdsService {
@@ -30,9 +31,18 @@ export class AdsService {
   }
 
   async listActive() {
+    return this.listActiveByGeography({});
+  }
+
+  async listActiveByGeography(geography: {
+    country?: string;
+    state?: string;
+    city?: string;
+  }) {
     const now = new Date();
     return Ad.find({
       status: "active",
+      ...buildGeographyFilter(geography),
       $and: [
         { $or: [{ startsAt: { $exists: false } }, { startsAt: { $lte: now } }] },
         { $or: [{ endsAt: { $exists: false } }, { endsAt: { $gte: now } }] },
@@ -46,6 +56,9 @@ export class AdsService {
     name: string;
     imageUrl: string;
     linkUrl: string;
+    country: string;
+    state?: string;
+    city?: string;
     status?: "active" | "expired";
     startsAt?: Date;
     endsAt?: Date;
@@ -55,6 +68,11 @@ export class AdsService {
       name: payload.name,
       imageUrl: payload.imageUrl,
       linkUrl: payload.linkUrl,
+      ...normalizeGeography({
+        country: payload.country,
+        state: payload.state,
+        city: payload.city,
+      }),
       status: payload.status ?? "active",
       startsAt: payload.startsAt,
       endsAt: payload.endsAt,
@@ -68,6 +86,9 @@ export class AdsService {
       name?: string;
       imageUrl?: string;
       linkUrl?: string;
+      country?: string;
+      state?: string;
+      city?: string;
       status?: "active" | "expired";
       startsAt?: Date;
       endsAt?: Date;
@@ -80,6 +101,10 @@ export class AdsService {
     if (payload.name !== undefined) ad.name = payload.name;
     if (payload.imageUrl !== undefined) ad.imageUrl = payload.imageUrl;
     if (payload.linkUrl !== undefined) ad.linkUrl = payload.linkUrl;
+    const geography = normalizeGeography(payload);
+    if (payload.country !== undefined) ad.country = geography.country!;
+    if (payload.state !== undefined) ad.state = geography.state;
+    if (payload.city !== undefined) ad.city = geography.city;
     if (payload.status !== undefined) ad.status = payload.status;
     if (payload.startsAt !== undefined) ad.startsAt = payload.startsAt;
     if (payload.endsAt !== undefined) ad.endsAt = payload.endsAt;

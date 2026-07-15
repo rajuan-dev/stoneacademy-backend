@@ -22,7 +22,10 @@ export class ActivityController {
 
   list = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(listActivitiesSchema, req);
-    const result = await this.service.list(validated.query);
+    const result = await this.service.list({
+      ...validated.query,
+      viewerUserId: req.user?.userId,
+    });
     ApiResponse.paginated(
       res,
       result.data,

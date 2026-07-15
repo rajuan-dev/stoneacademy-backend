@@ -20,6 +20,7 @@ import {
   NotFoundException,
 } from "@/utils/app-error.utils";
 import { generateRandomPassword, hashPassword } from "@/utils/password.utils";
+import { normalizeGeography } from "@/utils/geography.utils";
 import type { IUser } from "./user.interface";
 import { UserRepository } from "./user.repository";
 import { Activity } from "@/modules/activity/activity.model";
@@ -53,6 +54,9 @@ export class UserService {
       fullName: user.fullName,
       phone: resolvedPhone ?? null,
       phoneNumber: resolvedPhone ?? null,
+      country: user.country || null,
+      state: user.state || null,
+      city: user.city || null,
       dob: user.dob,
       gender: user.gender,
       location: user.location,
@@ -253,6 +257,9 @@ export class UserService {
       fullName: payload.fullName,
       phoneNumber: payload.phone,
       phone: payload.phone,
+      country: payload.country,
+      state: payload.state,
+      city: payload.city,
       location: payload.location
         ? {
             label: payload.location.label,
@@ -279,6 +286,7 @@ export class UserService {
     email: string;
     passwordHash: string;
     fullName: string;
+    country: string;
     dob?: Date;
     role: (typeof ROLES)[keyof typeof ROLES];
     status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];
@@ -293,6 +301,7 @@ export class UserService {
       email: payload.email.toLowerCase(),
       passwordHash: payload.passwordHash,
       fullName: payload.fullName,
+      country: payload.country,
       dob: payload.dob,
       role: payload.role,
       status: payload.status ?? USER_STATUS.ACTIVE,
@@ -525,6 +534,9 @@ export class UserService {
       phone?: string;
       phoneNumber?: string;
       dob?: Date;
+      country?: string;
+      state?: string;
+      city?: string;
       gender?: string;
       bio?: string;
       location?: {
@@ -567,6 +579,21 @@ export class UserService {
 
     if (payload.dob !== undefined) {
       user.dob = payload.dob;
+    }
+
+    const geography = normalizeGeography({
+      country: payload.country,
+      state: payload.state,
+      city: payload.city,
+    });
+    if (payload.country !== undefined) {
+      user.country = geography.country;
+    }
+    if (payload.state !== undefined) {
+      user.state = geography.state;
+    }
+    if (payload.city !== undefined) {
+      user.city = geography.city;
     }
 
     if (payload.gender !== undefined) {

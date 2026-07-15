@@ -6,6 +6,9 @@ export interface IAd {
   name: string;
   imageUrl: string;
   linkUrl: string;
+  country?: string;
+  state?: string;
+  city?: string;
   status: "active" | "expired";
   startsAt?: Date;
   endsAt?: Date;
@@ -33,6 +36,22 @@ const adSchema = BaseSchemaUtil.createSchema<IAd>({
     trim: true,
     maxlength: 2000,
   },
+  country: {
+    type: String,
+    required: true,
+    trim: true,
+    index: true,
+  },
+  state: {
+    type: String,
+    trim: true,
+    index: true,
+  },
+  city: {
+    type: String,
+    trim: true,
+    index: true,
+  },
   status: {
     type: String,
     enum: ["active", "expired"],
@@ -52,5 +71,6 @@ const adSchema = BaseSchemaUtil.createSchema<IAd>({
 });
 
 adSchema.index({ status: 1, startsAt: 1, endsAt: 1 });
+adSchema.index({ country: 1, state: 1, city: 1, status: 1, order: 1 });
 
 export const Ad = model<IAd>("Ad", adSchema);

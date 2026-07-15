@@ -62,7 +62,7 @@ const controller = new ActivityController();
  *       200:
  *         description: Activities list
  */
-router.get("/", controller.list);
+router.get("/", authMiddleware.optionalAuth, controller.list);
 /**
  * @openapi
  * /activities:

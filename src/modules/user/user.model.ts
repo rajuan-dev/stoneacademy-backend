@@ -67,6 +67,21 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         type: String,
         trim: true,
       },
+      country: {
+        type: String,
+        trim: true,
+        index: true,
+      },
+      state: {
+        type: String,
+        trim: true,
+        index: true,
+      },
+      city: {
+        type: String,
+        trim: true,
+        index: true,
+      },
       role: {
         type: String,
         enum: Object.values(ROLES),
@@ -312,6 +327,7 @@ userSchema.index({ status: 1, role: 1 });
 userSchema.index({ status: 1, isDeleted: 1, createdAt: -1 });
 userSchema.index({ role: 1, status: 1, isDeleted: 1, createdAt: -1 });
 userSchema.index({ "location.coordinates": "2dsphere" });
+userSchema.index({ country: 1, state: 1, city: 1, role: 1, status: 1 });
 
 userSchema.pre(/^find/, function (this: Query<any, IUser>) {
   if (!this.getOptions().includeDeleted) {

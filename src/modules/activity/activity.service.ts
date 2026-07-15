@@ -19,18 +19,26 @@ import { QrToken } from "./qr-token.model";
 import { User } from "../user/user.model";
 import { ChatService } from "../chat/chat.service";
 import { SubscriptionService } from "../subscription/subscription.service";
+import {
+  buildGeographyFilter,
+  getUserGeography,
+  normalizeGeography,
+} from "@/utils/geography.utils";
 
 type ListQuery = {
   q?: string;
   type?: string;
   dateFrom?: Date;
   dateTo?: Date;
+  state?: string;
+  city?: string;
   lat?: number;
   lng?: number;
   radiusMiles?: number;
   sort?: "distance" | "time" | "popular";
   page?: number;
   limit?: number;
+  viewerUserId?: string;
 };
 
 const MILES_TO_METERS = 1609.34;
@@ -54,6 +62,12 @@ export class ActivityService {
     const filter: FilterQuery<any> = {
       status: ACTIVITY_STATUS.APPROVED,
     };
+    const viewerGeography = await getUserGeography(query.viewerUserId);
+    Object.assign(filter, buildGeographyFilter({
+      country: viewerGeography.country,
+      state: query.state,
+      city: query.city,
+    }));
 
     if (query.q) {
       const pattern = new RegExp(query.q, "i");
@@ -167,6 +181,9 @@ export class ActivityService {
         startAt: item.startAt,
         createdAt: item.createdAt,
         location: item.location?.label || null,
+        country: item.country || null,
+        state: item.state || null,
+        city: item.city || null,
         distanceMilesAway,
         participantLimit: item.participantLimit ?? null,
         joinedCount: item.stats?.joinedCount ?? 0,
@@ -196,6 +213,9 @@ export class ActivityService {
     description?: string;
     startAt?: Date;
     endAt?: Date;
+    country: string;
+    state?: string;
+    city?: string;
     location?: { label: string; coordinates: [number, number] };
     participantLimit?: number;
     distanceMiles?: number;
@@ -211,6 +231,7 @@ export class ActivityService {
     const hasSubscription = await this.subscriptionService.hasActiveSubscription(
       payload.hostId,
     );
+    const geography = normalizeGeography(payload);
 
     if (!hasSubscription) {
       const totalCreatedActivities = await Activity.countDocuments({
@@ -238,6 +259,9 @@ export class ActivityService {
       title: payload.title || "Untitled Activity",
       type: payload.type || "general",
       description: payload.description,
+      country: geography.country!,
+      state: geography.state,
+      city: geography.city,
       startAt,
       endAt: payload.endAt,
       location: payload.location
@@ -320,6 +344,9 @@ export class ActivityService {
       endAt: activity.endAt || null,
       createdAt: activity.createdAt,
       location: activity.location?.label || null,
+      country: activity.country || null,
+      state: activity.state || null,
+      city: activity.city || null,
       locationCoordinates: activity.location?.coordinates?.coordinates || null,
       participantLimit: activity.participantLimit ?? null,
       joinedCount,
@@ -407,6 +434,9 @@ export class ActivityService {
       description?: string;
       startAt?: Date;
       endAt?: Date;
+      country?: string;
+      state?: string;
+      city?: string;
       location?: { label: string; coordinates: [number, number] };
       participantLimit?: number;
       distanceMiles?: number;
@@ -451,6 +481,19 @@ export class ActivityService {
         },
       };
       changedFields.push("location");
+    }
+    const geography = normalizeGeography(payload);
+    if (payload.country !== undefined) {
+      activity.country = geography.country!;
+      changedFields.push("country");
+    }
+    if (payload.state !== undefined) {
+      activity.state = geography.state;
+      changedFields.push("state");
+    }
+    if (payload.city !== undefined) {
+      activity.city = geography.city;
+      changedFields.push("city");
     }
     if (payload.participantLimit !== undefined) {
       activity.participantLimit = payload.participantLimit;

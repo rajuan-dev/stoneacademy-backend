@@ -14,6 +14,9 @@ export type UserResponse = {
   fullName: string;
   phone?: string | null;
   phoneNumber?: string | null;
+  country?: string | null;
+  state?: string | null;
+  city?: string | null;
   dob?: Date;
   gender?: (typeof GENDERS)[keyof typeof GENDERS];
   location?: {
@@ -62,6 +65,9 @@ export type UserCreatePayload = {
   password?: string;
   fullName: string;
   phone?: string;
+  country?: string;
+  state?: string;
+  city?: string;
   dob?: Date;
   gender?: (typeof GENDERS)[keyof typeof GENDERS];
   location?: {
@@ -102,6 +108,9 @@ export type UpdateUserPayload = {
   phone?: string;
   dob?: Date;
   gender?: (typeof GENDERS)[keyof typeof GENDERS];
+  country?: string;
+  state?: string;
+  city?: string;
   location?: {
     label?: string;
     coordinates?: {

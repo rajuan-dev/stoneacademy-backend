@@ -12,6 +12,9 @@ export interface IActivity {
   description?: string;
   startAt: Date;
   endAt?: Date;
+  country?: string;
+  state?: string;
+  city?: string;
   location?: {
     label?: string;
     coordinates?: {
@@ -58,6 +61,22 @@ const activitySchema = BaseSchemaUtil.createSchema<IActivity>({
   },
   endAt: {
     type: Date,
+  },
+  country: {
+    type: String,
+    required: true,
+    trim: true,
+    index: true,
+  },
+  state: {
+    type: String,
+    trim: true,
+    index: true,
+  },
+  city: {
+    type: String,
+    trim: true,
+    index: true,
   },
   location: {
     label: {
@@ -109,5 +128,6 @@ activitySchema.index({ hostId: 1 });
 activitySchema.index({ createdAt: -1 });
 activitySchema.index({ status: 1, createdAt: -1 });
 activitySchema.index({ hostId: 1, createdAt: -1 });
+activitySchema.index({ country: 1, state: 1, city: 1, status: 1, createdAt: -1 });
 
 export const Activity = model<IActivity>("Activity", activitySchema);

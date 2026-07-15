@@ -109,6 +109,9 @@ export const createEventSchema = z.object({
       date: z.coerce.date().optional(),
       startAt: z.coerce.date().optional(),
       endAt: z.coerce.date().optional(),
+      country: z.string().trim().min(2).max(100),
+      state: z.string().trim().min(1).max(100).optional(),
+      city: z.string().trim().min(1).max(100).optional(),
       location: locationSchema,
       participantLimit: z.coerce.number().min(1).optional(),
       mediaIds: z.preprocess(
@@ -166,6 +169,9 @@ export const updateEventSchema = z.object({
       date: z.coerce.date().optional(),
       startAt: z.coerce.date().optional(),
       endAt: z.coerce.date().optional(),
+      country: z.string().trim().min(2).max(100).optional(),
+      state: z.string().trim().min(1).max(100).optional(),
+      city: z.string().trim().min(1).max(100).optional(),
       location: locationSchema,
       participantLimit: z.coerce.number().min(1).optional(),
       mediaIds: z.preprocess(
@@ -242,6 +248,8 @@ export const listEventsSchema = z.object({
     lng: z.coerce.number().optional(),
     radiusMiles: z.coerce.number().min(0).optional(),
     paid: z.enum(["free", "paid"]).optional(),
+    state: z.string().trim().max(100).optional(),
+    city: z.string().trim().max(100).optional(),
     sort: z.enum(["distance", "time", "popular"]).optional(),
     page: z.coerce.number().min(1).optional(),
     limit: z.coerce.number().min(1).max(100).optional(),

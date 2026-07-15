@@ -33,6 +33,7 @@ import type {
 } from "./auth.type";
 import { PendingRegistration } from "./pending-registration.model";
 import { AuthUtil } from "./auth.utils";
+import { normalizeGeographyValue } from "@/utils/geography.utils";
 type TokenSubject = {
   id: string;
   email: string;
@@ -240,6 +241,7 @@ export class AuthService {
       {
         email,
         fullName: payload.fullName,
+        country: normalizeGeographyValue(payload.country),
         dob: payload.dob,
         passwordHash,
         role: ROLES.USER,
@@ -352,6 +354,7 @@ export class AuthService {
           email: pending.email,
           passwordHash: pending.passwordHash,
           fullName: pending.fullName,
+          country: pending.country,
           dob: pending.dob,
           role: pending.role,
           status: USER_STATUS.ACTIVE,

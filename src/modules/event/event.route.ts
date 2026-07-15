@@ -6,7 +6,7 @@ import { EventController } from "./event.controller";
 const router = Router();
 const controller = new EventController();
 
-router.get("/", controller.list);
+router.get("/", authMiddleware.optionalAuth, controller.list);
 router.post(
   "/",
   authMiddleware.verifyToken,

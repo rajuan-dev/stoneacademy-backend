@@ -13,6 +13,9 @@ export interface IUser extends Document {
   phoneNumber?: string;
   phone?: string;
   address?: string;
+  country?: string;
+  state?: string;
+  city?: string;
   fullName: string;
   role: (typeof ROLES)[keyof typeof ROLES];
   accountStatus: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];

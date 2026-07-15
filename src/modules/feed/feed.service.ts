@@ -1,21 +1,35 @@
 import { ACTIVITY_STATUS, PAGINATION } from "@/constants/app.constants";
 import type { FilterQuery } from "mongoose";
 import { Activity } from "@/modules/activity/activity.model";
+import { Ad } from "@/modules/ads/ads.model";
 import { Event } from "@/modules/event/event.model";
-import { User } from "@/modules/user/user.model";
+import {
+  buildGeographyFilter,
+  getUserGeography,
+} from "@/utils/geography.utils";
 
 export class FeedService {
   async list(query: {
     q?: string;
+    state?: string;
+    city?: string;
     page?: number;
     limit?: number;
+    userId: string;
   }) {
     const page = query.page ?? PAGINATION.DEFAULT_PAGE;
     const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
+    const viewerGeography = await getUserGeography(query.userId);
+    const geographyFilter = buildGeographyFilter({
+      country: viewerGeography.country,
+      state: query.state,
+      city: query.city,
+    });
 
     const baseFilter: FilterQuery<any> = {
       status: ACTIVITY_STATUS.APPROVED,
+      ...geographyFilter,
     };
 
     if (query.q) {
@@ -25,27 +39,48 @@ export class FeedService {
 
     const includeActivities = true;
     const includeEvents = true;
-    const includeUsers = Boolean(query.q);
 
-    const userFilter: FilterQuery<any> = {};
+    const adFilter: FilterQuery<any> = {
+      status: "active",
+      ...geographyFilter,
+      $and: [
+        { $or: [{ startsAt: { $exists: false } }, { startsAt: { $lte: new Date() } }] },
+        { $or: [{ endsAt: { $exists: false } }, { endsAt: { $gte: new Date() } }] },
+      ],
+    };
+
     if (query.q) {
       const pattern = new RegExp(query.q, "i");
-      userFilter.fullName = pattern;
+      adFilter.name = pattern;
     }
 
-    const [activities, events, users] = await Promise.all([
+    const [activities, events, ads] = await Promise.all([
       includeActivities ? Activity.find(baseFilter).limit(limit * 2).exec() : Promise.resolve([]),
       includeEvents ? Event.find(baseFilter).limit(limit * 2).exec() : Promise.resolve([]),
-      includeUsers ? User.find(userFilter).select("fullName email profileImageUrl profilePhoto createdAt").limit(limit * 2).exec() : Promise.resolve([]),
+      Ad.find(adFilter).limit(limit * 2).exec(),
     ]);
 
     const merged = [
+      ...ads.map((item: any) => ({
+        kind: "ad",
+        id: item._id.toString(),
+        name: item.name,
+        imageUrl: item.imageUrl,
+        linkUrl: item.linkUrl,
+        country: item.country || null,
+        state: item.state || null,
+        city: item.city || null,
+        createdAt: item.createdAt,
+      })),
       ...activities.map((item: any) => ({
         kind: "activity",
         id: item._id.toString(),
         hostId: item.hostId?.toString?.() || item.hostId?._id?.toString?.() || null,
         name: item.title,
         type: item.type,
+        country: item.country || null,
+        state: item.state || null,
+        city: item.city || null,
         createdAt: item.createdAt,
       })),
       ...events.map((item: any) => ({
@@ -55,15 +90,10 @@ export class FeedService {
         creatorId: item.creatorId?.toString?.() || item.creatorId?._id?.toString?.() || null,
         name: item.title,
         type: item.type,
+        country: item.country || null,
+        state: item.state || null,
+        city: item.city || null,
         createdAt: item.createdAt,
-      })),
-      ...users.map((user: any) => ({
-        kind: "user",
-        id: user._id.toString(),
-        name: user.fullName,
-        username: user.email ? String(user.email).split("@")[0] : null,
-        imageUrl: user.profileImageUrl || null,
-        createdAt: user.createdAt,
       })),
     ].sort((a, b) => {
       const aTime = new Date(a.createdAt).getTime();
@@ -88,22 +118,46 @@ export class FeedService {
   }
 
   async searchFilter(query: {
-    kind?: "all" | "activity" | "event";
+    kind?: "all" | "activity" | "event" | "ad";
     type?: string;
     date?: Date;
     paid?: "all" | "free" | "paid";
+    state?: string;
+    city?: string;
+    userId: string;
   }) {
     const page = PAGINATION.DEFAULT_PAGE;
     const limit = PAGINATION.DEFAULT_LIMIT;
     const skip = 0;
+    const viewerGeography = await getUserGeography(query.userId);
+    const geographyFilter = buildGeographyFilter({
+      country: viewerGeography.country,
+      state: query.state,
+      city: query.city,
+    });
 
-    const activityFilter: FilterQuery<any> = { status: ACTIVITY_STATUS.APPROVED };
-    const eventFilter: FilterQuery<any> = { status: ACTIVITY_STATUS.APPROVED };
+    const activityFilter: FilterQuery<any> = {
+      status: ACTIVITY_STATUS.APPROVED,
+      ...geographyFilter,
+    };
+    const eventFilter: FilterQuery<any> = {
+      status: ACTIVITY_STATUS.APPROVED,
+      ...geographyFilter,
+    };
+    const adFilter: FilterQuery<any> = {
+      status: "active",
+      ...geographyFilter,
+      $and: [
+        { $or: [{ startsAt: { $exists: false } }, { startsAt: { $lte: new Date() } }] },
+        { $or: [{ endsAt: { $exists: false } }, { endsAt: { $gte: new Date() } }] },
+      ],
+    };
 
     if (query.type && query.type.toLowerCase() !== "all") {
       const pattern = new RegExp(query.type, "i");
       activityFilter.type = pattern;
       eventFilter.type = pattern;
+      adFilter.name = pattern;
     }
 
     if (query.date) {
@@ -125,8 +179,9 @@ export class FeedService {
 
     const includeActivities = !query.kind || query.kind === "all" || query.kind === "activity";
     const includeEvents = !query.kind || query.kind === "all" || query.kind === "event";
+    const includeAds = !query.kind || query.kind === "all" || query.kind === "ad";
 
-    const [activities, events] = await Promise.all([
+    const [activities, events, ads] = await Promise.all([
       includeActivities
         ? Activity.find(activityFilter)
             .populate("hostId", "fullName email")
@@ -141,9 +196,24 @@ export class FeedService {
             .limit(100)
             .exec()
         : Promise.resolve([]),
+      includeAds
+        ? Ad.find(adFilter).limit(100).exec()
+        : Promise.resolve([]),
     ]);
 
     const merged = [
+      ...ads.map((item: any) => ({
+        kind: "ad",
+        id: item._id.toString(),
+        name: item.name,
+        imageUrl: item.imageUrl,
+        linkUrl: item.linkUrl,
+        country: item.country || null,
+        state: item.state || null,
+        city: item.city || null,
+        startAt: item.startsAt || item.createdAt,
+        createdAt: item.createdAt,
+      })),
       ...activities.map((item: any) => this.mapActivityCard(item)),
       ...events.map((item: any) => this.mapEventCard(item)),
     ];
@@ -184,6 +254,9 @@ export class FeedService {
       startAt: item.startAt,
       createdAt: item.createdAt,
       location: item.location?.label || null,
+      country: item.country || null,
+      state: item.state || null,
+      city: item.city || null,
       distanceMilesAway: null,
       participantLimit: item.participantLimit ?? null,
       joinedCount: item.stats?.joinedCount ?? 0,
@@ -209,6 +282,9 @@ export class FeedService {
       startAt: item.startAt,
       createdAt: item.createdAt,
       location: item.location?.label || null,
+      country: item.country || null,
+      state: item.state || null,
+      city: item.city || null,
       distanceMilesAway: null,
       participantLimit: item.participantLimit ?? null,
       joinedCount: item.stats?.joinedCount ?? 0,
