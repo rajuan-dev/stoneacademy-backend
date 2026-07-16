@@ -1,8 +1,10 @@
 import { ACTIVITY_STATUS, PAGINATION } from "@/constants/app.constants";
 import type { FilterQuery } from "mongoose";
 import { Activity } from "@/modules/activity/activity.model";
+import { ActivityParticipant } from "@/modules/activity/activity-participant.model";
 import { Ad } from "@/modules/ads/ads.model";
 import { Event } from "@/modules/event/event.model";
+import { EventParticipant } from "@/modules/event/event-participant.model";
 import {
   buildGeographyFilter,
   getUserGeography,
@@ -34,7 +36,7 @@ export class FeedService {
 
     if (query.q) {
       const pattern = new RegExp(query.q, "i");
-      baseFilter.title = pattern;
+      baseFilter.$or = [{ title: pattern }, { description: pattern }];
     }
 
     const includeActivities = true;
@@ -55,13 +57,59 @@ export class FeedService {
     }
 
     const [activities, events, ads] = await Promise.all([
-      includeActivities ? Activity.find(baseFilter).limit(limit * 2).exec() : Promise.resolve([]),
-      includeEvents ? Event.find(baseFilter).limit(limit * 2).exec() : Promise.resolve([]),
+      includeActivities
+        ? Activity.find(baseFilter)
+            .populate("hostId", "fullName email profileImageUrl rating")
+            .populate("media", "url")
+            .limit(limit * 2)
+            .exec()
+        : Promise.resolve([]),
+      includeEvents
+        ? Event.find(baseFilter)
+            .populate("creatorId", "fullName email profileImageUrl rating")
+            .populate("media", "url")
+            .limit(limit * 2)
+            .exec()
+        : Promise.resolve([]),
       Ad.find(adFilter).limit(limit * 2).exec(),
     ]);
 
-    const merged = [
-      ...ads.map((item: any) => ({
+    const [activityParticipants, eventParticipants] = await Promise.all([
+      activities.length
+        ? ActivityParticipant.find({
+            activityId: { $in: activities.map((item: any) => item._id) },
+            status: "joined",
+          })
+            .select("activityId userId")
+            .lean()
+        : Promise.resolve([]),
+      events.length
+        ? EventParticipant.find({
+            eventId: { $in: events.map((item: any) => item._id) },
+            status: "joined",
+          })
+            .select("eventId userId")
+            .lean()
+        : Promise.resolve([]),
+    ]);
+
+    const joinedUserIdsByActivity = new Map<string, string[]>();
+    for (const participant of activityParticipants as Array<any>) {
+      const activityId = participant.activityId.toString();
+      const existing = joinedUserIdsByActivity.get(activityId) || [];
+      existing.push(participant.userId.toString());
+      joinedUserIdsByActivity.set(activityId, existing);
+    }
+
+    const joinedUserIdsByEvent = new Map<string, string[]>();
+    for (const participant of eventParticipants as Array<any>) {
+      const eventId = participant.eventId.toString();
+      const existing = joinedUserIdsByEvent.get(eventId) || [];
+      existing.push(participant.userId.toString());
+      joinedUserIdsByEvent.set(eventId, existing);
+    }
+
+    const adItems = ads.map((item: any) => ({
         kind: "ad",
         id: item._id.toString(),
         name: item.name,
@@ -71,35 +119,25 @@ export class FeedService {
         state: item.state || null,
         city: item.city || null,
         createdAt: item.createdAt,
-      })),
-      ...activities.map((item: any) => ({
-        kind: "activity",
-        id: item._id.toString(),
-        hostId: item.hostId?.toString?.() || item.hostId?._id?.toString?.() || null,
-        name: item.title,
-        type: item.type,
-        country: item.country || null,
-        state: item.state || null,
-        city: item.city || null,
-        createdAt: item.createdAt,
-      })),
-      ...events.map((item: any) => ({
-        kind: "event",
-        id: item._id.toString(),
-        hostId: item.creatorId?.toString?.() || item.creatorId?._id?.toString?.() || null,
-        creatorId: item.creatorId?.toString?.() || item.creatorId?._id?.toString?.() || null,
-        name: item.title,
-        type: item.type,
-        country: item.country || null,
-        state: item.state || null,
-        city: item.city || null,
-        createdAt: item.createdAt,
-      })),
+      }));
+    const contentItems = [
+      ...activities.map((item: any) =>
+        this.mapFeedActivityCard(
+          item,
+          joinedUserIdsByActivity.get(item._id.toString()) || [],
+        )),
+      ...events.map((item: any) =>
+        this.mapFeedEventCard(
+          item,
+          joinedUserIdsByEvent.get(item._id.toString()) || [],
+        )),
     ].sort((a, b) => {
       const aTime = new Date(a.createdAt).getTime();
       const bTime = new Date(b.createdAt).getTime();
       return bTime - aTime;
     });
+
+    const merged = this.injectAdsIntoFeed(contentItems, adItems);
 
     const data = merged.slice(skip, skip + limit);
     const totalItems = merged.length;
@@ -114,6 +152,92 @@ export class FeedService {
         hasNext: page * limit < totalItems,
         hasPrev: page > 1,
       },
+    };
+  }
+
+  private mapFeedActivityCard(item: any, joinedUserIds: string[]) {
+    const host = item.hostId as any;
+    const imageUrl = Array.isArray(item.media) && item.media.length > 0
+      ? item.media[0]?.url || null
+      : null;
+
+    return {
+      kind: "activity",
+      id: item._id.toString(),
+      hostId: host?._id?.toString?.() || host?.toString?.() || null,
+      name: item.title,
+      title: item.title,
+      type: item.type,
+      description: item.description || null,
+      creatorName: host?.fullName || null,
+      creatorUsername: host?.email ? String(host.email).split("@")[0] : null,
+      creatorProfileImageUrl: host?.profileImageUrl || null,
+      creatorRating: host?.rating || { avg: 0, count: 0 },
+      rating: host?.rating || { avg: 0, count: 0 },
+      ratingAvg: host?.rating?.avg ?? 0,
+      ratingCount: host?.rating?.count ?? 0,
+      startAt: item.startAt,
+      createdAt: item.createdAt,
+      location: item.location?.label || null,
+      country: item.country || null,
+      state: item.state || null,
+      city: item.city || null,
+      distanceMilesAway: null,
+      distanceMiles: item.distanceMiles != null ? String(item.distanceMiles) : null,
+      participantLimit: item.participantLimit ?? null,
+      joinedCount: item.stats?.joinedCount ?? joinedUserIds.length,
+      joinedUserIds,
+      imageUrl,
+      status: item.status,
+    };
+  }
+
+  private mapFeedEventCard(item: any, joinedUserIds: string[]) {
+    const creator = item.creatorId as any;
+    const imageUrl = Array.isArray(item.media) && item.media.length > 0
+      ? item.media[0]?.url || null
+      : null;
+
+    return {
+      kind: "event",
+      id: item._id.toString(),
+      hostId: creator?._id?.toString?.() || creator?.toString?.() || null,
+      creatorId: creator?._id?.toString?.() || creator?.toString?.() || null,
+      name: item.title,
+      title: item.title,
+      type: item.type,
+      description: item.description || null,
+      creatorName: creator?.fullName || null,
+      creatorUsername: creator?.email ? String(creator.email).split("@")[0] : null,
+      creatorProfileImageUrl: creator?.profileImageUrl || null,
+      creatorRating: creator?.rating || { avg: 0, count: 0 },
+      rating: creator?.rating || { avg: 0, count: 0 },
+      ratingAvg: creator?.rating?.avg ?? 0,
+      ratingCount: creator?.rating?.count ?? 0,
+      startAt: item.startAt,
+      createdAt: item.createdAt,
+      location: item.location?.label || null,
+      country: item.country || null,
+      state: item.state || null,
+      city: item.city || null,
+      distanceMilesAway: null,
+      participantLimit: item.participantLimit ?? null,
+      joinedCount: item.stats?.joinedCount ?? joinedUserIds.length,
+      joinedUserIds,
+      imageUrl,
+      durationMinutes: item.durationMinutes != null ? String(item.durationMinutes) : null,
+      priceType: item.priceType || (item.ticketPrice > 0 ? "paid" : "free"),
+      ticketPrice: item.ticketPrice ?? 0,
+      discountPercentage: item.discountPercentage ?? 0,
+      payableTicketPrice: item.ticketPrice > 0
+        ? Number(
+            Math.max(
+              0,
+              (item.ticketPrice ?? 0) - ((item.ticketPrice ?? 0) * (item.discountPercentage ?? 0)) / 100,
+            ).toFixed(2),
+          )
+        : 0,
+      status: item.status,
     };
   }
 
@@ -258,6 +382,7 @@ export class FeedService {
       state: item.state || null,
       city: item.city || null,
       distanceMilesAway: null,
+      distanceMiles: item.distanceMiles != null ? String(item.distanceMiles) : null,
       participantLimit: item.participantLimit ?? null,
       joinedCount: item.stats?.joinedCount ?? 0,
       priceType: "free",
@@ -288,10 +413,35 @@ export class FeedService {
       distanceMilesAway: null,
       participantLimit: item.participantLimit ?? null,
       joinedCount: item.stats?.joinedCount ?? 0,
+      durationMinutes: item.durationMinutes != null ? String(item.durationMinutes) : null,
       priceType: item.priceType || (item.ticketPrice > 0 ? "paid" : "free"),
       ticketPrice: item.ticketPrice ?? 0,
       discountPercentage: item.discountPercentage ?? 0,
       imageUrl,
     };
+  }
+
+  private injectAdsIntoFeed(contentItems: any[], adItems: any[]) {
+    if (!adItems.length) return contentItems;
+    if (!contentItems.length) return adItems;
+
+    const merged: any[] = [];
+    let contentIndex = 0;
+    let adIndex = 0;
+    const interval = 3;
+
+    while (contentIndex < contentItems.length || adIndex < adItems.length) {
+      if (adIndex < adItems.length) {
+        merged.push(adItems[adIndex]);
+        adIndex += 1;
+      }
+
+      for (let i = 0; i < interval && contentIndex < contentItems.length; i += 1) {
+        merged.push(contentItems[contentIndex]);
+        contentIndex += 1;
+      }
+    }
+
+    return merged;
   }
 }

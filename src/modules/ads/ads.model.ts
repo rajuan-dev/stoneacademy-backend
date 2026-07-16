@@ -4,15 +4,15 @@ import { model, Schema, type Types } from "mongoose";
 export interface IAd {
   _id: Types.ObjectId;
   name: string;
+  category?: string;
+  description?: string;
+  price?: number;
   imageUrl: string;
   linkUrl: string;
   country?: string;
   state?: string;
   city?: string;
   status: "active" | "expired";
-  startsAt?: Date;
-  endsAt?: Date;
-  order?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +23,21 @@ const adSchema = BaseSchemaUtil.createSchema<IAd>({
     required: true,
     trim: true,
     maxlength: 200,
+  },
+  category: {
+    type: String,
+    trim: true,
+    maxlength: 120,
+  },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: 2000,
+  },
+  price: {
+    type: Number,
+    min: 0,
+    default: 0,
   },
   imageUrl: {
     type: String,
@@ -58,19 +73,8 @@ const adSchema = BaseSchemaUtil.createSchema<IAd>({
     default: "active",
     index: true,
   },
-  startsAt: {
-    type: Date,
-  },
-  endsAt: {
-    type: Date,
-  },
-  order: {
-    type: Number,
-    default: 0,
-  },
 });
 
-adSchema.index({ status: 1, startsAt: 1, endsAt: 1 });
-adSchema.index({ country: 1, state: 1, city: 1, status: 1, order: 1 });
+adSchema.index({ country: 1, state: 1, city: 1, status: 1 });
 
 export const Ad = model<IAd>("Ad", adSchema);

@@ -1069,6 +1069,7 @@ export class UserService {
         location: event.location?.label || null,
         locationCoordinates: event.location?.coordinates?.coordinates || null,
         participantLimit: event.participantLimit ?? null,
+        durationMinutes: event.durationMinutes != null ? String(event.durationMinutes) : null,
         status: event.status,
         priceType: event.priceType || "free",
         ticketPrice,
@@ -1450,6 +1451,7 @@ export class UserService {
       location: activity.location?.label || null,
       locationCoordinates: activity.location?.coordinates?.coordinates || null,
       participantLimit: activity.participantLimit ?? null,
+      distanceMiles: activity.distanceMiles != null ? String(activity.distanceMiles) : null,
       status: activity.status,
       stats: {
         joinedCount: activity.stats?.joinedCount ?? 0,
@@ -1490,6 +1492,7 @@ export class UserService {
       location: event.location?.label || null,
       locationCoordinates: event.location?.coordinates?.coordinates || null,
       participantLimit: event.participantLimit ?? null,
+      durationMinutes: event.durationMinutes != null ? String(event.durationMinutes) : null,
       status: event.status,
       priceType: event.priceType || "free",
       ticketPrice,

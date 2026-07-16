@@ -32,7 +32,8 @@
     { "key": "secondaryCity", "value": "New York City" },
     { "key": "eventId", "value": "" },
     { "key": "activityId", "value": "" },
-    { "key": "adId", "value": "" }
+    { "key": "adId", "value": "" },
+    { "key": "galleryMediaId", "value": "" }
   ],
   "item": [
     {
@@ -168,6 +169,123 @@
       ]
     },
     {
+      "name": "2.1 Profile Media And Joined Content",
+      "item": [
+        {
+          "name": "Upload Profile Gallery Media",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/users/me/gallery"
+          }
+        },
+        {
+          "name": "Upload My Videos",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/users/me/videos"
+          }
+        },
+        {
+          "name": "Get My Gallery",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const firstId = res.data?.[0]?._id || '';",
+                  "if (firstId) pm.collectionVariables.set('galleryMediaId', firstId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/gallery"
+          }
+        },
+        {
+          "name": "Get My Photos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/photos"
+          }
+        },
+        {
+          "name": "Get My Videos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/videos"
+          }
+        },
+        {
+          "name": "Delete Gallery Media Item",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/users/me/gallery/{{galleryMediaId}}"
+          }
+        },
+        {
+          "name": "Get My Joined Activities",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/joined/activities"
+          }
+        },
+        {
+          "name": "Get My Joined Events",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/joined/events"
+          }
+        },
+        {
+          "name": "Get My Hosted Activities",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/hosted/activities"
+          }
+        },
+        {
+          "name": "Get My Hosted Events",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/hosted/events"
+          }
+        },
+        {
+          "name": "Get My Profile Overview",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/me/overview"
+          }
+        }
+      ]
+    },
+    {
       "name": "3. Create Geo Content",
       "item": [
         {
@@ -259,6 +377,28 @@
     {
       "name": "4. Geo Filter Checks",
       "item": [
+        {
+          "name": "List Active Ads With Auto Country Filter",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const expectedCountry = pm.collectionVariables.get('country');",
+                  "pm.test('all ads belong to user country', function () {",
+                  "  (res.data || []).forEach((item) => pm.expect(item.country).to.eql(expectedCountry));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/ads"
+          }
+        },
         {
           "name": "List Events With Auto Country Filter",
           "event": [

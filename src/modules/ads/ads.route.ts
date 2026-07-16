@@ -1,3 +1,4 @@
+import upload from "@/config/multer.config";
 import { ROLES } from "@/constants/app.constants";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { Router } from "express";
@@ -6,7 +7,7 @@ import { AdsController } from "./ads.controller";
 const router = Router();
 const controller = new AdsController();
 
-router.get("/", controller.listActive);
+router.get("/", authMiddleware.optionalAuth, controller.listActive);
 
 router.get(
   "/admin",
@@ -18,12 +19,14 @@ router.post(
   "/admin",
   authMiddleware.verifyToken,
   authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  upload.single("image"),
   controller.create,
 );
 router.patch(
   "/admin/:id",
   authMiddleware.verifyToken,
   authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  upload.single("image"),
   controller.update,
 );
 router.delete(

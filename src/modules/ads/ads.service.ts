@@ -1,6 +1,11 @@
 import { PAGINATION } from "@/constants/app.constants";
-import { NotFoundException } from "@/utils/app-error.utils";
-import { buildGeographyFilter, normalizeGeography } from "@/utils/geography.utils";
+import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
+import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+import {
+  buildGeographyFilter,
+  getUserGeography,
+  normalizeGeography,
+} from "@/utils/geography.utils";
 import { Ad } from "./ads.model";
 
 export class AdsService {
@@ -13,7 +18,7 @@ export class AdsService {
     if (query.status) filter.status = query.status;
 
     const [data, totalItems] = await Promise.all([
-      Ad.find(filter).sort({ order: 1, createdAt: -1 }).skip(skip).limit(limit).exec(),
+      Ad.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
       Ad.countDocuments(filter),
     ]);
 
@@ -30,8 +35,17 @@ export class AdsService {
     };
   }
 
-  async listActive() {
-    return this.listActiveByGeography({});
+  async listActive(query?: {
+    viewerUserId?: string;
+    state?: string;
+    city?: string;
+  }) {
+    const viewerGeography = await getUserGeography(query?.viewerUserId);
+    return this.listActiveByGeography({
+      country: viewerGeography.country,
+      state: query?.state,
+      city: query?.city,
+    });
   }
 
   async listActiveByGeography(geography: {
@@ -43,30 +57,32 @@ export class AdsService {
     return Ad.find({
       status: "active",
       ...buildGeographyFilter(geography),
-      $and: [
-        { $or: [{ startsAt: { $exists: false } }, { startsAt: { $lte: now } }] },
-        { $or: [{ endsAt: { $exists: false } }, { endsAt: { $gte: now } }] },
-      ],
     })
-      .sort({ order: 1, createdAt: -1 })
+      .sort({ createdAt: -1 })
       .exec();
   }
 
   async create(payload: {
     name: string;
-    imageUrl: string;
+    category?: string;
+    description?: string;
+    price?: number;
+    imageUrl?: string;
     linkUrl: string;
     country: string;
     state?: string;
     city?: string;
     status?: "active" | "expired";
-    startsAt?: Date;
-    endsAt?: Date;
-    order?: number;
-  }) {
+  }, image?: StorageUploadInput) {
+    const upload = image
+      ? await this.uploadAdImage(image, payload.country)
+      : null;
     return Ad.create({
       name: payload.name,
-      imageUrl: payload.imageUrl,
+      category: payload.category,
+      description: payload.description,
+      price: payload.price ?? 0,
+      imageUrl: upload?.url || payload.imageUrl,
       linkUrl: payload.linkUrl,
       ...normalizeGeography({
         country: payload.country,
@@ -74,9 +90,6 @@ export class AdsService {
         city: payload.city,
       }),
       status: payload.status ?? "active",
-      startsAt: payload.startsAt,
-      endsAt: payload.endsAt,
-      order: payload.order ?? 0,
     });
   }
 
@@ -84,21 +97,25 @@ export class AdsService {
     id: string,
     payload: {
       name?: string;
+      category?: string;
+      description?: string;
+      price?: number;
       imageUrl?: string;
       linkUrl?: string;
       country?: string;
       state?: string;
       city?: string;
       status?: "active" | "expired";
-      startsAt?: Date;
-      endsAt?: Date;
-      order?: number;
     },
+    image?: StorageUploadInput,
   ) {
     const ad = await Ad.findById(id).exec();
     if (!ad) throw new NotFoundException("Ad not found");
 
     if (payload.name !== undefined) ad.name = payload.name;
+    if (payload.category !== undefined) ad.category = payload.category;
+    if (payload.description !== undefined) ad.description = payload.description;
+    if (payload.price !== undefined) ad.price = payload.price;
     if (payload.imageUrl !== undefined) ad.imageUrl = payload.imageUrl;
     if (payload.linkUrl !== undefined) ad.linkUrl = payload.linkUrl;
     const geography = normalizeGeography(payload);
@@ -106,9 +123,10 @@ export class AdsService {
     if (payload.state !== undefined) ad.state = geography.state;
     if (payload.city !== undefined) ad.city = geography.city;
     if (payload.status !== undefined) ad.status = payload.status;
-    if (payload.startsAt !== undefined) ad.startsAt = payload.startsAt;
-    if (payload.endsAt !== undefined) ad.endsAt = payload.endsAt;
-    if (payload.order !== undefined) ad.order = payload.order;
+    if (image) {
+      const upload = await this.uploadAdImage(image, payload.country ?? ad.country);
+      ad.imageUrl = upload.url;
+    }
     await ad.save();
     return ad;
   }
@@ -119,5 +137,21 @@ export class AdsService {
       throw new NotFoundException("Ad not found");
     }
     return { deleted: true };
+  }
+
+  private async uploadAdImage(file: StorageUploadInput, country?: string) {
+    if (!file?.buffer?.length) {
+      throw new BadRequestException("Ad image file is missing");
+    }
+    if (!file.mimeType?.startsWith("image/")) {
+      throw new BadRequestException("Ad image must be an image file");
+    }
+    const prefix = `ads/${this.slugifySegment(country)}`;
+    return s3Service.uploadFile(file, { prefix });
+  }
+
+  private slugifySegment(value?: string) {
+    const base = value?.trim().toLowerCase() || "general";
+    return base.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "general";
   }
 }
