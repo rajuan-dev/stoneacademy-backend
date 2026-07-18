@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "9a2ca9dd-c2b4-4405-b5b4-6f57fdfdfdfa",
     "name": "StoneAcademy - Search Filter API Only",
-    "description": "Dedicated collection for activity/event filter search API using only kind, type, date, and paid/free.",
+    "description": "Dedicated collection for activity/event filter search API using only kind, category, date, and paid/free.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -17,7 +17,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=all&type=Running&date=2026-08-20&paid=all",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=all&category=Running&date=2026-08-20&paid=all",
           "host": [
             "{{baseUrl}}"
           ],
@@ -27,7 +27,7 @@
           ],
           "query": [
             { "key": "kind", "value": "all" },
-            { "key": "type", "value": "Running" },
+            { "key": "category", "value": "Running" },
             { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "all" }
           ]
@@ -40,7 +40,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=activity&type=Cycling&date=2026-08-20&paid=all",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=activity&category=Cycling&date=2026-08-20&paid=all",
           "host": [
             "{{baseUrl}}"
           ],
@@ -50,7 +50,7 @@
           ],
           "query": [
             { "key": "kind", "value": "activity" },
-            { "key": "type", "value": "Cycling" },
+            { "key": "category", "value": "Cycling" },
             { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "all" }
           ]
@@ -63,7 +63,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Yoga&date=2026-08-20&paid=free",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=event&category=Yoga&date=2026-08-20&paid=free",
           "host": [
             "{{baseUrl}}"
           ],
@@ -73,7 +73,7 @@
           ],
           "query": [
             { "key": "kind", "value": "event" },
-            { "key": "type", "value": "Yoga" },
+            { "key": "category", "value": "Yoga" },
             { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "free" }
           ]
@@ -86,7 +86,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Swimming&date=2026-08-20&paid=paid",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=event&category=Swimming&date=2026-08-20&paid=paid",
           "host": [
             "{{baseUrl}}"
           ],
@@ -96,7 +96,7 @@
           ],
           "query": [
             { "key": "kind", "value": "event" },
-            { "key": "type", "value": "Swimming" },
+            { "key": "category", "value": "Swimming" },
             { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "paid" }
           ]

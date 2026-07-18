@@ -19,6 +19,8 @@ export class FeedService {
 
   async list(query: {
     q?: string;
+    category?: string;
+    type?: string;
     state?: string;
     city?: string;
     paid?: "all" | "free" | "paid";
@@ -54,21 +56,28 @@ export class FeedService {
     const sharedRadiusMiles = this.toMiles(query.radius, query.radiusUnit);
     const sharedSort = this.toSharedSort(query.sort);
 
+    const includeActivities = query.paid !== "paid";
+    const includeAds = !query.paid || query.paid === "all";
+
     const [activityResult, eventResult, ads] = await Promise.all([
-      this.activityService.list({
-        q: query.q,
-        state: query.state,
-        city: query.city,
-        lat: query.lat,
-        lng: query.lng,
-        radiusMiles: sharedRadiusMiles,
-        sort: sharedSort,
-        page: 1,
-        limit: limit * 2,
-        viewerUserId: query.userId,
-      }),
+      includeActivities
+        ? this.activityService.list({
+            q: query.q,
+            category: query.category ?? query.type,
+            state: query.state,
+            city: query.city,
+            lat: query.lat,
+            lng: query.lng,
+            radiusMiles: sharedRadiusMiles,
+            sort: sharedSort,
+            page: 1,
+            limit: limit * 2,
+            viewerUserId: query.userId,
+          })
+        : Promise.resolve({ data: [] as any[] }),
       this.eventService.list({
         q: query.q,
+        category: query.category ?? query.type,
         state: query.state,
         city: query.city,
         lat: query.lat,
@@ -80,7 +89,9 @@ export class FeedService {
         limit: limit * 2,
         viewerUserId: query.userId,
       }),
-      Ad.find(adFilter).sort({ createdAt: -1 }).limit(limit * 2).exec(),
+      includeAds
+        ? Ad.find(adFilter).sort({ createdAt: -1 }).limit(limit * 2).exec()
+        : Promise.resolve([]),
     ]);
 
     const adItems = ads.map((item: any) => ({
@@ -100,9 +111,11 @@ export class FeedService {
       ...eventResult.data,
     ];
 
-    this.sortContentItems(contentItems, query.sort, hasGeo);
+    const filteredContentItems = this.applyPaidFilter(contentItems, query.paid);
 
-    const merged = this.injectAdsIntoFeed(contentItems, adItems);
+    this.sortContentItems(filteredContentItems, query.sort, hasGeo);
+
+    const merged = this.injectAdsIntoFeed(filteredContentItems, adItems);
     const data = merged.slice(skip, skip + limit);
     const totalItems = merged.length;
 
@@ -121,6 +134,7 @@ export class FeedService {
 
   async searchFilter(query: {
     kind?: "all" | "activity" | "event" | "ad";
+    category?: string;
     type?: string;
     date?: Date;
     paid?: "all" | "free" | "paid";
@@ -150,10 +164,17 @@ export class FeedService {
     if (query.type && query.type.toLowerCase() !== "all") {
       adFilter.name = new RegExp(query.type, "i");
     }
+    if (query.category && query.category.toLowerCase() !== "all") {
+      adFilter.name = new RegExp(query.category, "i");
+    }
 
-    const includeActivities = !query.kind || query.kind === "all" || query.kind === "activity";
+    const includeActivities =
+      (!query.kind || query.kind === "all" || query.kind === "activity")
+      && query.paid !== "paid";
     const includeEvents = !query.kind || query.kind === "all" || query.kind === "event";
-    const includeAds = !query.kind || query.kind === "all" || query.kind === "ad";
+    const includeAds =
+      (!query.kind || query.kind === "all" || query.kind === "ad")
+      && (!query.paid || query.paid === "all");
     const hasGeo = query.lat !== undefined && query.lng !== undefined;
     const sharedRadiusMiles = this.toMiles(query.radius, query.radiusUnit);
     const sharedSort = this.toSharedSort(query.sort);
@@ -167,7 +188,7 @@ export class FeedService {
     const [activityResult, eventResult, ads] = await Promise.all([
       includeActivities
         ? this.activityService.list({
-            type: query.type,
+            category: query.category ?? query.type,
             dateFrom,
             dateTo,
             state: query.state,
@@ -183,7 +204,7 @@ export class FeedService {
         : Promise.resolve({ data: [] as any[] }),
       includeEvents
         ? this.eventService.list({
-            type: query.type,
+            category: query.category ?? query.type,
             dateFrom,
             dateTo,
             state: query.state,
@@ -220,16 +241,18 @@ export class FeedService {
       ...eventResult.data,
     ];
 
-    this.sortSearchItems(merged, query.sort, hasGeo);
+    const filteredMerged = this.applyPaidFilter(merged, query.paid);
+
+    this.sortSearchItems(filteredMerged, query.sort, hasGeo);
 
     return {
-      data: merged.slice(0, limit),
+      data: filteredMerged.slice(0, limit),
       pagination: {
         currentPage: page,
         itemsPerPage: limit,
-        totalItems: merged.length,
-        pageCount: Math.ceil(merged.length / limit),
-        hasNext: page * limit < merged.length,
+        totalItems: filteredMerged.length,
+        pageCount: Math.ceil(filteredMerged.length / limit),
+        hasNext: page * limit < filteredMerged.length,
         hasPrev: page > 1,
       },
     };
@@ -328,5 +351,20 @@ export class FeedService {
   private toSharedSort(sort?: "distance" | "time" | "popular" | "recent") {
     if (!sort || sort === "recent") return undefined;
     return sort;
+  }
+
+  private applyPaidFilter(items: any[], paid?: "all" | "free" | "paid") {
+    if (!paid || paid === "all") {
+      return items;
+    }
+
+    if (paid === "paid") {
+      return items.filter((item) => item.kind === "event" && item.priceType === "paid");
+    }
+
+    return items.filter((item) => {
+      if (item.kind === "activity") return true;
+      return item.kind === "event" && item.priceType === "free";
+    });
   }
 }

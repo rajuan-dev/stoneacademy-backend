@@ -27,6 +27,7 @@ import {
 
 type ListQuery = {
   q?: string;
+  category?: string;
   type?: string;
   dateFrom?: Date;
   dateTo?: Date;
@@ -74,8 +75,10 @@ export class ActivityService {
       filter.$or = [{ title: pattern }, { description: pattern }];
     }
 
-    if (query.type && query.type.toLowerCase() !== "all") {
-      filter.type = new RegExp(query.type, "i");
+    const normalizedCategory = this.normalizeCategoryInput(query.category ?? query.type);
+    if (normalizedCategory && normalizedCategory.toLowerCase() !== "all") {
+      const pattern = new RegExp(normalizedCategory, "i");
+      filter.$and = [...(filter.$and || []), { $or: [{ category: pattern }, { type: pattern }] }];
     }
 
     if (query.dateFrom || query.dateTo) {
@@ -89,6 +92,7 @@ export class ActivityService {
     }
 
     const hasGeo = query.lat !== undefined && query.lng !== undefined;
+    let countFilter: FilterQuery<any> = { ...filter };
     if (hasGeo) {
       const maxDistance =
         query.radiusMiles !== undefined
@@ -104,6 +108,20 @@ export class ActivityService {
           ...(maxDistance ? { $maxDistance: maxDistance } : {}),
         },
       };
+
+      if (maxDistance !== undefined) {
+        countFilter = {
+          ...countFilter,
+          "location.coordinates": {
+            $geoWithin: {
+              $centerSphere: [
+                [query.lng, query.lat],
+                maxDistance / MILES_TO_METERS / EARTH_RADIUS_MILES,
+              ],
+            },
+          },
+        };
+      }
     }
 
     let sort: Record<string, any> | undefined = { createdAt: -1 };
@@ -122,10 +140,12 @@ export class ActivityService {
       queryBuilder.sort(sort);
     }
 
-    const [data, totalItems] = await Promise.all([
-      queryBuilder.skip(skip).limit(limit).exec(),
-      Activity.countDocuments(filter),
-    ]);
+    const data = await queryBuilder.skip(skip).limit(limit).exec();
+    const totalItems = hasGeo
+      ? query.radiusMiles !== undefined
+        ? await Activity.countDocuments(countFilter)
+        : data.length
+      : await Activity.countDocuments(filter);
 
     const activityIds = data.map((item: any) => item._id);
     const participants = activityIds.length
@@ -167,7 +187,7 @@ export class ActivityService {
         hostId: host?._id?.toString?.() || host?.toString?.() || null,
         name: item.title,
         title: item.title,
-        type: item.type,
+        category: this.getActivityCategoryValue(item),
         description: item.description || null,
         creatorName: host?.fullName || null,
         creatorUsername: host?.email
@@ -186,7 +206,9 @@ export class ActivityService {
         state: item.state || null,
         city: item.city || null,
         distanceMilesAway: distanceMilesAway != null ? String(distanceMilesAway) : null,
-        distanceMiles: item.distanceMiles != null ? String(item.distanceMiles) : null,
+        distance: this.getActivityDistanceValue(item),
+        distanceType: this.getActivityDistanceType(item),
+        duration: item.duration || null,
         participantLimit: item.participantLimit ?? null,
         joinedCount: item.stats?.joinedCount ?? 0,
         joinedUserIds: joinedUserIdsByActivity.get(item._id.toString()) || [],
@@ -211,6 +233,7 @@ export class ActivityService {
   async create(payload: {
     hostId: string;
     title?: string;
+    category?: string;
     type?: string;
     description?: string;
     startAt?: Date;
@@ -220,7 +243,10 @@ export class ActivityService {
     city?: string;
     location?: { label: string; coordinates: [number, number] };
     participantLimit?: number;
+    distance?: number;
+    distanceType?: "km" | "miles";
     distanceMiles?: number;
+    duration?: string;
     mediaIds?: string[];
     mediaFiles?: Express.Multer.File[];
     status?: string;
@@ -255,11 +281,17 @@ export class ActivityService {
     const mediaIds = Array.from(
       new Set([...(payload.mediaIds || []), ...uploadedMediaIds]),
     );
+    const normalizedDistance = this.normalizeDistance(payload.distance, payload.distanceMiles);
+    const normalizedDistanceType = this.normalizeDistanceType(
+      payload.distanceType,
+      payload.distanceMiles,
+    );
+    const normalizedCategory = this.normalizeCategoryInput(payload.category ?? payload.type);
 
     return Activity.create({
       hostId: payload.hostId,
       title: payload.title || "Untitled Activity",
-      type: payload.type || "general",
+      category: normalizedCategory || "general",
       description: payload.description,
       country: geography.country!,
       state: geography.state,
@@ -276,7 +308,13 @@ export class ActivityService {
           }
         : undefined,
       participantLimit: payload.participantLimit,
-      distanceMiles: payload.distanceMiles,
+      distance: normalizedDistance,
+      distanceType: normalizedDistanceType,
+      distanceMiles:
+        normalizedDistanceType === "miles" && normalizedDistance !== undefined
+          ? normalizedDistance
+          : undefined,
+      duration: this.normalizeDuration(payload.duration),
       media: mediaIds,
       status: payload.status || ACTIVITY_STATUS.APPROVED,
       stats: { joinedCount: 0 },
@@ -340,7 +378,7 @@ export class ActivityService {
       hostId: host?._id?.toString?.() || null,
       name: activity.title,
       title: activity.title,
-      type: activity.type,
+      category: this.getActivityCategoryValue(activity),
       description: activity.description || null,
       startAt: activity.startAt,
       endAt: activity.endAt || null,
@@ -354,7 +392,9 @@ export class ActivityService {
       joinedCount,
       joinedUserIds,
       isJoined,
-      distanceMiles: activity.distanceMiles != null ? String(activity.distanceMiles) : null,
+      distance: this.getActivityDistanceValue(activity),
+      distanceType: this.getActivityDistanceType(activity),
+      duration: activity.duration || null,
       creatorName: host?.fullName || null,
       creatorUsername: host?.email ? String(host.email).split("@")[0] : null,
       creatorProfileImageUrl: host?.profileImageUrl || null,
@@ -432,6 +472,7 @@ export class ActivityService {
     userId: string,
     payload: {
       title?: string;
+      category?: string;
       type?: string;
       description?: string;
       startAt?: Date;
@@ -441,7 +482,10 @@ export class ActivityService {
       city?: string;
       location?: { label: string; coordinates: [number, number] };
       participantLimit?: number;
+      distance?: number;
+      distanceType?: "km" | "miles";
       distanceMiles?: number;
+      duration?: string;
       mediaIds?: string[];
       status?: string;
     },
@@ -458,9 +502,11 @@ export class ActivityService {
       activity.title = payload.title;
       changedFields.push("title");
     }
-    if (payload.type !== undefined) {
-      activity.type = payload.type;
-      changedFields.push("type");
+    if (payload.category !== undefined || payload.type !== undefined) {
+      const normalizedCategory = this.normalizeCategoryInput(payload.category ?? payload.type);
+      activity.category = normalizedCategory as any;
+      activity.type = undefined as any;
+      changedFields.push("category");
     }
     if (payload.description !== undefined) {
       changedFields.push("description");
@@ -501,9 +547,27 @@ export class ActivityService {
       activity.participantLimit = payload.participantLimit;
       changedFields.push("participantLimit");
     }
-    if (payload.distanceMiles !== undefined) {
-      activity.distanceMiles = payload.distanceMiles;
-      changedFields.push("distanceMiles");
+    if (payload.distance !== undefined || payload.distanceMiles !== undefined) {
+      const normalizedDistance = this.normalizeDistance(payload.distance, payload.distanceMiles);
+      const normalizedDistanceType = this.normalizeDistanceType(
+        payload.distanceType,
+        payload.distanceMiles,
+      );
+      activity.distance = normalizedDistance as any;
+      activity.distanceType = normalizedDistanceType as any;
+      activity.distanceMiles =
+        normalizedDistanceType === "miles" && normalizedDistance !== undefined
+          ? normalizedDistance
+          : undefined;
+      changedFields.push("distance");
+      changedFields.push("distanceType");
+    } else if (payload.distanceType !== undefined) {
+      activity.distanceType = this.normalizeDistanceType(payload.distanceType) as any;
+      changedFields.push("distanceType");
+    }
+    if (payload.duration !== undefined) {
+      activity.duration = this.normalizeDuration(payload.duration) as any;
+      changedFields.push("duration");
     }
     if (payload.mediaIds !== undefined) {
       activity.media = payload.mediaIds as any;
@@ -881,6 +945,57 @@ export class ActivityService {
       fullName: user?.fullName || null,
       profileImageUrl: user?.profileImageUrl || null,
     };
+  }
+
+  private normalizeDistance(distance?: number, legacyDistanceMiles?: number) {
+    const raw = distance ?? legacyDistanceMiles;
+    if (raw === undefined || raw === null) return undefined;
+    return Math.max(0, Math.trunc(raw));
+  }
+
+  private normalizeDistanceType(
+    distanceType?: "km" | "miles",
+    legacyDistanceMiles?: number,
+  ) {
+    if (distanceType) return distanceType;
+    if (legacyDistanceMiles !== undefined) return "miles";
+    return undefined;
+  }
+
+  private normalizeDuration(duration?: string) {
+    if (duration === undefined) return undefined;
+    const normalized = String(duration).trim();
+    return normalized.length ? normalized : undefined;
+  }
+
+  private normalizeCategoryInput(category?: string) {
+    if (category === undefined) return undefined;
+    const normalized = String(category).trim();
+    return normalized.length ? normalized : undefined;
+  }
+
+  private getActivityDistanceValue(activity: any) {
+    if (activity?.distance !== undefined && activity?.distance !== null) {
+      return String(Math.trunc(Number(activity.distance)));
+    }
+    if (activity?.distanceMiles !== undefined && activity?.distanceMiles !== null) {
+      return String(Math.trunc(Number(activity.distanceMiles)));
+    }
+    return null;
+  }
+
+  private getActivityDistanceType(activity: any) {
+    if (activity?.distanceType) {
+      return activity.distanceType;
+    }
+    if (activity?.distanceMiles !== undefined && activity?.distanceMiles !== null) {
+      return "miles";
+    }
+    return null;
+  }
+
+  private getActivityCategoryValue(activity: any) {
+    return activity?.category || activity?.type || "general";
   }
 
   private getDefaultFutureStartAt(): Date {

@@ -28,6 +28,7 @@ import {
 
 type ListQuery = {
   q?: string;
+  category?: string;
   type?: string;
   dateFrom?: Date;
   dateTo?: Date;
@@ -73,8 +74,10 @@ export class EventService {
       filter.$or = [{ title: pattern }, { description: pattern }];
     }
 
-    if (query.type && query.type.toLowerCase() !== "all") {
-      filter.type = new RegExp(query.type, "i");
+    const normalizedCategory = this.normalizeCategoryInput(query.category ?? query.type);
+    if (normalizedCategory && normalizedCategory.toLowerCase() !== "all") {
+      const pattern = new RegExp(normalizedCategory, "i");
+      filter.$and = [...(filter.$and || []), { $or: [{ category: pattern }, { type: pattern }] }];
     }
 
     if (query.dateFrom || query.dateTo) {
@@ -94,6 +97,7 @@ export class EventService {
     }
 
     const hasGeo = query.lat !== undefined && query.lng !== undefined;
+    let countFilter: FilterQuery<any> = { ...filter };
     if (hasGeo) {
       const maxDistance =
         query.radiusMiles !== undefined
@@ -109,6 +113,22 @@ export class EventService {
           ...(maxDistance ? { $maxDistance: maxDistance } : {}),
         },
       };
+
+      if (maxDistance !== undefined) {
+        countFilter = {
+          ...countFilter,
+          "location.coordinates": {
+            $geoWithin: {
+              $centerSphere: [
+                [query.lng, query.lat],
+                maxDistance / MILES_TO_METERS / EARTH_RADIUS_MILES,
+              ],
+            },
+          },
+        };
+      } else {
+        countFilter = { ...countFilter };
+      }
     }
 
     let sort: Record<string, any> | undefined = { createdAt: -1 };
@@ -127,10 +147,12 @@ export class EventService {
       queryBuilder.sort(sort);
     }
 
-    const [data, totalItems] = await Promise.all([
-      queryBuilder.skip(skip).limit(limit).exec(),
-      Event.countDocuments(filter),
-    ]);
+    const data = await queryBuilder.skip(skip).limit(limit).exec();
+    const totalItems = hasGeo
+      ? query.radiusMiles !== undefined
+        ? await Event.countDocuments(countFilter)
+        : data.length
+      : await Event.countDocuments(filter);
 
     const eventIds = data.map((item: any) => item._id);
     const participants = eventIds.length
@@ -173,7 +195,7 @@ export class EventService {
         creatorId: creator?._id?.toString?.() || creator?.toString?.() || null,
         name: item.title,
         title: item.title,
-        type: item.type,
+        category: this.getEventCategoryValue(item),
         description: item.description || null,
         creatorName: creator?.fullName || null,
         creatorUsername: creator?.email
@@ -224,6 +246,7 @@ export class EventService {
   async create(payload: {
     creatorId: string;
     title?: string;
+    category?: string;
     type?: string;
     description?: string;
     date?: Date;
@@ -282,11 +305,12 @@ export class EventService {
     const mediaIds = Array.from(
       new Set([...(payload.mediaIds || []), ...uploadedMediaIds]),
     );
+    const normalizedCategory = this.normalizeCategoryInput(payload.category ?? payload.type);
 
     return Event.create({
       creatorId: payload.creatorId,
       title: payload.title || "Untitled Event",
-      type: payload.type || "general",
+      category: normalizedCategory || "general",
       description: payload.description,
       country: geography.country!,
       state: geography.state,
@@ -378,7 +402,7 @@ export class EventService {
       creatorId: creator?._id?.toString?.() || null,
       name: event.title,
       title: event.title,
-      type: event.type,
+      category: this.getEventCategoryValue(event),
       description: event.description || null,
       startAt: event.startAt,
       endAt: event.endAt || null,
@@ -520,6 +544,7 @@ export class EventService {
     userId: string,
     payload: {
       title?: string;
+      category?: string;
       type?: string;
       description?: string;
       date?: Date;
@@ -551,9 +576,11 @@ export class EventService {
       event.title = payload.title;
       changedFields.push("title");
     }
-    if (payload.type !== undefined) {
-      event.type = payload.type;
-      changedFields.push("type");
+    if (payload.category !== undefined || payload.type !== undefined) {
+      const normalizedCategory = this.normalizeCategoryInput(payload.category ?? payload.type);
+      event.category = normalizedCategory as any;
+      event.type = undefined as any;
+      changedFields.push("category");
     }
     if (payload.description !== undefined) {
       event.description = payload.description;
@@ -911,6 +938,16 @@ export class EventService {
 
   private roundMoney(value: number): number {
     return Number(value.toFixed(2));
+  }
+
+  private normalizeCategoryInput(category?: string) {
+    if (category === undefined) return undefined;
+    const normalized = String(category).trim();
+    return normalized.length ? normalized : undefined;
+  }
+
+  private getEventCategoryValue(event: any) {
+    return event?.category || event?.type || "general";
   }
 
   private calculatePayableTicketPrice(

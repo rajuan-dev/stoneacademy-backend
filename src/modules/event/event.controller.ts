@@ -19,6 +19,12 @@ export class EventController {
     this.service = new EventService();
   }
 
+  private serializeWriteResponse(event: any) {
+    const data = event?.toObject ? event.toObject() : { ...event };
+    delete data.type;
+    return data;
+  }
+
   list = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(listEventsSchema, req);
     const result = await this.service.list({
@@ -71,7 +77,11 @@ export class EventController {
       mediaFiles,
       ...validated.body,
     });
-    ApiResponse.created(res, event, "Event created successfully");
+    ApiResponse.created(
+      res,
+      this.serializeWriteResponse(event),
+      "Event created successfully",
+    );
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
@@ -108,14 +118,22 @@ export class EventController {
       userId,
       validated.body,
     );
-    ApiResponse.success(res, event, "Event updated successfully");
+    ApiResponse.success(
+      res,
+      this.serializeWriteResponse(event),
+      "Event updated successfully",
+    );
   });
 
   remove = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(eventIdSchema, req);
     const userId = req.user?.userId as string;
     const event = await this.service.remove(validated.params.id, userId);
-    ApiResponse.success(res, event, "Event cancelled successfully");
+    ApiResponse.success(
+      res,
+      this.serializeWriteResponse(event),
+      "Event cancelled successfully",
+    );
   });
 
   join = asyncHandler(async (req: Request, res: Response) => {

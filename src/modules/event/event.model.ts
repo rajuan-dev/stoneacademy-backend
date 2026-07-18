@@ -6,7 +6,8 @@ export interface IEvent {
   _id: Types.ObjectId;
   creatorId: Types.ObjectId;
   title: string;
-  type: string;
+  category?: string;
+  type?: string;
   description?: string;
   startAt: Date;
   endAt?: Date;
@@ -48,9 +49,15 @@ const eventSchema = BaseSchemaUtil.createSchema<IEvent>({
     trim: true,
     index: true,
   },
+  category: {
+    type: String,
+    required: false,
+    trim: true,
+    index: true,
+  },
   type: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
     index: true,
   },

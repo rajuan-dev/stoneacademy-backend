@@ -96,6 +96,7 @@ const locationSchema = z
 export const createActivitySchema = z.object({
   body: z.object({
     title: z.string().trim().min(1).max(200).optional(),
+    category: z.string().trim().min(1).max(100).optional(),
     type: z.string().trim().min(1).max(100).optional(),
     description: z.string().trim().max(2000).optional(),
     startAt: z.coerce.date().optional(),
@@ -105,7 +106,10 @@ export const createActivitySchema = z.object({
     city: z.string().trim().min(1).max(100).optional(),
     location: locationSchema,
     participantLimit: z.coerce.number().min(1).optional(),
+    distance: z.coerce.number().int().min(0).optional(),
+    distanceType: z.enum(["km", "miles"]).optional(),
     distanceMiles: z.coerce.number().min(0).optional(),
+    duration: z.string().trim().min(1).max(50).optional(),
     mediaIds: z.preprocess(
       parseObject,
       z.array(z.string().trim().min(1)).optional(),
@@ -123,6 +127,7 @@ export const updateActivitySchema = z.object({
   body: z
     .object({
       title: z.string().trim().min(1).max(200).optional(),
+      category: z.string().trim().min(1).max(100).optional(),
       type: z.string().trim().min(1).max(100).optional(),
       description: z.string().trim().max(2000).optional(),
       startAt: z.coerce.date().optional(),
@@ -132,7 +137,10 @@ export const updateActivitySchema = z.object({
       city: z.string().trim().min(1).max(100).optional(),
       location: locationSchema,
       participantLimit: z.coerce.number().min(1).optional(),
+      distance: z.coerce.number().int().min(0).optional(),
+      distanceType: z.enum(["km", "miles"]).optional(),
       distanceMiles: z.coerce.number().min(0).optional(),
+      duration: z.string().trim().min(1).max(50).optional(),
       mediaIds: z.preprocess(
         parseObject,
         z.array(z.string().trim().min(1)).optional(),
@@ -166,6 +174,7 @@ export const messageHostSchema = z.object({
 export const listActivitiesSchema = z.object({
   query: z.object({
     q: z.string().trim().max(200).optional(),
+    category: z.string().trim().max(100).optional(),
     type: z.string().trim().max(100).optional(),
     dateFrom: z.coerce.date().optional(),
     dateTo: z.coerce.date().optional(),

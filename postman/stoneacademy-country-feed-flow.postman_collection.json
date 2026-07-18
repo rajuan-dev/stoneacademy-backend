@@ -339,12 +339,26 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Country Filter Event\",\n  \"type\": \"networking\",\n  \"description\": \"Event for geo-filter verification\",\n  \"country\": \"{{country}}\",\n  \"state\": \"{{state}}\",\n  \"city\": \"{{city}}\",\n  \"startAt\": \"2026-08-01T18:00:00.000Z\",\n  \"participantLimit\": 25,\n  \"location\": {\n    \"label\": \"Downtown Los Angeles\",\n    \"coordinates\": [-118.2437, 34.0522]\n  },\n  \"priceType\": \"free\"\n}"
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Country Filter Event", "type": "text" },
+                { "key": "category", "value": "networking", "type": "text" },
+                { "key": "description", "value": "Event for geo-filter verification", "type": "text" },
+                { "key": "country", "value": "{{country}}", "type": "text" },
+                { "key": "state", "value": "{{state}}", "type": "text" },
+                { "key": "city", "value": "{{city}}", "type": "text" },
+                { "key": "date", "value": "2026-08-01", "type": "text" },
+                { "key": "startAt", "value": "2026-08-01T18:00:00.000Z", "type": "text" },
+                { "key": "participantLimit", "value": "25", "type": "text" },
+                { "key": "location", "value": "{\"label\":\"Downtown Los Angeles\",\"latitude\":34.0522,\"longitude\":-118.2437}", "type": "text" },
+                { "key": "priceType", "value": "free", "type": "text" },
+                { "key": "ticketPrice", "value": "0", "type": "text" },
+                { "key": "discountPercentage", "value": "0", "type": "text" },
+                { "key": "currency", "value": "USD", "type": "text" },
+                { "key": "mediaFiles", "type": "file", "src": [] }
+              ]
             },
             "url": "{{baseUrl}}/events"
           }
@@ -365,12 +379,24 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Country Filter Activity\",\n  \"type\": \"sports\",\n  \"description\": \"Activity for geo-filter verification\",\n  \"country\": \"{{country}}\",\n  \"state\": \"{{state}}\",\n  \"city\": \"{{city}}\",\n  \"startAt\": \"2026-08-02T18:00:00.000Z\",\n  \"participantLimit\": 15,\n  \"location\": {\n    \"label\": \"Santa Monica\",\n    \"coordinates\": [-118.4912, 34.0195]\n  }\n}"
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Country Filter Activity", "type": "text" },
+                { "key": "category", "value": "sports", "type": "text" },
+                { "key": "description", "value": "Activity for geo-filter verification", "type": "text" },
+                { "key": "country", "value": "{{country}}", "type": "text" },
+                { "key": "state", "value": "{{state}}", "type": "text" },
+                { "key": "city", "value": "{{city}}", "type": "text" },
+                { "key": "startAt", "value": "2026-08-02T18:00:00.000Z", "type": "text" },
+                { "key": "participantLimit", "value": "15", "type": "text" },
+                { "key": "distance", "value": "5", "type": "text" },
+                { "key": "distanceType", "value": "miles", "type": "text" },
+                { "key": "duration", "value": "45 min", "type": "text" },
+                { "key": "location", "value": "{\"label\":\"Santa Monica\",\"latitude\":34.0195,\"longitude\":-118.4912}", "type": "text" },
+                { "key": "mediaFiles", "type": "file", "src": [] }
+              ]
             },
             "url": "{{baseUrl}}/activities"
           }

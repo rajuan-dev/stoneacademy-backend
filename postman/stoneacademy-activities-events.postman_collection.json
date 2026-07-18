@@ -139,11 +139,11 @@
           "response": []
         },
         {
-          "name": "List Activities (Filter Type + Distance)",
+          "name": "List Activities (Filter Category + Distance)",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/activities?type=walking&lat=23.7643863&lng=90.3890144&radiusMiles=10",
+              "raw": "{{baseUrl}}/activities?category=walking&lat=23.7643863&lng=90.3890144&radiusMiles=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -152,7 +152,7 @@
               ],
               "query": [
                 {
-                  "key": "type",
+                  "key": "category",
                   "value": "walking"
                 },
                 {
@@ -198,7 +198,7 @@
                   "type": "text"
                 },
                 {
-                  "key": "type",
+                  "key": "category",
                   "value": "walking",
                   "type": "text"
                 },
@@ -218,8 +218,18 @@
                   "type": "text"
                 },
                 {
-                  "key": "distanceMiles",
+                  "key": "distance",
                   "value": "3",
+                  "type": "text"
+                },
+                {
+                  "key": "distanceType",
+                  "value": "miles",
+                  "type": "text"
+                },
+                {
+                  "key": "duration",
+                  "value": "30 min",
                   "type": "text"
                 },
                 {
@@ -339,11 +349,11 @@
           "response": []
         },
         {
-          "name": "List Events (Filter Type + Distance)",
+          "name": "List Events (Filter Category + Distance)",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/events?type=running&lat=23.7643863&lng=90.3890144&radiusMiles=10",
+              "raw": "{{baseUrl}}/events?category=running&lat=23.7643863&lng=90.3890144&radiusMiles=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -352,7 +362,7 @@
               ],
               "query": [
                 {
-                  "key": "type",
+                  "key": "category",
                   "value": "running"
                 },
                 {
@@ -403,18 +413,18 @@
                   "type": "text"
                 },
                 {
-                  "key": "type",
+                  "key": "category",
                   "value": "walking",
                   "type": "text"
                 },
                 {
                   "key": "date",
-                  "value": "2026-02-16",
+                  "value": "2026-08-20",
                   "type": "text"
                 },
                 {
                   "key": "startAt",
-                  "value": "2026-02-15T00:48:12.000Z",
+                  "value": "2026-08-20T00:48:12.000Z",
                   "type": "text"
                 },
                 {

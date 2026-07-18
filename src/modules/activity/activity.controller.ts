@@ -20,6 +20,12 @@ export class ActivityController {
     this.service = new ActivityService();
   }
 
+  private serializeWriteResponse(activity: any) {
+    const data = activity?.toObject ? activity.toObject() : { ...activity };
+    delete data.type;
+    return data;
+  }
+
   list = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(listActivitiesSchema, req);
     const result = await this.service.list({
@@ -60,7 +66,11 @@ export class ActivityController {
       mediaFiles,
       ...validated.body,
     });
-    ApiResponse.created(res, activity, "Activity created successfully");
+    ApiResponse.created(
+      res,
+      this.serializeWriteResponse(activity),
+      "Activity created successfully",
+    );
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
@@ -91,14 +101,22 @@ export class ActivityController {
       userId,
       validated.body,
     );
-    ApiResponse.success(res, activity, "Activity updated successfully");
+    ApiResponse.success(
+      res,
+      this.serializeWriteResponse(activity),
+      "Activity updated successfully",
+    );
   });
 
   remove = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(activityIdSchema, req);
     const userId = req.user?.userId as string;
     const activity = await this.service.remove(validated.params.id, userId);
-    ApiResponse.success(res, activity, "Activity cancelled successfully");
+    ApiResponse.success(
+      res,
+      this.serializeWriteResponse(activity),
+      "Activity cancelled successfully",
+    );
   });
 
   join = asyncHandler(async (req: Request, res: Response) => {
@@ -126,7 +144,11 @@ export class ActivityController {
     const validated = await zParse(activityIdSchema, req);
     const userId = req.user?.userId as string;
     const activity = await this.service.cancel(validated.params.id, userId);
-    ApiResponse.success(res, activity, "Activity cancelled successfully");
+    ApiResponse.success(
+      res,
+      this.serializeWriteResponse(activity),
+      "Activity cancelled successfully",
+    );
   });
 
   messageHost = asyncHandler(async (req: Request, res: Response) => {

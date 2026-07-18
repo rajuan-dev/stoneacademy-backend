@@ -436,7 +436,7 @@ export class ReportService {
   ) {
     if (entityType === "activity") {
       const activity = await Activity.findById(entityId)
-        .select("title type description status hostId startAt endAt participantLimit")
+        .select("title category type description status hostId startAt endAt participantLimit")
         .populate("hostId", "fullName email profileImageUrl")
         .lean();
 
@@ -446,7 +446,7 @@ export class ReportService {
         kind: "activity",
         id: activity._id.toString(),
         title: activity.title || null,
-        type: activity.type || null,
+        category: (activity as any).category || activity.type || null,
         description: activity.description || null,
         status: activity.status || null,
         startAt: activity.startAt || null,
@@ -459,7 +459,7 @@ export class ReportService {
     if (entityType === "event") {
       const event = await Event.findById(entityId)
         .select(
-          "title type description status creatorId startAt endAt participantLimit priceType ticketPrice discountPercentage currency",
+          "title category type description status creatorId startAt endAt participantLimit priceType ticketPrice discountPercentage currency",
         )
         .populate("creatorId", "fullName email profileImageUrl")
         .lean();
@@ -470,7 +470,7 @@ export class ReportService {
         kind: "event",
         id: event._id.toString(),
         title: event.title || null,
-        type: event.type || null,
+        category: (event as any).category || event.type || null,
         description: event.description || null,
         status: event.status || null,
         startAt: event.startAt || null,

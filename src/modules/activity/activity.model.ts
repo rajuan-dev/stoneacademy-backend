@@ -8,7 +8,8 @@ export interface IActivity {
   _id: Types.ObjectId;
   hostId: Types.ObjectId;
   title: string;
-  type: string;
+  category?: string;
+  type?: string;
   description?: string;
   startAt: Date;
   endAt?: Date;
@@ -22,7 +23,10 @@ export interface IActivity {
       coordinates: [number, number];
     };
   };
+  distance?: number;
+  distanceType?: "km" | "miles";
   distanceMiles?: number;
+  duration?: string;
   participantLimit?: number;
   media?: Types.ObjectId[];
   status: (typeof ACTIVITY_STATUS)[keyof typeof ACTIVITY_STATUS];
@@ -45,9 +49,15 @@ const activitySchema = BaseSchemaUtil.createSchema<IActivity>({
     trim: true,
     index: true,
   },
+  category: {
+    type: String,
+    required: false,
+    trim: true,
+    index: true,
+  },
   type: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
     index: true,
   },
@@ -94,9 +104,23 @@ const activitySchema = BaseSchemaUtil.createSchema<IActivity>({
       },
     },
   },
+  distance: {
+    type: Number,
+    min: 0,
+    integer: true,
+  },
+  distanceType: {
+    type: String,
+    enum: ["km", "miles"],
+    trim: true,
+  },
   distanceMiles: {
     type: Number,
     min: 0,
+  },
+  duration: {
+    type: String,
+    trim: true,
   },
   participantLimit: {
     type: Number,

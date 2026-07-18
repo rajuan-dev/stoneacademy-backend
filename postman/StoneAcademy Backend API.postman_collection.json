@@ -494,7 +494,7 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/feed/search-filter?kind=all&type=walking&date=2026-08-20&paid=all",
+                      "raw": "{{baseUrl}}/feed/search-filter?kind=all&category=walking&date=2026-08-20&paid=all",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -508,7 +508,7 @@
                           "value": "all"
                         },
                         {
-                          "key": "type",
+                          "key": "category",
                           "value": "walking"
                         },
                         {
@@ -544,7 +544,7 @@
                           "value": "activity"
                         },
                         {
-                          "key": "type",
+                          "key": "category",
                           "value": "Cycling",
                           "disabled": true
                         },
@@ -567,7 +567,7 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Yoga&date=2026-08-20&paid=free",
+                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&category=Yoga&date=2026-08-20&paid=free",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -581,7 +581,7 @@
                           "value": "event"
                         },
                         {
-                          "key": "type",
+                          "key": "category",
                           "value": "Yoga"
                         },
                         {
@@ -603,7 +603,7 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Swimming&date=2026-08-20&paid=paid",
+                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&category=Swimming&date=2026-08-20&paid=paid",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -617,7 +617,7 @@
                           "value": "event"
                         },
                         {
-                          "key": "type",
+                          "key": "category",
                           "value": "Swimming"
                         },
                         {
@@ -1218,12 +1218,12 @@
                           "response": []
                         },
                         {
-                          "name": "List Activities (Filter Type + Distance)",
+                          "name": "List Activities (Filter Category + Distance)",
                           "request": {
                             "method": "GET",
                             "header": [],
                             "url": {
-                              "raw": "{{baseUrl}}/activities?type=walking",
+                              "raw": "{{baseUrl}}/activities?category=walking",
                               "host": [
                                 "{{baseUrl}}"
                               ],
@@ -1232,7 +1232,7 @@
                               ],
                               "query": [
                                 {
-                                  "key": "type",
+                                  "key": "category",
                                   "value": "walking"
                                 }
                               ]
@@ -1286,13 +1286,28 @@
                                   "type": "text"
                                 },
                                 {
-                                  "key": "type",
+                                  "key": "category",
                                   "value": "walking",
                                   "type": "text"
                                 },
                                 {
                                   "key": "description",
                                   "value": "Community walk activity",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "country",
+                                  "value": "Bangladesh",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "state",
+                                  "value": "Dhaka Division",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "city",
+                                  "value": "Dhaka",
                                   "type": "text"
                                 },
                                 {
@@ -1306,17 +1321,27 @@
                                   "type": "text"
                                 },
                                 {
-                                  "key": "distanceMiles",
+                                  "key": "distance",
                                   "value": "3",
                                   "type": "text"
                                 },
                                 {
-                                  "key": "location",
-                                  "value": "{\"label\":\"Dhaka\",\"coordinates\":[90.3890144,23.7643863]}",
+                                  "key": "distanceType",
+                                  "value": "miles",
                                   "type": "text"
                                 },
                                 {
-                                  "key": "media",
+                                  "key": "duration",
+                                  "value": "30 min",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "location",
+                                  "value": "{\"label\":\"Dhaka, Bangladesh\",\"latitude\":23.7643863,\"longitude\":90.3890144}",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "mediaFiles",
                                   "type": "file",
                                   "value": null
                                 }
@@ -1349,6 +1374,10 @@
                             },
                             "method": "POST",
                             "header": [],
+                            "body": {
+                              "mode": "formdata",
+                              "formdata": []
+                            },
                             "url": {
                               "raw": "{{baseUrl}}/activities/{{activityId}}/join",
                               "host": [
@@ -1453,12 +1482,12 @@
                           "response": []
                         },
                         {
-                          "name": "List Events (Filter Type + Distance)",
+                          "name": "List Events (Filter Category + Distance)",
                           "request": {
                             "method": "GET",
                             "header": [],
                             "url": {
-                              "raw": "{{baseUrl}}/events?type=walking",
+                              "raw": "{{baseUrl}}/events?category=walking",
                               "host": [
                                 "{{baseUrl}}"
                               ],
@@ -1467,7 +1496,7 @@
                               ],
                               "query": [
                                 {
-                                  "key": "type",
+                                  "key": "category",
                                   "value": "walking"
                                 }
                               ]
@@ -1526,13 +1555,28 @@
                                   "type": "text"
                                 },
                                 {
-                                  "key": "type",
+                                  "key": "category",
                                   "value": "walking",
                                   "type": "text"
                                 },
                                 {
                                   "key": "date",
                                   "value": "2026-08-20",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "country",
+                                  "value": "Bangladesh",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "state",
+                                  "value": "Dhaka Division",
+                                  "type": "text"
+                                },
+                                {
+                                  "key": "city",
+                                  "value": "Dhaka",
                                   "type": "text"
                                 },
                                 {
@@ -1597,8 +1641,22 @@
                         {
                           "name": "Join Event (Free Event)",
                           "request": {
+                            "auth": {
+                              "type": "bearer",
+                              "bearer": [
+                                {
+                                  "key": "token",
+                                  "value": "{{accessToken}}",
+                                  "type": "string"
+                                }
+                              ]
+                            },
                             "method": "POST",
                             "header": [],
+                            "body": {
+                              "mode": "formdata",
+                              "formdata": []
+                            },
                             "url": {
                               "raw": "{{baseUrl}}/events/{{eventId}}/join",
                               "host": [
@@ -1616,16 +1674,27 @@
                         {
                           "name": "Join Event (Paid Event)",
                           "request": {
+                            "auth": {
+                              "type": "bearer",
+                              "bearer": [
+                                {
+                                  "key": "token",
+                                  "value": "{{accessToken}}",
+                                  "type": "string"
+                                }
+                              ]
+                            },
                             "method": "POST",
-                            "header": [
-                              {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                              }
-                            ],
+                            "header": [],
                             "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"providerReference\": \"PAYMENT_REF_123\"\n}"
+                              "mode": "formdata",
+                              "formdata": [
+                                {
+                                  "key": "providerReference",
+                                  "value": "PAYMENT_REF_123",
+                                  "type": "text"
+                                }
+                              ]
                             },
                             "url": {
                               "raw": "{{baseUrl}}/events/{{eventId}}/join",
@@ -1750,8 +1819,22 @@
                         {
                           "name": "Join",
                           "request": {
+                            "auth": {
+                              "type": "bearer",
+                              "bearer": [
+                                {
+                                  "key": "token",
+                                  "value": "{{accessToken}}",
+                                  "type": "string"
+                                }
+                              ]
+                            },
                             "method": "POST",
                             "header": [],
+                            "body": {
+                              "mode": "formdata",
+                              "formdata": []
+                            },
                             "url": {
                               "raw": "{{baseUrl}}/activities/:id/join",
                               "host": [
@@ -1891,16 +1974,27 @@
                         {
                           "name": "Join",
                           "request": {
+                            "auth": {
+                              "type": "bearer",
+                              "bearer": [
+                                {
+                                  "key": "token",
+                                  "value": "{{accessToken}}",
+                                  "type": "string"
+                                }
+                              ]
+                            },
                             "method": "POST",
-                            "header": [
-                              {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                              }
-                            ],
+                            "header": [],
                             "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"providerReference\": \"manual\"\n}"
+                              "mode": "formdata",
+                              "formdata": [
+                                {
+                                  "key": "providerReference",
+                                  "value": "manual",
+                                  "type": "text"
+                                }
+                              ]
                             },
                             "url": {
                               "raw": "{{baseUrl}}/events/:id/join",

@@ -68,6 +68,33 @@ const nullableNumber = (value: unknown) => {
   return value;
 };
 
+const parseDurationMinutes = (value: unknown) => {
+  if (value === null || value === undefined || value === "" || value === "null") {
+    return undefined;
+  }
+
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim();
+    if (!normalized) return undefined;
+
+    const exactNumber = Number(normalized);
+    if (Number.isFinite(exactNumber)) {
+      return exactNumber;
+    }
+
+    const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(min|mins|minute|minutes)?$/i);
+    if (match) {
+      return Number(match[1]);
+    }
+  }
+
+  return value;
+};
+
 const locationSchema = z
   .preprocess(normalizeLocationInput, z.any().optional())
   .transform((value) => {
@@ -104,6 +131,7 @@ export const createEventSchema = z.object({
   body: z
     .object({
       title: z.string().trim().min(1).max(200).optional(),
+      category: z.string().trim().min(1).max(100).optional(),
       type: z.string().trim().min(1).max(100).optional(),
       description: z.string().trim().max(2000).optional(),
       date: z.coerce.date().optional(),
@@ -127,7 +155,10 @@ export const createEventSchema = z.object({
         nullableNumber,
         z.coerce.number().min(0).max(100).optional(),
       ),
-      durationMinutes: z.coerce.number().int().min(1).optional(),
+      durationMinutes: z.preprocess(
+        parseDurationMinutes,
+        z.coerce.number().int().min(1).optional(),
+      ),
       currency: z.string().trim().min(3).max(10).optional(),
     })
     .superRefine((data, ctx) => {
@@ -164,6 +195,7 @@ export const updateEventSchema = z.object({
   body: z
     .object({
       title: z.string().trim().min(1).max(200).optional(),
+      category: z.string().trim().min(1).max(100).optional(),
       type: z.string().trim().min(1).max(100).optional(),
       description: z.string().trim().max(2000).optional(),
       date: z.coerce.date().optional(),
@@ -187,7 +219,10 @@ export const updateEventSchema = z.object({
         nullableNumber,
         z.coerce.number().min(0).max(100).optional(),
       ),
-      durationMinutes: z.coerce.number().int().min(1).optional(),
+      durationMinutes: z.preprocess(
+        parseDurationMinutes,
+        z.coerce.number().int().min(1).optional(),
+      ),
       currency: z.string().trim().min(3).max(10).optional(),
     })
     .superRefine((data, ctx) => {
@@ -241,6 +276,7 @@ export const eventIdSchema = z.object({
 export const listEventsSchema = z.object({
   query: z.object({
     q: z.string().trim().max(200).optional(),
+    category: z.string().trim().max(100).optional(),
     type: z.string().trim().max(100).optional(),
     dateFrom: z.coerce.date().optional(),
     dateTo: z.coerce.date().optional(),

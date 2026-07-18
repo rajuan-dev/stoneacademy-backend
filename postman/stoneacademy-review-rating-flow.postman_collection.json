@@ -108,9 +108,12 @@
               "mode": "formdata",
               "formdata": [
                 { "key": "title", "value": "Rating Test Activity", "type": "text" },
-                { "key": "type", "value": "walking", "type": "text" },
+                { "key": "category", "value": "walking", "type": "text" },
                 { "key": "description", "value": "Activity for review testing", "type": "text" },
                 { "key": "startAt", "value": "2026-08-20T10:00:00.000Z", "type": "text" },
+                { "key": "country", "value": "United States", "type": "text" },
+                { "key": "state", "value": "California", "type": "text" },
+                { "key": "city", "value": "San Francisco", "type": "text" },
                 { "key": "participantLimit", "value": "20", "type": "text" },
                 { "key": "location", "value": "{\"label\":\"San Francisco\",\"coordinates\":[-122.4194,37.7749]}", "type": "text" }
               ]
@@ -144,9 +147,12 @@
               "mode": "formdata",
               "formdata": [
                 { "key": "title", "value": "Rating Test Event", "type": "text" },
-                { "key": "type", "value": "running", "type": "text" },
+                { "key": "category", "value": "running", "type": "text" },
                 { "key": "description", "value": "Event for review testing", "type": "text" },
                 { "key": "startAt", "value": "2026-08-21T14:00:00.000Z", "type": "text" },
+                { "key": "country", "value": "United States", "type": "text" },
+                { "key": "state", "value": "California", "type": "text" },
+                { "key": "city", "value": "San Francisco", "type": "text" },
                 { "key": "durationMinutes", "value": "90", "type": "text" },
                 { "key": "participantLimit", "value": "50", "type": "text" },
                 { "key": "location", "value": "{\"latitude\":37.7749,\"longitude\":-122.4194}", "type": "text" },
