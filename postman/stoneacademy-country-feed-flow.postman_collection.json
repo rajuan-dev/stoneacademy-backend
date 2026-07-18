@@ -34,7 +34,11 @@
     { "key": "activityId", "value": "" },
     { "key": "adId", "value": "" },
     { "key": "creatorUserId", "value": "" },
-    { "key": "galleryMediaId", "value": "" }
+    { "key": "galleryMediaId", "value": "" },
+    { "key": "lat", "value": "34.0522" },
+    { "key": "lng", "value": "-118.2437" },
+    { "key": "radius", "value": "10" },
+    { "key": "radiusUnit", "value": "mile" }
   ],
   "item": [
     {
@@ -412,6 +416,26 @@
           }
         },
         {
+          "name": "Migrate Shop Products To Ads",
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              { "key": "token", "value": "{{adminToken}}", "type": "string" }
+            ]
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"country\": \"{{country}}\",\n  \"state\": \"{{state}}\",\n  \"city\": \"{{city}}\",\n  \"status\": \"active\",\n  \"onlyActive\": true,\n  \"deleteSource\": true\n}"
+            },
+            "url": "{{baseUrl}}/ads/admin/migrate-products"
+          }
+        },
+        {
           "name": "Update Sponsored Ad",
           "auth": {
             "type": "bearer",
@@ -605,6 +629,62 @@
           }
         },
         {
+          "name": "Home Feed Within Radius",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/feed?lat={{lat}}&lng={{lng}}&radius={{radius}}&radiusUnit={{radiusUnit}}&sort=distance",
+              "host": ["{{baseUrl}}"],
+              "path": ["feed"],
+              "query": [
+                { "key": "lat", "value": "{{lat}}" },
+                { "key": "lng", "value": "{{lng}}" },
+                { "key": "radius", "value": "{{radius}}" },
+                { "key": "radiusUnit", "value": "{{radiusUnit}}" },
+                { "key": "sort", "value": "distance" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Home Feed Free Events Within Radius",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/feed?lat={{lat}}&lng={{lng}}&radius={{radius}}&radiusUnit={{radiusUnit}}&paid=free&sort=distance",
+              "host": ["{{baseUrl}}"],
+              "path": ["feed"],
+              "query": [
+                { "key": "lat", "value": "{{lat}}" },
+                { "key": "lng", "value": "{{lng}}" },
+                { "key": "radius", "value": "{{radius}}" },
+                { "key": "radiusUnit", "value": "{{radiusUnit}}" },
+                { "key": "paid", "value": "free" },
+                { "key": "sort", "value": "distance" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Home Feed Paid Events Within Radius",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/feed?lat={{lat}}&lng={{lng}}&radius={{radius}}&radiusUnit={{radiusUnit}}&paid=paid&sort=distance",
+              "host": ["{{baseUrl}}"],
+              "path": ["feed"],
+              "query": [
+                { "key": "lat", "value": "{{lat}}" },
+                { "key": "lng", "value": "{{lng}}" },
+                { "key": "radius", "value": "{{radius}}" },
+                { "key": "radiusUnit", "value": "{{radiusUnit}}" },
+                { "key": "paid", "value": "paid" },
+                { "key": "sort", "value": "distance" }
+              ]
+            }
+          }
+        },
+        {
           "name": "Search Filter Feed By Kind",
           "event": [
             {
@@ -630,6 +710,26 @@
                 { "key": "kind", "value": "activity" },
                 { "key": "state", "value": "{{state}}" },
                 { "key": "city", "value": "{{city}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Filter Feed By Radius And Paid",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/feed/search-filter?kind=event&lat={{lat}}&lng={{lng}}&radius={{radius}}&radiusUnit={{radiusUnit}}&paid=paid&sort=distance",
+              "host": ["{{baseUrl}}"],
+              "path": ["feed", "search-filter"],
+              "query": [
+                { "key": "kind", "value": "event" },
+                { "key": "lat", "value": "{{lat}}" },
+                { "key": "lng", "value": "{{lng}}" },
+                { "key": "radius", "value": "{{radius}}" },
+                { "key": "radiusUnit", "value": "{{radiusUnit}}" },
+                { "key": "paid", "value": "paid" },
+                { "key": "sort", "value": "distance" }
               ]
             }
           }

@@ -494,7 +494,7 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/feed/search-filter?kind=all&type=walking&date=2026-02-20&paid=all",
+                      "raw": "{{baseUrl}}/feed/search-filter?kind=all&type=walking&date=2026-08-20&paid=all",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -513,7 +513,7 @@
                         },
                         {
                           "key": "date",
-                          "value": "2026-02-20"
+                          "value": "2026-08-20"
                         },
                         {
                           "key": "paid",
@@ -530,7 +530,7 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/feed/search-filter?kind=activity&date=2026-02-20&paid=all",
+                      "raw": "{{baseUrl}}/feed/search-filter?kind=activity&date=2026-08-20&paid=all",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -550,7 +550,7 @@
                         },
                         {
                           "key": "date",
-                          "value": "2026-02-20"
+                          "value": "2026-08-20"
                         },
                         {
                           "key": "paid",
@@ -567,7 +567,7 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Yoga&date=2026-02-20&paid=free",
+                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Yoga&date=2026-08-20&paid=free",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -586,7 +586,7 @@
                         },
                         {
                           "key": "date",
-                          "value": "2026-02-20"
+                          "value": "2026-08-20"
                         },
                         {
                           "key": "paid",
@@ -603,7 +603,7 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Swimming&date=2026-02-20&paid=paid",
+                      "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Swimming&date=2026-08-20&paid=paid",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -622,7 +622,7 @@
                         },
                         {
                           "key": "date",
-                          "value": "2026-02-20"
+                          "value": "2026-08-20"
                         },
                         {
                           "key": "paid",
@@ -1297,7 +1297,7 @@
                                 },
                                 {
                                   "key": "startAt",
-                                  "value": "2026-02-20T08:00:00.000Z",
+                                  "value": "2026-08-20T08:00:00.000Z",
                                   "type": "text"
                                 },
                                 {
@@ -1532,12 +1532,12 @@
                                 },
                                 {
                                   "key": "date",
-                                  "value": "2026-02-20",
+                                  "value": "2026-08-20",
                                   "type": "text"
                                 },
                                 {
                                   "key": "startAt",
-                                  "value": "2026-02-20T00:48:12.000Z",
+                                  "value": "2026-08-20T00:48:12.000Z",
                                   "type": "text"
                                 },
                                 {

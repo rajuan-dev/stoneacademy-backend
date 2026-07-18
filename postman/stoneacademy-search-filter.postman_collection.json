@@ -17,7 +17,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=all&type=Running&date=2026-02-20&paid=all",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=all&type=Running&date=2026-08-20&paid=all",
           "host": [
             "{{baseUrl}}"
           ],
@@ -28,7 +28,7 @@
           "query": [
             { "key": "kind", "value": "all" },
             { "key": "type", "value": "Running" },
-            { "key": "date", "value": "2026-02-20" },
+            { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "all" }
           ]
         }
@@ -40,7 +40,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=activity&type=Cycling&date=2026-02-20&paid=all",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=activity&type=Cycling&date=2026-08-20&paid=all",
           "host": [
             "{{baseUrl}}"
           ],
@@ -51,7 +51,7 @@
           "query": [
             { "key": "kind", "value": "activity" },
             { "key": "type", "value": "Cycling" },
-            { "key": "date", "value": "2026-02-20" },
+            { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "all" }
           ]
         }
@@ -63,7 +63,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Yoga&date=2026-02-20&paid=free",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Yoga&date=2026-08-20&paid=free",
           "host": [
             "{{baseUrl}}"
           ],
@@ -74,7 +74,7 @@
           "query": [
             { "key": "kind", "value": "event" },
             { "key": "type", "value": "Yoga" },
-            { "key": "date", "value": "2026-02-20" },
+            { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "free" }
           ]
         }
@@ -86,7 +86,7 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Swimming&date=2026-02-20&paid=paid",
+          "raw": "{{baseUrl}}/feed/search-filter?kind=event&type=Swimming&date=2026-08-20&paid=paid",
           "host": [
             "{{baseUrl}}"
           ],
@@ -97,7 +97,7 @@
           "query": [
             { "key": "kind", "value": "event" },
             { "key": "type", "value": "Swimming" },
-            { "key": "date", "value": "2026-02-20" },
+            { "key": "date", "value": "2026-08-20" },
             { "key": "paid", "value": "paid" }
           ]
         }

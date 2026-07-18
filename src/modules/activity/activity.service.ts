@@ -181,6 +181,7 @@ export class ActivityService {
         startAt: item.startAt,
         createdAt: item.createdAt,
         location: item.location?.label || null,
+        locationCoordinates: coordinates || null,
         country: item.country || null,
         state: item.state || null,
         city: item.city || null,

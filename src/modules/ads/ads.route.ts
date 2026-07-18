@@ -22,6 +22,12 @@ router.post(
   upload.single("image"),
   controller.create,
 );
+router.post(
+  "/admin/migrate-products",
+  authMiddleware.verifyToken,
+  authMiddleware.authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN),
+  controller.migrateShopProducts,
+);
 router.patch(
   "/admin/:id",
   authMiddleware.verifyToken,

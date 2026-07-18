@@ -36,6 +36,17 @@ export const createAdSchema = z.object({
   }),
 });
 
+export const migrateShopProductsSchema = z.object({
+  body: z.object({
+    country: z.string().trim().min(2).max(100),
+    state: z.string().trim().min(1).max(100).optional(),
+    city: z.string().trim().min(1).max(100).optional(),
+    status: z.enum(["active", "expired"]).optional(),
+    onlyActive: z.coerce.boolean().optional(),
+    deleteSource: z.coerce.boolean().optional(),
+  }),
+});
+
 export const updateAdSchema = z.object({
   params: z.object({
     id: z.string().trim().min(1),

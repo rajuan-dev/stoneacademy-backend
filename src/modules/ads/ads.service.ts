@@ -7,6 +7,7 @@ import {
   normalizeGeography,
 } from "@/utils/geography.utils";
 import { Ad } from "./ads.model";
+import { Product } from "@/modules/shop/product.model";
 
 export class AdsService {
   async list(query: { page?: number; limit?: number; status?: "active" | "expired" }) {
@@ -137,6 +138,110 @@ export class AdsService {
       throw new NotFoundException("Ad not found");
     }
     return { deleted: true };
+  }
+
+  async migrateShopProducts(payload: {
+    country: string;
+    state?: string;
+    city?: string;
+    status?: "active" | "expired";
+    onlyActive?: boolean;
+    deleteSource?: boolean;
+  }) {
+    const geography = normalizeGeography({
+      country: payload.country,
+      state: payload.state,
+      city: payload.city,
+    });
+
+    const productFilter: Record<string, any> = {};
+    if (payload.onlyActive !== false) {
+      productFilter.isActive = true;
+    }
+
+    const products = await Product.find(productFilter).exec();
+    const migrated: Array<{ productId: string; adId: string; name: string }> = [];
+    const skipped: Array<{ productId: string; name: string; reason: string }> = [];
+    const deletedSourceIds: string[] = [];
+
+    for (const product of products) {
+      const productId = product._id.toString();
+
+      if (!product.imageUrl) {
+        skipped.push({
+          productId,
+          name: product.name,
+          reason: "missing imageUrl",
+        });
+        continue;
+      }
+
+      const existingAd = await Ad.findOne({
+        $or: [
+          { sourceProductId: product._id },
+          {
+            name: product.name,
+            linkUrl: product.ctaUrl,
+            imageUrl: product.imageUrl,
+          },
+        ],
+      }).exec();
+
+      if (existingAd) {
+        skipped.push({
+          productId,
+          name: product.name,
+          reason: "already migrated",
+        });
+        if (payload.deleteSource !== false) {
+          await Product.deleteOne({ _id: product._id }).exec();
+          deletedSourceIds.push(productId);
+        }
+        continue;
+      }
+
+      const ad = await Ad.create({
+        name: product.name,
+        category: product.category,
+        description: product.description,
+        price: product.price ?? 0,
+        imageUrl: product.imageUrl,
+        linkUrl: product.ctaUrl,
+        sourceProductId: product._id,
+        country: geography.country!,
+        state: geography.state,
+        city: geography.city,
+        status: payload.status ?? (product.isActive ? "active" : "expired"),
+      });
+
+      migrated.push({
+        productId,
+        adId: ad._id.toString(),
+        name: product.name,
+      });
+
+      if (payload.deleteSource !== false) {
+        await Product.deleteOne({ _id: product._id }).exec();
+        deletedSourceIds.push(productId);
+      }
+    }
+
+    return {
+      summary: {
+        scanned: products.length,
+        migrated: migrated.length,
+        skipped: skipped.length,
+        deletedSources: deletedSourceIds.length,
+      },
+      geography: {
+        country: geography.country!,
+        state: geography.state ?? null,
+        city: geography.city ?? null,
+      },
+      migrated,
+      skipped,
+      deletedSourceIds,
+    };
   }
 
   private async uploadAdImage(file: StorageUploadInput, country?: string) {

@@ -9,6 +9,7 @@ export interface IAd {
   price?: number;
   imageUrl: string;
   linkUrl: string;
+  sourceProductId?: Types.ObjectId | null;
   country?: string;
   state?: string;
   city?: string;
@@ -51,6 +52,12 @@ const adSchema = BaseSchemaUtil.createSchema<IAd>({
     trim: true,
     maxlength: 2000,
   },
+  sourceProductId: {
+    type: Schema.Types.ObjectId,
+    ref: "Product",
+    default: null,
+    sparse: true,
+  },
   country: {
     type: String,
     required: true,
@@ -76,5 +83,6 @@ const adSchema = BaseSchemaUtil.createSchema<IAd>({
 });
 
 adSchema.index({ country: 1, state: 1, city: 1, status: 1 });
+adSchema.index({ sourceProductId: 1 }, { unique: true, sparse: true });
 
 export const Ad = model<IAd>("Ad", adSchema);

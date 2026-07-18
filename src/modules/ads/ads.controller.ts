@@ -9,6 +9,7 @@ import {
   createAdSchema,
   listActiveAdsSchema,
   listAdsSchema,
+  migrateShopProductsSchema,
   updateAdSchema,
 } from "./ads.schema";
 
@@ -89,6 +90,12 @@ export class AdsController {
     const validated = await zParse(adIdSchema, req);
     const result = await this.service.remove(validated.params.id);
     ApiResponse.success(res, result, "Ad deleted");
+  });
+
+  migrateShopProducts = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(migrateShopProductsSchema, req);
+    const result = await this.service.migrateShopProducts(validated.body);
+    ApiResponse.success(res, result, "Shop products migrated to ads successfully");
   });
 
   private validateCreativeUpload(file: Express.Multer.File) {
