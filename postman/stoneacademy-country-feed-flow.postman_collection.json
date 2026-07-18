@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "f9d6f8c2-04b8-4307-9238-9cb5b5ebf4dd",
     "name": "StoneAcademy - Country Feed Flow",
-    "description": "Feature-focused collection for country-aware registration, content creation, ads, and unified home feed filtering. Set `otpCode` manually after registration before running OTP verify.",
+    "description": "Feature-focused collection for country-aware registration, creator profile lookup, content creation, sponsored ads, and unified home feed filtering. Set `otpCode` manually after registration before running OTP verify.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -16,7 +16,7 @@
     ]
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:5191/api/v1" },
+    { "key": "baseUrl", "value": "http://localhost:5190/api/v1" },
     { "key": "userEmail", "value": "country.user@example.com" },
     { "key": "userPassword", "value": "Password123!" },
     { "key": "userFullName", "value": "Country Filter User" },
@@ -33,6 +33,7 @@
     { "key": "eventId", "value": "" },
     { "key": "activityId", "value": "" },
     { "key": "adId", "value": "" },
+    { "key": "creatorUserId", "value": "" },
     { "key": "galleryMediaId", "value": "" }
   ],
   "item": [
@@ -77,7 +78,8 @@
                 "exec": [
                   "const res = pm.response.json();",
                   "pm.test('login succeeded', function () { pm.expect(pm.response.code).to.eql(200); });",
-                  "pm.collectionVariables.set('userToken', res.data.accessToken);"
+                  "pm.collectionVariables.set('userToken', res.data.accessToken);",
+                  "pm.collectionVariables.set('creatorUserId', res.data.user._id);"
                 ]
               }
             }
@@ -131,6 +133,18 @@
       "item": [
         {
           "name": "Get My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res?.data?._id) pm.collectionVariables.set('creatorUserId', res.data._id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/users/me"
@@ -282,6 +296,23 @@
             "method": "GET",
             "url": "{{baseUrl}}/users/me/overview"
           }
+        },
+        {
+          "name": "Get Creator Full Profile",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/{{creatorUserId}}/creator-profile?page=1&limit=10&recentLimit=10&mediaLimit=6",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{creatorUserId}}", "creator-profile"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "recentLimit", "value": "10" },
+                { "key": "mediaLimit", "value": "6" }
+              ]
+            }
+          }
         }
       ]
     },
@@ -362,14 +393,49 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Country Sponsored Ad\",\n  \"imageUrl\": \"https://example.com/ad.jpg\",\n  \"linkUrl\": \"https://example.com\",\n  \"country\": \"{{country}}\",\n  \"state\": \"{{state}}\",\n  \"city\": \"{{city}}\",\n  \"status\": \"active\",\n  \"order\": 1\n}"
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Country Sponsored Ad", "type": "text" },
+                { "key": "category", "value": "Fitness", "type": "text" },
+                { "key": "description", "value": "Country-targeted sponsored ad for feed verification", "type": "text" },
+                { "key": "price", "value": "9.99", "type": "text" },
+                { "key": "linkUrl", "value": "https://example.com", "type": "text" },
+                { "key": "country", "value": "{{country}}", "type": "text" },
+                { "key": "state", "value": "{{state}}", "type": "text" },
+                { "key": "city", "value": "{{city}}", "type": "text" },
+                { "key": "status", "value": "active", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
             },
             "url": "{{baseUrl}}/ads/admin"
+          }
+        },
+        {
+          "name": "Update Sponsored Ad",
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              { "key": "token", "value": "{{adminToken}}", "type": "string" }
+            ]
+          },
+          "request": {
+            "method": "PATCH",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Country Sponsored Ad Updated", "type": "text" },
+                { "key": "category", "value": "Fitness", "type": "text" },
+                { "key": "description", "value": "Updated sponsored ad", "type": "text" },
+                { "key": "price", "value": "12.99", "type": "text" },
+                { "key": "linkUrl", "value": "https://example.com/updated", "type": "text" },
+                { "key": "country", "value": "{{country}}", "type": "text" },
+                { "key": "state", "value": "{{state}}", "type": "text" },
+                { "key": "city", "value": "{{city}}", "type": "text" },
+                { "key": "status", "value": "active", "type": "text" }
+              ]
+            },
+            "url": "{{baseUrl}}/ads/admin/{{adId}}"
           }
         }
       ]

@@ -12,6 +12,7 @@ import type { Request, Response } from "express";
 import type { StorageUploadInput } from "@/services/s3.service";
 import {
   cleanerIdSchema,
+  creatorFullProfileSchema,
   createCleanerSchema,
   galleryRemoveSchema,
   listCleanersSchema,
@@ -389,6 +390,15 @@ export class UserController {
       validated.query,
     );
     ApiResponse.success(res, result, "Host profile fetched successfully");
+  });
+
+  getCreatorFullProfile = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(creatorFullProfileSchema, req);
+    const result = await this.userService.getCreatorFullProfile(
+      validated.params.id,
+      validated.query,
+    );
+    ApiResponse.success(res, result, "Creator profile fetched successfully");
   });
 
   blockUser = asyncHandler(async (req: Request, res: Response) => {

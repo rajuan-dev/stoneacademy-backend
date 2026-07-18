@@ -254,6 +254,11 @@ router.get(
   authMiddleware.verifyToken,
   userController.getMyHostedEvents,
 );
+router.get(
+  "/:id/creator-profile",
+  authMiddleware.verifyToken,
+  userController.getCreatorFullProfile,
+);
 router.get("/:id/host-profile", userController.getHostProfile);
 
 /**

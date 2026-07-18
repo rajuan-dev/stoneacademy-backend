@@ -150,6 +150,18 @@ export const hostProfileSchema = z.object({
   }),
 });
 
+export const creatorFullProfileSchema = z.object({
+  params: z.object({
+    id: z.string().trim().min(1),
+  }),
+  query: z.object({
+    recentLimit: z.coerce.number().min(1).max(20).optional(),
+    mediaLimit: z.coerce.number().min(1).max(20).optional(),
+    page: z.coerce.number().min(1).optional(),
+    limit: z.coerce.number().min(1).max(100).optional(),
+  }),
+});
+
 export const galleryRemoveSchema = z.object({
   params: z.object({
     mediaId: z.string().trim().min(1),

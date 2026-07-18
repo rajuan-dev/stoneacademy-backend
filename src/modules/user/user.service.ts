@@ -715,6 +715,101 @@ export class UserService {
     };
   }
 
+  async getCreatorFullProfile(
+    userId: string,
+    query?: {
+      recentLimit?: number;
+      mediaLimit?: number;
+      page?: number;
+      limit?: number;
+    },
+  ) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER.USER_NOT_FOUND);
+    }
+
+    const page = query?.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query?.limit ?? 10;
+
+    const [
+      overview,
+      hostedActivities,
+      hostedEvents,
+      joinedActivities,
+      joinedEvents,
+      ratings,
+      gallery,
+    ] = await Promise.all([
+      this.getMyProfileOverview(userId, {
+        recentLimit: query?.recentLimit,
+        mediaLimit: query?.mediaLimit,
+      }),
+      this.listHostedActivities(userId, { page, limit }),
+      this.listHostedEvents(userId, { page, limit }),
+      this.listJoinedActivities(userId, { page, limit }),
+      this.listJoinedEvents(userId, { page, limit }),
+      this.listMyRatings(userId, { page, limit }),
+      this.getMyGalleryMedia(userId, {
+        page,
+        limit,
+        source: "all",
+        mediaType: "all",
+      }),
+    ]);
+
+    const profile = this.toUserResponse(user);
+    const username = this.deriveUsername(user.email);
+    const locationLabel = this.buildLocationLabel(user);
+    const reviewsCount = overview.socialSnapshot?.reviews ?? 0;
+    const photosCount = overview.socialSnapshot?.photos ?? 0;
+    const videosCount = overview.socialSnapshot?.videos ?? 0;
+
+    return {
+      profile: {
+        ...profile,
+        profileId: profile._id,
+        username,
+        locationLabel,
+        profileImageUrl: user.profileImageUrl || null,
+        coverImageUrl: user.coverImageUrl || null,
+      },
+      hero: {
+        profileId: profile._id,
+        fullName: profile.fullName,
+        username,
+        bio: profile.bio || null,
+        locationLabel,
+        rating: profile.rating || { avg: 0, count: 0 },
+        reviewsCount,
+        photosCount,
+        videosCount,
+        profileImageUrl: user.profileImageUrl || null,
+        coverImageUrl: user.coverImageUrl || null,
+      },
+      about: {
+        bio: profile.bio || null,
+        locationLabel,
+        username,
+        profileId: profile._id,
+        country: profile.country || null,
+        state: profile.state || null,
+        city: profile.city || null,
+      },
+      overview,
+      socialSnapshot: overview.socialSnapshot,
+      metrics: overview.metrics,
+      recentActivity: overview.recentActivity,
+      mediaPreview: overview.mediaPreview,
+      hostedActivities,
+      hostedEvents,
+      joinedActivities,
+      joinedEvents,
+      ratings,
+      gallery,
+    };
+  }
+
   async blockUser(userId: string, targetId: string): Promise<UserResponse> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
@@ -994,35 +1089,14 @@ export class UserService {
         .skip(skip)
         .limit(limit)
         .populate("media", "url type mimeType")
+        .populate("hostId", "fullName email profileImageUrl rating")
         .lean(),
       Activity.countDocuments(filter),
     ]);
 
-    const data = activities.map((activity: any) => ({
-      _id: activity._id.toString(),
-      title: activity.title,
-      type: activity.type,
-      description: activity.description || null,
-      startAt: activity.startAt,
-      endAt: activity.endAt || null,
-      location: activity.location?.label || null,
-      locationCoordinates: activity.location?.coordinates?.coordinates || null,
-      participantLimit: activity.participantLimit ?? null,
-      status: activity.status,
-      stats: {
-        joinedCount: activity.stats?.joinedCount ?? 0,
-      },
-      gallery: Array.isArray(activity.media)
-        ? activity.media.map((media: any) => ({
-            _id: media._id?.toString?.() || null,
-            url: media.url || null,
-            type: media.type || null,
-            mimeType: media.mimeType || null,
-          }))
-        : [],
-      createdAt: activity.createdAt,
-      updatedAt: activity.updatedAt,
-    }));
+    const data = activities.map((activity: any) =>
+      this.formatActivityCard(activity, activity.hostId),
+    );
 
     return {
       data,
@@ -1052,48 +1126,14 @@ export class UserService {
         .skip(skip)
         .limit(limit)
         .populate("media", "url type mimeType")
+        .populate("creatorId", "fullName email profileImageUrl rating")
         .lean(),
       Event.countDocuments(filter),
     ]);
 
-    const data = events.map((event: any) => {
-      const ticketPrice = event.ticketPrice ?? 0;
-      const discountPercentage = event.discountPercentage ?? 0;
-      return {
-        _id: event._id.toString(),
-        title: event.title,
-        type: event.type,
-        description: event.description || null,
-        startAt: event.startAt,
-        endAt: event.endAt || null,
-        location: event.location?.label || null,
-        locationCoordinates: event.location?.coordinates?.coordinates || null,
-        participantLimit: event.participantLimit ?? null,
-        durationMinutes: event.durationMinutes != null ? String(event.durationMinutes) : null,
-        status: event.status,
-        priceType: event.priceType || "free",
-        ticketPrice,
-        discountPercentage,
-        payableTicketPrice: this.calculatePayablePrice(
-          ticketPrice,
-          discountPercentage,
-        ),
-        currency: event.currency || "USD",
-        stats: {
-          joinedCount: event.stats?.joinedCount ?? 0,
-        },
-        gallery: Array.isArray(event.media)
-          ? event.media.map((media: any) => ({
-              _id: media._id?.toString?.() || null,
-              url: media.url || null,
-              type: media.type || null,
-              mimeType: media.mimeType || null,
-            }))
-          : [],
-        createdAt: event.createdAt,
-        updatedAt: event.updatedAt,
-      };
-    });
+    const data = events.map((event: any) =>
+      this.formatEventCard(event, event.creatorId),
+    );
 
     return {
       data,
@@ -1456,15 +1496,7 @@ export class UserService {
       stats: {
         joinedCount: activity.stats?.joinedCount ?? 0,
       },
-      host: host
-        ? {
-            _id: host._id?.toString?.() || null,
-            fullName: host.fullName || null,
-            username: host.email ? String(host.email).split("@")[0] : null,
-            profileImageUrl: host.profileImageUrl || null,
-            rating: host.rating || { avg: 0, count: 0 },
-          }
-        : null,
+      host: this.formatHostSummary(host),
       gallery: Array.isArray(activity.media)
         ? activity.media.map((media: any) => ({
             _id: media._id?.toString?.() || null,
@@ -1481,6 +1513,7 @@ export class UserService {
   private formatEventCard(event: any, creator?: any) {
     const ticketPrice = event.ticketPrice ?? 0;
     const discountPercentage = event.discountPercentage ?? 0;
+    const host = this.formatHostSummary(creator);
 
     return {
       _id: event._id.toString(),
@@ -1505,15 +1538,8 @@ export class UserService {
       stats: {
         joinedCount: event.stats?.joinedCount ?? 0,
       },
-      creator: creator
-        ? {
-            _id: creator._id?.toString?.() || null,
-            fullName: creator.fullName || null,
-            username: creator.email ? String(creator.email).split("@")[0] : null,
-            profileImageUrl: creator.profileImageUrl || null,
-            rating: creator.rating || { avg: 0, count: 0 },
-          }
-        : null,
+      host,
+      creator: host,
       gallery: Array.isArray(event.media)
         ? event.media.map((media: any) => ({
             _id: media._id?.toString?.() || null,
@@ -1534,5 +1560,35 @@ export class UserService {
     }
     const discounted = ticketPrice - (ticketPrice * discountPercentage) / 100;
     return Number(Math.max(0, discounted).toFixed(2));
+  }
+
+  private formatHostSummary(host?: any) {
+    if (!host) return null;
+
+    return {
+      _id: host._id?.toString?.() || null,
+      fullName: host.fullName || null,
+      username: host.email ? String(host.email).split("@")[0] : null,
+      profileImageUrl: host.profileImageUrl || null,
+      rating: host.rating || { avg: 0, count: 0 },
+    };
+  }
+
+  private deriveUsername(email?: string | null) {
+    if (!email) return null;
+    const [username] = String(email).split("@");
+    return username || null;
+  }
+
+  private buildLocationLabel(user: IUser) {
+    if (user.location?.label?.trim()) {
+      return user.location.label.trim();
+    }
+
+    const parts = [user.city, user.state, user.country]
+      .map((part) => String(part || "").trim())
+      .filter(Boolean);
+
+    return parts.length ? parts.join(", ") : null;
   }
 }
