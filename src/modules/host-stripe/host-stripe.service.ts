@@ -7,6 +7,46 @@ import {
 import { User } from "../user/user.model";
 
 export class HostStripeService {
+  async getHostMe(hostId: string) {
+    const host = await User.findById(hostId).lean();
+    if (!host) {
+      throw new NotFoundException("Host not found");
+    }
+
+    return {
+      _id: host._id.toString(),
+      email: host.email,
+      fullName: host.fullName,
+      phone: host.phone || host.phoneNumber || null,
+      phoneNumber: host.phoneNumber || host.phone || null,
+      country: host.country || null,
+      state: host.state || null,
+      city: host.city || null,
+      dob: host.dob ?? null,
+      gender: host.gender ?? null,
+      bio: host.bio || null,
+      location: host.location || null,
+      role: host.role,
+      status: host.status,
+      accountStatus: host.accountStatus,
+      emailVerified: Boolean(host.emailVerified),
+      emailVerifiedAt: host.emailVerifiedAt ?? null,
+      rating: host.rating || { avg: 0, count: 0 },
+      creatorStatus: host.creatorStatus || {
+        subscriptionActive: false,
+        subscriptionId: null,
+      },
+      profileImage: host.profileImageUrl || null,
+      coverImage: host.coverImageUrl || null,
+      stripeAccountId: host.stripeAccountId || null,
+      stripeCustomerId: host.stripeCustomerId || null,
+      stripeOnboardingCompleted: Boolean(host.stripeOnboardingCompleted),
+      hasStripeAccount: Boolean(host.stripeAccountId),
+      createdAt: host.createdAt,
+      updatedAt: host.updatedAt,
+    };
+  }
+
   async createConnectedAccountForHost(
     hostId: string,
     payload?: { email?: string },

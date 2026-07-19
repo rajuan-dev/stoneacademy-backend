@@ -487,6 +487,7 @@ export class ActivityService {
       distanceMiles?: number;
       duration?: string;
       mediaIds?: string[];
+      mediaFiles?: Express.Multer.File[];
       status?: string;
     },
   ) {
@@ -572,6 +573,19 @@ export class ActivityService {
     if (payload.mediaIds !== undefined) {
       activity.media = payload.mediaIds as any;
       changedFields.push("media");
+    }
+    if (payload.mediaFiles?.length) {
+      const uploadedMediaIds = await this.uploadMediaFiles(userId, payload.mediaFiles);
+      const existingMediaIds = Array.isArray(activity.media)
+        ? activity.media.map((mediaId: any) => mediaId.toString())
+        : [];
+      const baseMediaIds = payload.mediaIds !== undefined
+        ? payload.mediaIds
+        : existingMediaIds;
+      activity.media = Array.from(new Set([...baseMediaIds, ...uploadedMediaIds])) as any;
+      if (!changedFields.includes("media")) {
+        changedFields.push("media");
+      }
     }
     if (payload.status !== undefined) {
       activity.status = payload.status as any;

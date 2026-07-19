@@ -15,6 +15,12 @@ export class HostStripeController {
     this.service = new HostStripeService();
   }
 
+  getMe = asyncHandler(async (req: Request, res: Response) => {
+    const hostId = req.user?.userId as string;
+    const result = await this.service.getHostMe(hostId);
+    ApiResponse.success(res, result, "Host profile fetched successfully");
+  });
+
   createStripeAccount = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(createStripeAccountSchema, req);
     const hostId = req.user?.userId as string;

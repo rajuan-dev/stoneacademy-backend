@@ -163,7 +163,12 @@ router.get("/:id/joined-users", authMiddleware.verifyToken, controller.getJoined
  *       200:
  *         description: Updated
  */
-router.patch("/:id", authMiddleware.verifyToken, controller.update);
+router.patch(
+  "/:id",
+  authMiddleware.verifyToken,
+  upload.any(),
+  controller.update,
+);
 /**
  * @openapi
  * /activities/{id}:

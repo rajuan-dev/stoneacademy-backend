@@ -111,12 +111,45 @@ export class EventController {
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {
+    const locationLatitude = (req.body as any)?.["location[latitude]"];
+    const locationLongitude = (req.body as any)?.["location[longitude]"];
+    const locationLabel = (req.body as any)?.["location[label]"];
+
+    if (
+      req.body
+      && !req.body.location
+      && locationLatitude !== undefined
+      && locationLongitude !== undefined
+    ) {
+      req.body.location = {
+        latitude: locationLatitude,
+        longitude: locationLongitude,
+        ...(locationLabel !== undefined ? { label: locationLabel } : {}),
+      };
+    }
+
     const validated = await zParse(updateEventSchema, req);
     const userId = req.user?.userId as string;
+    const rawFiles = req.files as
+      | Express.Multer.File[]
+      | Record<string, Express.Multer.File[]>
+      | undefined;
+
+    const mediaFiles = Array.isArray(rawFiles)
+      ? rawFiles.filter(Boolean)
+      : [
+          ...(rawFiles?.media || []),
+          ...(rawFiles?.mediaFiles || []),
+          ...(rawFiles?.["mediaFiles[]"] || []),
+        ].filter(Boolean);
+
     const event = await this.service.update(
       validated.params.id,
       userId,
-      validated.body,
+      {
+        ...validated.body,
+        mediaFiles,
+      },
     );
     ApiResponse.success(
       res,

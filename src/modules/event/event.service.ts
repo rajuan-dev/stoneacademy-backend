@@ -556,6 +556,7 @@ export class EventService {
       city?: string;
       participantLimit?: number;
       mediaIds?: string[];
+      mediaFiles?: Express.Multer.File[];
       status?: string;
       priceType?: "free" | "paid";
       ticketPrice?: number;
@@ -631,6 +632,19 @@ export class EventService {
     if (payload.mediaIds !== undefined) {
       event.media = payload.mediaIds as any;
       changedFields.push("media");
+    }
+    if (payload.mediaFiles?.length) {
+      const uploadedMediaIds = await this.uploadMediaFiles(userId, payload.mediaFiles);
+      const existingMediaIds = Array.isArray(event.media)
+        ? event.media.map((mediaId: any) => mediaId.toString())
+        : [];
+      const baseMediaIds = payload.mediaIds !== undefined
+        ? payload.mediaIds
+        : existingMediaIds;
+      event.media = Array.from(new Set([...baseMediaIds, ...uploadedMediaIds])) as any;
+      if (!changedFields.includes("media")) {
+        changedFields.push("media");
+      }
     }
     if (payload.status !== undefined) {
       event.status = payload.status as any;

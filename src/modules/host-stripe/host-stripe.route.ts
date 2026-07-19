@@ -5,6 +5,12 @@ import { HostStripeController } from "./host-stripe.controller";
 const router = Router();
 const controller = new HostStripeController();
 
+router.get(
+  "/me",
+  authMiddleware.verifyToken,
+  controller.getMe,
+);
+
 router.post(
   "/create-stripe-account",
   authMiddleware.verifyToken,

@@ -402,6 +402,61 @@
           }
         },
         {
+          "name": "Update Event",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Country Filter Event Updated", "type": "text" },
+                { "key": "category", "value": "wellness", "type": "text" },
+                { "key": "description", "value": "Updated event for geo-filter verification", "type": "text" },
+                { "key": "country", "value": "{{country}}", "type": "text" },
+                { "key": "state", "value": "{{state}}", "type": "text" },
+                { "key": "city", "value": "{{city}}", "type": "text" },
+                { "key": "date", "value": "2026-08-03", "type": "text" },
+                { "key": "startAt", "value": "2026-08-03T18:30:00.000Z", "type": "text" },
+                { "key": "participantLimit", "value": "30", "type": "text" },
+                { "key": "location", "value": "{\"label\":\"Hollywood\",\"latitude\":34.0983,\"longitude\":-118.3267}", "type": "text" },
+                { "key": "priceType", "value": "paid", "type": "text" },
+                { "key": "ticketPrice", "value": "15", "type": "text" },
+                { "key": "discountPercentage", "value": "10", "type": "text" },
+                { "key": "durationMinutes", "value": "90 min", "type": "text" },
+                { "key": "currency", "value": "USD", "type": "text" },
+                { "key": "mediaFiles", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          }
+        },
+        {
+          "name": "Update Activity",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Country Filter Activity Updated", "type": "text" },
+                { "key": "category", "value": "fitness", "type": "text" },
+                { "key": "description", "value": "Updated activity for geo-filter verification", "type": "text" },
+                { "key": "country", "value": "{{country}}", "type": "text" },
+                { "key": "state", "value": "{{state}}", "type": "text" },
+                { "key": "city", "value": "{{city}}", "type": "text" },
+                { "key": "startAt", "value": "2026-08-04T18:15:00.000Z", "type": "text" },
+                { "key": "participantLimit", "value": "18", "type": "text" },
+                { "key": "distance", "value": "8", "type": "text" },
+                { "key": "distanceType", "value": "km", "type": "text" },
+                { "key": "duration", "value": "60 min", "type": "text" },
+                { "key": "location", "value": "{\"label\":\"Venice Beach\",\"latitude\":33.9850,\"longitude\":-118.4695}", "type": "text" },
+                { "key": "mediaFiles", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/activities/{{activityId}}"
+          }
+        },
+        {
           "name": "Create Sponsored Ad",
           "auth": {
             "type": "bearer",
