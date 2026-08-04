@@ -7,6 +7,7 @@ describe("Event schema", () => {
     type: "walking",
     description: "Community walk",
     startAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    country: "Bangladesh",
     location: {
       label: "Central Park",
       coordinates: [-73.97, 40.77],

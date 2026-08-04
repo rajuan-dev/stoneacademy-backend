@@ -1,0 +1,490 @@
+{
+  "info": {
+    "_postman_id": "9a65e4aa-b890-44b1-91cb-b5cf6b5dd221",
+    "name": "StoneAcademy Community API",
+    "description": "Single-file Postman collection for Community mobile/frontend integration generated from the implemented StoneAcademy Community backend as of August 1, 2026.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "postId",
+      "value": "6890e4caa12f9d001f1b0001"
+    },
+    {
+      "key": "commentId",
+      "value": "6890e4caa12f9d001f1b0301"
+    },
+    {
+      "key": "eventId",
+      "value": "6890e4caa12f9d001f1b0401"
+    },
+    {
+      "key": "mediaId",
+      "value": "6890e4caa12f9d001f1b0201"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let body = {};",
+                  "try {",
+                  "  body = pm.response.json();",
+                  "} catch (error) {",
+                  "  console.log('Response is not JSON');",
+                  "}",
+                  "",
+                  "const token = body?.data?.accessToken;",
+                  "if (token) {",
+                  "  pm.collectionVariables.set('accessToken', token);",
+                  "  console.log('Stored accessToken in collection variables');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in a user. The backend returns accessToken in JSON and sets refreshToken as an httpOnly cookie."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Access Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/token/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "token",
+                "refresh"
+              ]
+            },
+            "description": "Refreshes the access token. The backend accepts refreshToken from JSON body or the refreshToken cookie."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Community Feed",
+      "item": [
+        {
+          "name": "List Community Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/posts?page=1&limit=10&q=training",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "q",
+                  "value": "training"
+                }
+              ]
+            },
+            "description": "Lists community posts sorted by createdAt descending. Search is case-insensitive and applies to post text only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Community Post Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/posts/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "posts",
+                "{{postId}}"
+              ]
+            },
+            "description": "Fetches a single community post by ObjectId."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Community Engagement",
+      "item": [
+        {
+          "name": "Like Community Post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/posts/{{postId}}/like",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "posts",
+                "{{postId}}",
+                "like"
+              ]
+            },
+            "description": "Likes a community post. Repeated requests remain safe for the client."
+          },
+          "response": []
+        },
+        {
+          "name": "Unlike Community Post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/posts/{{postId}}/like",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "posts",
+                "{{postId}}",
+                "like"
+              ]
+            },
+            "description": "Unlikes a community post. Repeated requests remain safe for the client."
+          },
+          "response": []
+        },
+        {
+          "name": "List Post Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/posts/{{postId}}/comments?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "posts",
+                "{{postId}}",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Lists top-level comments for the post. Each comment may include one preview reply."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Post Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let body = {};",
+                  "try {",
+                  "  body = pm.response.json();",
+                  "} catch (error) {",
+                  "  console.log('Response is not JSON');",
+                  "}",
+                  "",
+                  "const commentId = body?.data?.id;",
+                  "if (commentId) {",
+                  "  pm.collectionVariables.set('commentId', commentId);",
+                  "  console.log('Stored commentId in collection variables');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Great update\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/community/posts/{{postId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "posts",
+                "{{postId}}",
+                "comments"
+              ]
+            },
+            "description": "Creates a top-level comment and stores the returned commentId in collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "List Comment Replies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/comments/{{commentId}}/replies?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "comments",
+                "{{commentId}}",
+                "replies"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Lists replies for a top-level comment sorted by createdAt ascending."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment Reply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Thank you\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/community/comments/{{commentId}}/replies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community",
+                "comments",
+                "{{commentId}}",
+                "replies"
+              ]
+            },
+            "description": "Creates a reply for a top-level comment."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Community Creator",
+      "item": [
+        {
+          "name": "Create Community Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let body = {};",
+                  "try {",
+                  "  body = pm.response.json();",
+                  "} catch (error) {",
+                  "  console.log('Response is not JSON');",
+                  "}",
+                  "",
+                  "const postId = body?.data?.id;",
+                  "if (postId) {",
+                  "  pm.collectionVariables.set('postId', postId);",
+                  "  console.log('Stored postId in collection variables');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "text",
+                  "value": "Morning training update",
+                  "type": "text"
+                },
+                {
+                  "key": "mediaIds",
+                  "value": "[\"{{mediaId}}\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "location[label]",
+                  "value": "Central Park",
+                  "type": "text"
+                },
+                {
+                  "key": "location[latitude]",
+                  "value": "40.785091",
+                  "type": "text"
+                },
+                {
+                  "key": "location[longitude]",
+                  "value": "-73.968285",
+                  "type": "text"
+                },
+                {
+                  "key": "eventId",
+                  "value": "{{eventId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "link",
+                  "value": "https://example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/community-creator/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "community-creator",
+                "posts"
+              ]
+            },
+            "description": "Creates a community post using multipart/form-data and stores the returned postId in collection variables."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -39,6 +39,7 @@ describe("Auth routes", () => {
         password: "StrongP@ssw0rd",
         confirmPassword: "StrongP@ssw0rd",
         fullName: "Test User",
+        country: "Bangladesh",
       })
       .expect(201);
 

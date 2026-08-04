@@ -18,6 +18,8 @@ import shopRouter from "@/modules/shop/shop.route";
 import settingsRouter from "@/modules/settings/settings.route";
 import adminNotificationRouter from "@/modules/admin-notification/admin-notification.route";
 import cmsRouter from "@/modules/cms/cms.route";
+import communityRouter from "@/modules/community/community.route";
+import communityCreatorRouter from "@/modules/community-creator/community-creator.route";
 import adsRouter from "@/modules/ads/ads.route";
 import feedRouter from "@/modules/feed/feed.route";
 import chatRouter from "@/modules/chat/chat.route";
@@ -111,6 +113,14 @@ const moduleRoutes = [
   {
     path: "/cms",
     route: cmsRouter,
+  },
+  {
+    path: "/community",
+    route: communityRouter,
+  },
+  {
+    path: "/community-creator",
+    route: communityCreatorRouter,
   },
   {
     path: "/ads",
