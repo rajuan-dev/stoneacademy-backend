@@ -1,7 +1,13 @@
 import { PAGINATION } from "@/constants/app.constants";
-import { EventService } from "@/modules/event/event.service";
+import { env } from "@/env";
+import { Activity } from "@/modules/activity/activity.model";
+import { Event } from "@/modules/event/event.model";
+import { Media } from "@/modules/media/media.model";
+import { ReportService } from "@/modules/report/report.service";
+import { s3Service, type StorageUploadInput } from "@/services/s3.service";
 import {
   BadRequestException,
+  ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
 import { TransactionHelper } from "@/utils/transaction.utils";
@@ -10,6 +16,7 @@ import { CommunityComment, type ICommunityComment } from "./community-comment.mo
 import { CommunityLike } from "./community-like.model";
 import { CommunityPost, type ICommunityPost } from "./community-post.model";
 import type {
+  CommunityActivitySummary,
   CommunityAuthorResponse,
   CommunityCommentResponse,
   CommunityEventSummary,
@@ -22,58 +29,55 @@ import type {
   CreateCommunityPostInput,
   CreateCommunityReplyInput,
   ListCommunityPostsInput,
+  PopulatedCommunityActivity,
   PopulatedCommunityEvent,
   PopulatedCommunityMedia,
   PopulatedCommunityUser,
+  UpdateCommunityPostInput,
 } from "./community.type";
 
 type CommunityPostDocument = HydratedDocument<ICommunityPost> & {
   authorId: Types.ObjectId | PopulatedCommunityUser;
   media: Array<Types.ObjectId | PopulatedCommunityMedia>;
   eventId?: Types.ObjectId | PopulatedCommunityEvent | null;
+  activityId?: Types.ObjectId | PopulatedCommunityActivity | null;
 };
 
 type CommunityCommentDocument = HydratedDocument<ICommunityComment> & {
   authorId: Types.ObjectId | PopulatedCommunityUser;
+  eventId?: Types.ObjectId | PopulatedCommunityEvent | null;
+  activityId?: Types.ObjectId | PopulatedCommunityActivity | null;
 };
 
 const POST_AUTHOR_SELECT = "fullName email profileImageUrl";
 const MEDIA_SELECT = "type url";
 const EVENT_SELECT = "title type category startAt location creatorId media";
-const EVENT_MEDIA_SELECT = "url";
+const ACTIVITY_SELECT = "title type category startAt location hostId media";
+const ATTACHMENT_MEDIA_SELECT = "url";
+const ALLOWED_PREFIXES = ["image/", "video/"] as const;
 
 export class CommunityService {
-  private eventService: EventService;
+  private reportService: ReportService;
 
   constructor() {
-    this.eventService = new EventService();
+    this.reportService = new ReportService();
   }
 
   async listPosts(input: ListCommunityPostsInput) {
     const page = input.page ?? PAGINATION.DEFAULT_PAGE;
     const limit = input.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
-    const filter: FilterQuery<ICommunityPost> = {};
+    const filter: FilterQuery<ICommunityPost> = { isDeleted: false };
 
     if (input.q) {
       filter.text = new RegExp(this.escapeRegex(input.q), "i");
     }
 
     const [posts, totalItems] = await Promise.all([
-      CommunityPost.find(filter)
+      this.populatePostQuery(CommunityPost.find(filter))
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("authorId", POST_AUTHOR_SELECT)
-        .populate("media", MEDIA_SELECT)
-        .populate({
-          path: "eventId",
-          select: EVENT_SELECT,
-          populate: [
-            { path: "creatorId", select: POST_AUTHOR_SELECT },
-            { path: "media", select: EVENT_MEDIA_SELECT },
-          ],
-        })
         .exec() as Promise<CommunityPostDocument[]>,
       CommunityPost.countDocuments(filter),
     ]);
@@ -107,23 +111,7 @@ export class CommunityService {
   }
 
   async getPostById(postId: string, currentUserId: string) {
-    const post = await CommunityPost.findById(postId)
-      .populate("authorId", POST_AUTHOR_SELECT)
-      .populate("media", MEDIA_SELECT)
-      .populate({
-        path: "eventId",
-        select: EVENT_SELECT,
-        populate: [
-          { path: "creatorId", select: POST_AUTHOR_SELECT },
-          { path: "media", select: EVENT_MEDIA_SELECT },
-        ],
-      })
-      .exec() as CommunityPostDocument | null;
-
-    if (!post) {
-      throw new NotFoundException("Community post not found");
-    }
-
+    const post = await this.getPopulatedPost(postId);
     const like = await CommunityLike.findOne({
       postId: post._id,
       userId: currentUserId,
@@ -135,97 +123,201 @@ export class CommunityService {
   }
 
   async createPost(input: CreateCommunityPostInput) {
-    if (input.eventId) {
-      await this.eventService.getById(input.eventId);
-    }
-
     const created = await CommunityPost.create({
       authorId: input.authorId,
       text: input.text,
       media: input.mediaIds ?? [],
       location: input.location ?? undefined,
       eventId: input.eventId ?? null,
+      activityId: input.activityId ?? null,
       link: input.link,
+      isDeleted: false,
     });
 
-    const post = await CommunityPost.findById(created._id)
-      .populate("authorId", POST_AUTHOR_SELECT)
-      .populate("media", MEDIA_SELECT)
-      .populate({
-        path: "eventId",
-        select: EVENT_SELECT,
-        populate: [
-          { path: "creatorId", select: POST_AUTHOR_SELECT },
-          { path: "media", select: EVENT_MEDIA_SELECT },
-        ],
-      })
-      .exec() as CommunityPostDocument | null;
-
-    if (!post) {
-      throw new NotFoundException("Community post not found");
-    }
-
+    const post = await this.getPopulatedPost(created._id.toString());
     return this.mapPostResponse(post, false);
   }
 
-  async likePost(postId: string, userId: string): Promise<CommunityLikeResult> {
-    const post = await CommunityPost.findById(postId).select("likeCount").exec();
-    if (!post) {
-      throw new NotFoundException("Community post not found");
-    }
+  async updatePost(input: UpdateCommunityPostInput) {
+    const uploadedMedia = await this.processUploadedMedia(input.userId, input.files ?? []);
 
-    let createdLike = false;
     try {
-      await CommunityLike.create({ postId, userId });
-      createdLike = true;
-    } catch (error: unknown) {
-      const maybeMongoError = error as { code?: number };
-      if (maybeMongoError.code !== 11000) {
-        throw error;
-      }
+      const updatedId = await TransactionHelper.withTransaction(async (session) => {
+        const post = await CommunityPost.findOne({
+          _id: input.postId,
+          isDeleted: false,
+        })
+          .session(session)
+          .exec();
+
+        if (!post) {
+          throw new NotFoundException("Community post not found");
+        }
+        if (post.authorId.toString() !== input.userId) {
+          throw new ForbiddenException("Only author can edit this community post");
+        }
+
+        if (input.mediaIds !== undefined && input.mediaIds !== null) {
+          await this.validateExistingMedia(input.userId, input.mediaIds);
+          post.media = [
+            ...input.mediaIds,
+            ...uploadedMedia.map((item) => item.id),
+          ] as any;
+        } else if (uploadedMedia.length) {
+          const existingMediaIds = Array.isArray(post.media)
+            ? post.media.map((mediaId: any) => mediaId.toString())
+            : [];
+          post.media = [
+            ...existingMediaIds,
+            ...uploadedMedia.map((item) => item.id),
+          ] as any;
+        }
+
+        if (input.text !== undefined) {
+          post.text = input.text?.trim() || null;
+        }
+        if (input.location !== undefined) {
+          post.location = input.location === null
+            ? undefined
+            : this.normalizeLocationInput(input.location) ?? undefined;
+        }
+        if (input.link !== undefined) {
+          post.link = input.link?.trim() || null;
+        }
+
+        let nextEventId = input.eventId !== undefined
+          ? input.eventId
+          : post.eventId?.toString() ?? null;
+        let nextActivityId = input.activityId !== undefined
+          ? input.activityId
+          : post.activityId?.toString() ?? null;
+
+        if (input.eventId) nextActivityId = null;
+        if (input.activityId) nextEventId = null;
+
+        if (nextEventId && nextActivityId) {
+          throw new BadRequestException("eventId and activityId cannot both be supplied");
+        }
+
+        if (input.eventId !== undefined) {
+          if (input.eventId) {
+            await this.validateEventOwnership(input.userId, input.eventId);
+          }
+          post.eventId = input.eventId ? input.eventId as any : null;
+          if (input.eventId) post.activityId = null;
+        }
+
+        if (input.activityId !== undefined) {
+          if (input.activityId) {
+            await this.validateActivityOwnership(input.userId, input.activityId);
+          }
+          post.activityId = input.activityId ? input.activityId as any : null;
+          if (input.activityId) post.eventId = null;
+        }
+
+        if (!this.hasPostContent({
+          text: post.text,
+          mediaIds: post.media?.map((id: any) => id.toString()) ?? [],
+          location: post.location ?? null,
+          eventId: post.eventId?.toString() ?? null,
+          activityId: post.activityId?.toString() ?? null,
+          link: post.link,
+        })) {
+          throw new BadRequestException("Community post must include at least one content field");
+        }
+
+        await post.save({ session });
+        return post._id.toString();
+      });
+
+      const post = await this.getPopulatedPost(updatedId);
+      const like = await CommunityLike.findOne({
+        postId: post._id,
+        userId: input.userId,
+      }).select("_id").lean();
+
+      return this.mapPostResponse(post, Boolean(like));
+    } catch (error) {
+      await this.cleanupUploadedMedia(uploadedMedia);
+      throw error;
     }
-
-    const updatedPost = createdLike
-      ? await CommunityPost.findByIdAndUpdate(
-          postId,
-          { $inc: { likeCount: 1 } },
-          { new: true },
-        )
-          .select("likeCount")
-          .exec()
-      : await CommunityPost.findById(postId).select("likeCount").exec();
-
-    if (!updatedPost) {
-      throw new NotFoundException("Community post not found");
-    }
-
-    return {
-      postId,
-      likeCount: updatedPost.likeCount,
-      isLikedByCurrentUser: true,
-    };
   }
 
-  async unlikePost(postId: string, userId: string): Promise<CommunityLikeResult> {
-    const post = await CommunityPost.findById(postId).select("likeCount").exec();
-    if (!post) {
-      throw new NotFoundException("Community post not found");
-    }
+  async deletePost(postId: string, userId: string) {
+    await TransactionHelper.withTransaction(async (session) => {
+      const post = await CommunityPost.findOne({ _id: postId, isDeleted: false })
+        .session(session)
+        .exec();
+      if (!post) {
+        throw new NotFoundException("Community post not found");
+      }
+      if (post.authorId.toString() !== userId) {
+        throw new ForbiddenException("Only author can delete this community post");
+      }
 
-    const deleted = await CommunityLike.findOneAndDelete({ postId, userId }).lean();
+      post.isDeleted = true;
+      post.deletedAt = new Date();
+      post.deletedBy = userId as any;
+      post.likeCount = 0;
+      post.commentCount = 0;
+      await post.save({ session });
 
-    const updatedPost = deleted
-      ? await CommunityPost.findOneAndUpdate(
-          { _id: postId, likeCount: { $gt: 0 } },
-          { $inc: { likeCount: -1 } },
-          { new: true },
-        )
-          .select("likeCount")
-          .exec()
-      : await CommunityPost.findById(postId).select("likeCount").exec();
+      await Promise.all([
+        CommunityLike.deleteMany({ postId }, { session }).exec(),
+        CommunityComment.deleteMany({ postId }, { session }).exec(),
+      ]);
+    });
+  }
 
-    const authoritativePost = updatedPost
-      ?? await CommunityPost.findById(postId).select("likeCount").exec();
+  async togglePostLike(postId: string, userId: string): Promise<CommunityLikeResult> {
+    const result = await TransactionHelper.withTransaction(async (session) => {
+      const post = await CommunityPost.findOne({ _id: postId, isDeleted: false })
+        .select("likeCount")
+        .session(session)
+        .exec();
+      if (!post) {
+        throw new NotFoundException("Community post not found");
+      }
+
+      const existing = await CommunityLike.findOne({ postId, userId })
+        .session(session)
+        .exec();
+
+      if (existing) {
+        const deleted = await CommunityLike.deleteOne({ _id: existing._id }, { session }).exec();
+        if (deleted.deletedCount > 0) {
+          await CommunityPost.updateOne(
+            { _id: postId, likeCount: { $gt: 0 } },
+            { $inc: { likeCount: -1 } },
+            { session },
+          ).exec();
+        }
+        return { isLikedByCurrentUser: false };
+      }
+
+      try {
+        await CommunityLike.create([{ postId, userId }], { session });
+        await CommunityPost.updateOne(
+          { _id: postId },
+          { $inc: { likeCount: 1 } },
+          { session },
+        ).exec();
+      } catch (error: unknown) {
+        const maybeMongoError = error as { code?: number };
+        if (maybeMongoError.code !== 11000) {
+          throw error;
+        }
+      }
+
+      return { isLikedByCurrentUser: true };
+    });
+
+    const authoritativePost = await CommunityPost.findOne({
+      _id: postId,
+      isDeleted: false,
+    })
+      .select("likeCount")
+      .lean();
 
     if (!authoritativePost) {
       throw new NotFoundException("Community post not found");
@@ -234,15 +326,37 @@ export class CommunityService {
     return {
       postId,
       likeCount: Math.max(0, authoritativePost.likeCount),
-      isLikedByCurrentUser: false,
+      isLikedByCurrentUser: result.isLikedByCurrentUser,
     };
+  }
+
+  async reportPost(
+    postId: string,
+    reporterId: string,
+    payload: { reason: string; details?: string },
+  ) {
+    const post = await CommunityPost.findOne({ _id: postId, isDeleted: false })
+      .select("_id")
+      .lean();
+    if (!post) {
+      throw new NotFoundException("Community post not found");
+    }
+
+    return this.reportService.create(reporterId, {
+      entityType: "community_post",
+      entityId: postId,
+      reason: payload.reason,
+      details: payload.details,
+    });
   }
 
   async listComments(
     postId: string,
     pagination: CommunityPaginationInput,
   ) {
-    const post = await CommunityPost.findById(postId).select("authorId").lean();
+    const post = await CommunityPost.findOne({ _id: postId, isDeleted: false })
+      .select("authorId")
+      .lean();
     if (!post) {
       throw new NotFoundException("Community post not found");
     }
@@ -252,14 +366,13 @@ export class CommunityService {
     const skip = (page - 1) * limit;
 
     const [comments, totalItems] = await Promise.all([
-      CommunityComment.find({
+      this.populateCommentQuery(CommunityComment.find({
         postId,
         parentCommentId: null,
-      })
+      }))
         .sort({ createdAt: 1 })
         .skip(skip)
         .limit(limit)
-        .populate("authorId", POST_AUTHOR_SELECT)
         .exec() as Promise<CommunityCommentDocument[]>,
       CommunityComment.countDocuments({
         postId,
@@ -270,34 +383,17 @@ export class CommunityService {
     const commentIds = comments.map((comment) => comment._id);
     const previewReplyIds = commentIds.length
       ? await CommunityComment.aggregate<{ _id: Types.ObjectId }>([
-          {
-            $match: {
-              parentCommentId: { $in: commentIds },
-            },
-          },
-          {
-            $sort: { createdAt: 1 },
-          },
-          {
-            $group: {
-              _id: "$parentCommentId",
-              replyId: { $first: "$_id" },
-            },
-          },
-          {
-            $project: {
-              _id: "$replyId",
-            },
-          },
+          { $match: { parentCommentId: { $in: commentIds } } },
+          { $sort: { createdAt: 1 } },
+          { $group: { _id: "$parentCommentId", replyId: { $first: "$_id" } } },
+          { $project: { _id: "$replyId" } },
         ])
       : [];
 
     const previewReplies = previewReplyIds.length
-      ? await CommunityComment.find({
+      ? await this.populateCommentQuery(CommunityComment.find({
           _id: { $in: previewReplyIds.map((item) => item._id) },
-        })
-          .populate("authorId", POST_AUTHOR_SELECT)
-          .exec() as CommunityCommentDocument[]
+        })).exec() as CommunityCommentDocument[]
       : [];
 
     const firstReplyByParent = new Map<string, CommunityCommentDocument>();
@@ -308,17 +404,15 @@ export class CommunityService {
       }
     }
 
-    const data = comments.map((comment) => {
-      const previewReply = firstReplyByParent.get(comment._id.toString());
-      return this.mapCommentResponse(
-        comment,
-        post.authorId.toString(),
-        previewReply ? [previewReply] : [],
-      );
-    });
-
     return {
-      data,
+      data: comments.map((comment) => {
+        const previewReply = firstReplyByParent.get(comment._id.toString());
+        return this.mapCommentResponse(
+          comment,
+          post.authorId.toString(),
+          previewReply ? [previewReply] : [],
+        );
+      }),
       pagination: {
         currentPage: page,
         itemsPerPage: limit,
@@ -331,8 +425,11 @@ export class CommunityService {
   }
 
   async createComment(input: CreateCommunityCommentInput) {
+    await this.validateCommentAttachment(input);
+    const text = input.text?.trim() || undefined;
+
     const created = await TransactionHelper.withTransaction(async (session) => {
-      const post = await CommunityPost.findById(input.postId)
+      const post = await CommunityPost.findOne({ _id: input.postId, isDeleted: false })
         .select("authorId")
         .session(session)
         .exec();
@@ -345,7 +442,9 @@ export class CommunityService {
         postId: input.postId,
         authorId: input.authorId,
         parentCommentId: null,
-        text: input.text,
+        text,
+        eventId: input.eventId ?? null,
+        activityId: input.activityId ?? null,
       }], { session });
 
       await CommunityPost.updateOne(
@@ -360,9 +459,9 @@ export class CommunityService {
       };
     });
 
-    const comment = await CommunityComment.findById(created.commentId)
-      .populate("authorId", POST_AUTHOR_SELECT)
-      .exec() as CommunityCommentDocument | null;
+    const comment = await this.populateCommentQuery(
+      CommunityComment.findById(created.commentId),
+    ).exec() as CommunityCommentDocument | null;
 
     if (!comment) {
       throw new NotFoundException("Community comment not found");
@@ -384,7 +483,12 @@ export class CommunityService {
       throw new BadRequestException("Replies can only be listed for top-level comments");
     }
 
-    const post = await CommunityPost.findById(parentComment.postId).select("authorId").lean();
+    const post = await CommunityPost.findOne({
+      _id: parentComment.postId,
+      isDeleted: false,
+    })
+      .select("authorId")
+      .lean();
     if (!post) {
       throw new NotFoundException("Community post not found");
     }
@@ -394,11 +498,10 @@ export class CommunityService {
     const skip = (page - 1) * limit;
 
     const [replies, totalItems] = await Promise.all([
-      CommunityComment.find({ parentCommentId: commentId })
+      this.populateCommentQuery(CommunityComment.find({ parentCommentId: commentId }))
         .sort({ createdAt: 1 })
         .skip(skip)
         .limit(limit)
-        .populate("authorId", POST_AUTHOR_SELECT)
         .exec() as Promise<CommunityCommentDocument[]>,
       CommunityComment.countDocuments({ parentCommentId: commentId }),
     ]);
@@ -418,6 +521,9 @@ export class CommunityService {
   }
 
   async createReply(input: CreateCommunityReplyInput) {
+    await this.validateCommentAttachment(input);
+    const text = input.text?.trim() || undefined;
+
     const created = await TransactionHelper.withTransaction(async (session) => {
       const parentComment = await CommunityComment.findById(input.commentId)
         .select("postId parentCommentId")
@@ -432,7 +538,10 @@ export class CommunityService {
         throw new BadRequestException("Replying to a reply is not supported");
       }
 
-      const post = await CommunityPost.findById(parentComment.postId)
+      const post = await CommunityPost.findOne({
+        _id: parentComment.postId,
+        isDeleted: false,
+      })
         .select("authorId")
         .session(session)
         .exec();
@@ -445,7 +554,9 @@ export class CommunityService {
         postId: parentComment.postId,
         authorId: input.authorId,
         parentCommentId: input.commentId,
-        text: input.text,
+        text,
+        eventId: input.eventId ?? null,
+        activityId: input.activityId ?? null,
       }], { session });
 
       await CommunityComment.updateOne(
@@ -466,15 +577,165 @@ export class CommunityService {
       };
     });
 
-    const reply = await CommunityComment.findById(created.replyId)
-      .populate("authorId", POST_AUTHOR_SELECT)
-      .exec() as CommunityCommentDocument | null;
+    const reply = await this.populateCommentQuery(
+      CommunityComment.findById(created.replyId),
+    ).exec() as CommunityCommentDocument | null;
 
     if (!reply) {
       throw new NotFoundException("Community comment not found");
     }
 
     return this.mapCommentResponse(reply, created.postAuthorId, []);
+  }
+
+  async validateExistingMedia(userId: string, mediaIds: string[]) {
+    if (!mediaIds.length) return [];
+
+    const mediaDocs = await Media.find({ _id: { $in: mediaIds } })
+      .select("ownerId type")
+      .lean();
+    const mediaById = new Map(mediaDocs.map((media) => [media._id.toString(), media]));
+
+    return mediaIds.map((mediaId) => {
+      const media = mediaById.get(mediaId);
+      if (!media) throw new NotFoundException("Media not found");
+      if (media.ownerId.toString() !== userId) {
+        throw new ForbiddenException("You do not have access to this media");
+      }
+      if (media.type !== "image" && media.type !== "video") {
+        throw new BadRequestException("Unsupported media type");
+      }
+      return mediaId;
+    });
+  }
+
+  async processUploadedMedia(userId: string, files: Express.Multer.File[]) {
+    if (!files.length) return [];
+
+    for (const file of files) {
+      if (!ALLOWED_PREFIXES.some((prefix) => file.mimetype.startsWith(prefix))) {
+        throw new BadRequestException("Only image and video uploads are supported");
+      }
+    }
+
+    const uploadsInput: StorageUploadInput[] = files.map((file) => ({
+      buffer: file.buffer,
+      mimeType: file.mimetype,
+      originalName: file.originalname,
+    }));
+
+    const uploads = await s3Service.uploadFiles(uploadsInput, {
+      prefix: `community/${userId}`,
+    });
+
+    try {
+      const mediaDocs = await Media.insertMany(
+        uploads.map((upload, index) => ({
+          ownerId: userId,
+          type: uploadsInput[index].mimeType.startsWith("video/") ? "video" : "image",
+          s3Bucket: env.AWS_S3_BUCKET,
+          s3Key: upload.key,
+          url: upload.url,
+          mimeType: uploadsInput[index].mimeType,
+          sizeBytes: uploadsInput[index].buffer.length,
+        })),
+      );
+
+      return mediaDocs.map((doc, index) => ({
+        id: doc._id.toString(),
+        s3Key: uploads[index].key,
+      }));
+    } catch (error) {
+      await Promise.allSettled(uploads.map((upload) => s3Service.deleteFile(upload.key)));
+      throw error;
+    }
+  }
+
+  async validateEventOwnership(userId: string, eventId?: string | null) {
+    if (!eventId) return undefined;
+    const event = await Event.findById(eventId).select("_id creatorId").exec();
+    if (!event) throw new NotFoundException("Event not found");
+    if (event.creatorId.toString() !== userId) {
+      throw new ForbiddenException("You do not have access to this event");
+    }
+    return eventId;
+  }
+
+  async validateActivityOwnership(userId: string, activityId?: string | null) {
+    if (!activityId) return undefined;
+    const activity = await Activity.findById(activityId).select("_id hostId").exec();
+    if (!activity) throw new NotFoundException("Activity not found");
+    if (activity.hostId.toString() !== userId) {
+      throw new ForbiddenException("You do not have access to this activity");
+    }
+    return activityId;
+  }
+
+  hasPostContent(input: {
+    text?: string | null;
+    mediaIds?: string[];
+    location?: CommunityLocation | null;
+    eventId?: string | null;
+    activityId?: string | null;
+    link?: string | null;
+  }) {
+    return Boolean(
+      input.text?.trim()
+      || input.mediaIds?.length
+      || input.location
+      || input.eventId
+      || input.activityId
+      || input.link?.trim(),
+    );
+  }
+
+  normalizeLocationInput(value: unknown): CommunityLocation | null {
+    if (value === null || value === undefined || value === "" || value === "null") {
+      return null;
+    }
+
+    const parsed = typeof value === "string" ? this.parseJson(value) : value;
+    if (!parsed || typeof parsed !== "object") {
+      throw new BadRequestException("Invalid location");
+    }
+
+    const location = parsed as {
+      label?: string;
+      latitude?: number | string;
+      longitude?: number | string;
+      coordinates?: [number, number];
+    };
+
+    const coordinates = Array.isArray(location.coordinates)
+      ? location.coordinates
+      : location.longitude !== undefined && location.latitude !== undefined
+        ? [Number(location.longitude), Number(location.latitude)] as [number, number]
+        : null;
+
+    if (!coordinates) {
+      throw new BadRequestException("Invalid location");
+    }
+
+    const longitude = Number(coordinates[0]);
+    const latitude = Number(coordinates[1]);
+    if (
+      !Number.isFinite(longitude)
+      || !Number.isFinite(latitude)
+      || longitude < -180
+      || longitude > 180
+      || latitude < -90
+      || latitude > 90
+    ) {
+      throw new BadRequestException("Invalid location");
+    }
+
+    return {
+      label: location.label?.trim() || `${latitude},${longitude}`,
+      coordinates: {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      },
+    };
   }
 
   mapPostResponse(
@@ -488,6 +749,7 @@ export class CommunityService {
       media: this.mapMediaList(post.media),
       location: post.location ?? null,
       event: this.mapEventSummary(post.eventId),
+      activity: this.mapActivitySummary(post.activityId),
       link: post.link?.trim() || null,
       likeCount: post.likeCount,
       commentCount: post.commentCount,
@@ -506,12 +768,122 @@ export class CommunityService {
       postId: comment.postId.toString(),
       parentCommentId: comment.parentCommentId?.toString() || null,
       author: this.mapAuthor(comment.authorId),
-      text: comment.text,
+      text: comment.text?.trim() || null,
+      event: this.mapEventSummary(comment.eventId),
+      activity: this.mapActivitySummary(comment.activityId),
       isPostAuthor: this.getAuthorId(comment.authorId) === postAuthorId,
       replyCount: comment.replyCount,
       replies: replies.map((reply) => this.mapCommentResponse(reply, postAuthorId, [])),
       createdAt: comment.createdAt.toISOString(),
     };
+  }
+
+  mapActivitySummary(
+    activity: Types.ObjectId | PopulatedCommunityActivity | null | undefined,
+  ): CommunityActivitySummary | null {
+    if (!activity || !this.isPopulatedActivity(activity)) {
+      return null;
+    }
+
+    const host = this.isPopulatedUser(activity.hostId) ? activity.hostId : null;
+    const firstMedia = Array.isArray(activity.media) ? activity.media[0] : null;
+    const firstMediaUrl = firstMedia && this.isPopulatedMedia(firstMedia)
+      ? firstMedia.url || null
+      : null;
+
+    return {
+      id: activity._id.toString(),
+      title: activity.title || null,
+      type: activity.type || activity.category || null,
+      startAt: activity.startAt ? activity.startAt.toISOString() : null,
+      location: activity.location?.label || null,
+      hostName: host?.fullName || null,
+      hostUsername: host?.email ? String(host.email).split("@")[0] : null,
+      hostProfileImageUrl: host?.profileImageUrl || null,
+      imageUrl: firstMediaUrl,
+    };
+  }
+
+  private async validateCommentAttachment(input: {
+    authorId: string;
+    text?: string;
+    eventId?: string;
+    activityId?: string;
+  }) {
+    if (input.eventId && input.activityId) {
+      throw new BadRequestException("eventId and activityId cannot both be supplied");
+    }
+    if (!input.text?.trim() && !input.eventId && !input.activityId) {
+      throw new BadRequestException("Comment must include text, eventId, or activityId");
+    }
+    if (input.eventId) {
+      await this.validateEventOwnership(input.authorId, input.eventId);
+    }
+    if (input.activityId) {
+      await this.validateActivityOwnership(input.authorId, input.activityId);
+    }
+  }
+
+  private async cleanupUploadedMedia(media: Array<{ id: string; s3Key: string }>) {
+    if (!media.length) return;
+    await Promise.allSettled([
+      Media.deleteMany({ _id: { $in: media.map((item) => item.id) } }).exec(),
+      ...media.map((item) => s3Service.deleteFile(item.s3Key)),
+    ]);
+  }
+
+  private async getPopulatedPost(postId: string) {
+    const post = await this.populatePostQuery(
+      CommunityPost.findOne({ _id: postId, isDeleted: false }),
+    ).exec() as CommunityPostDocument | null;
+
+    if (!post) {
+      throw new NotFoundException("Community post not found");
+    }
+    return post;
+  }
+
+  private populatePostQuery(query: any) {
+    return query
+      .populate("authorId", POST_AUTHOR_SELECT)
+      .populate("media", MEDIA_SELECT)
+      .populate({
+        path: "eventId",
+        select: EVENT_SELECT,
+        populate: [
+          { path: "creatorId", select: POST_AUTHOR_SELECT },
+          { path: "media", select: ATTACHMENT_MEDIA_SELECT },
+        ],
+      })
+      .populate({
+        path: "activityId",
+        select: ACTIVITY_SELECT,
+        populate: [
+          { path: "hostId", select: POST_AUTHOR_SELECT },
+          { path: "media", select: ATTACHMENT_MEDIA_SELECT },
+        ],
+      });
+  }
+
+  private populateCommentQuery(query: any) {
+    return query
+      .populate("authorId", POST_AUTHOR_SELECT)
+      .populate({
+        path: "eventId",
+        select: EVENT_SELECT,
+        populate: [
+          { path: "creatorId", select: POST_AUTHOR_SELECT },
+          { path: "media", select: ATTACHMENT_MEDIA_SELECT },
+        ],
+      })
+      .populate({
+        path: "activityId",
+        select: ACTIVITY_SELECT,
+        populate: [
+          { path: "hostId", select: POST_AUTHOR_SELECT },
+          { path: "media", select: ATTACHMENT_MEDIA_SELECT },
+        ],
+      });
   }
 
   private mapAuthor(author: Types.ObjectId | PopulatedCommunityUser): CommunityAuthorResponse {
@@ -602,6 +974,20 @@ export class CommunityService {
     value: Types.ObjectId | PopulatedCommunityEvent,
   ): value is PopulatedCommunityEvent {
     return typeof value === "object" && "_id" in value && "title" in value;
+  }
+
+  private isPopulatedActivity(
+    value: Types.ObjectId | PopulatedCommunityActivity,
+  ): value is PopulatedCommunityActivity {
+    return typeof value === "object" && "_id" in value && "title" in value;
+  }
+
+  private parseJson(value: string) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
   }
 
   private escapeRegex(value: string) {

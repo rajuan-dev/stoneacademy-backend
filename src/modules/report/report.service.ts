@@ -7,12 +7,13 @@ import {
   NotFoundException,
 } from "@/utils/app-error.utils";
 import { Activity } from "../activity/activity.model";
+import { CommunityPost } from "../community/community-post.model";
 import { Event } from "../event/event.model";
 import { Message } from "../message/message.model";
 import { User } from "../user/user.model";
 import { Report } from "./report.model";
 
-type ReportEntityType = "user" | "activity" | "event" | "message";
+type ReportEntityType = "user" | "activity" | "event" | "message" | "community_post";
 type ReportStatus = "open" | "under_review" | "resolved" | "rejected";
 
 export class ReportService {
@@ -69,7 +70,11 @@ export class ReportService {
     if (
       reportedUserId
       && reportedUserId !== reporterId
-      && (payload.entityType === "activity" || payload.entityType === "event")
+      && (
+        payload.entityType === "activity"
+        || payload.entityType === "event"
+        || payload.entityType === "community_post"
+      )
     ) {
       await notificationService.create({
         userId: reportedUserId,
@@ -311,6 +316,19 @@ export class ReportService {
       };
     }
 
+    if (entityType === "community_post") {
+      const post = await CommunityPost.findById(entityId)
+        .select("_id authorId")
+        .exec();
+      if (!post) {
+        throw new NotFoundException("Community post not found");
+      }
+
+      return {
+        reportedUserId: post.authorId.toString(),
+      };
+    }
+
     if (entityType === "user") {
       const user = await User.findById(entityId).select("_id").exec();
       if (!user) {
@@ -481,6 +499,51 @@ export class ReportService {
         discountPercentage: event.discountPercentage ?? 0,
         currency: event.currency || null,
         owner: this.normalizeUser(event.creatorId),
+      };
+    }
+
+    if (entityType === "community_post") {
+      const post = await CommunityPost.findById(entityId)
+        .select("authorId text media eventId activityId createdAt isDeleted deletedAt")
+        .populate("authorId", "fullName email profileImageUrl status")
+        .populate("media", "url type")
+        .populate("eventId", "title type category")
+        .populate("activityId", "title type category")
+        .lean();
+
+      if (!post) return null;
+
+      const media = Array.isArray(post.media) ? post.media as any[] : [];
+      const event = post.eventId as any;
+      const activity = post.activityId as any;
+
+      return {
+        kind: "community_post",
+        id: post._id.toString(),
+        text: post.text || null,
+        media: media.map((item) => ({
+          id: item._id?.toString?.() || null,
+          type: item.type || null,
+          url: item.url || null,
+        })),
+        event: event
+          ? {
+              id: event._id?.toString?.() || null,
+              title: event.title || null,
+              type: event.type || event.category || null,
+            }
+          : null,
+        activity: activity
+          ? {
+              id: activity._id?.toString?.() || null,
+              title: activity.title || null,
+              type: activity.type || activity.category || null,
+            }
+          : null,
+        createdAt: post.createdAt || null,
+        isDeleted: Boolean(post.isDeleted),
+        deletedAt: post.deletedAt || null,
+        owner: this.normalizeUser(post.authorId),
       };
     }
 

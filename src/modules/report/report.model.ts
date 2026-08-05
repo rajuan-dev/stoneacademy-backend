@@ -5,7 +5,7 @@ export interface IReport {
   _id: Types.ObjectId;
   reporterId: Types.ObjectId;
   reportedUserId?: Types.ObjectId | null;
-  entityType: "user" | "activity" | "event" | "message";
+  entityType: "user" | "activity" | "event" | "message" | "community_post";
   entityId: Types.ObjectId;
   reason: string;
   details?: string;
@@ -32,7 +32,7 @@ const reportSchema = BaseSchemaUtil.createSchema<IReport>({
   },
   entityType: {
     type: String,
-    enum: ["user", "activity", "event", "message"],
+    enum: ["user", "activity", "event", "message", "community_post"],
     required: true,
     index: true,
   },

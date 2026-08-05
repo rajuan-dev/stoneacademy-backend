@@ -40,6 +40,7 @@ describe("Community creator routes", () => {
   const otherMediaId = "6890e4caa12f9d001f1b0202";
   const missingMediaId = "6890e4caa12f9d001f1b0203";
   const validEventId = "6890e4caa12f9d001f1b0401";
+  const validActivityId = "6890e4caa12f9d001f1b0501";
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -172,6 +173,29 @@ describe("Community creator routes", () => {
       .expect(201);
 
     expect(res.body.data.event.id).toBe("event-1");
+  });
+
+  it("supports activity posts", async () => {
+    createPostMock.mockResolvedValueOnce({ id: "post-1", activity: { id: "activity-1" } });
+
+    const res = await request(app)
+      .post("/api/v1/community-creator/posts")
+      .set("Authorization", "Bearer valid-token")
+      .field("activityId", validActivityId)
+      .expect(201);
+
+    expect(res.body.data.activity.id).toBe("activity-1");
+  });
+
+  it("rejects event and activity together", async () => {
+    const res = await request(app)
+      .post("/api/v1/community-creator/posts")
+      .set("Authorization", "Bearer valid-token")
+      .field("eventId", validEventId)
+      .field("activityId", validActivityId)
+      .expect(400);
+
+    expect(res.body.message).toBe("Validation failed");
   });
 
   it("supports link posts", async () => {

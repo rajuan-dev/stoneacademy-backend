@@ -6,7 +6,9 @@ export interface ICommunityComment {
   postId: Types.ObjectId;
   authorId: Types.ObjectId;
   parentCommentId?: Types.ObjectId | null;
-  text: string;
+  text?: string | null;
+  eventId?: Types.ObjectId | null;
+  activityId?: Types.ObjectId | null;
   replyCount: number;
   createdAt: Date;
   updatedAt: Date;
@@ -31,8 +33,17 @@ const communityCommentSchema = BaseSchemaUtil.createSchema<ICommunityComment>({
   },
   text: {
     type: String,
-    required: true,
     trim: true,
+  },
+  eventId: {
+    type: Schema.Types.ObjectId,
+    ref: "Event",
+    default: null,
+  },
+  activityId: {
+    type: Schema.Types.ObjectId,
+    ref: "Activity",
+    default: null,
   },
   replyCount: {
     type: Number,

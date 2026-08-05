@@ -40,6 +40,8 @@ const controller = new CommunityCreatorController();
  *                 type: number
  *               eventId:
  *                 type: string
+ *               activityId:
+ *                 type: string
  *               link:
  *                 type: string
  *               media:
@@ -60,6 +62,8 @@ const controller = new CommunityCreatorController();
  *               location:
  *                 type: object
  *               eventId:
+ *                 type: string
+ *               activityId:
  *                 type: string
  *               link:
  *                 type: string
@@ -87,6 +91,7 @@ const controller = new CommunityCreatorController();
  *                     order: 0
  *                 location: null
  *                 event: null
+ *                 activity: null
  *                 link: null
  *                 likeCount: 0
  *                 commentCount: 0

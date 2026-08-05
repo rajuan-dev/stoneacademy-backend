@@ -10,7 +10,7 @@ const reasonEnum = z.enum([
 
 export const createReportSchema = z.object({
   body: z.object({
-    entityType: z.enum(["user", "activity", "event", "message"]),
+    entityType: z.enum(["user", "activity", "event", "message", "community_post"]),
     entityId: z.string().trim().min(1),
     reason: z.union([reasonEnum, z.string().trim().min(3).max(250)]),
     details: z.string().trim().max(3000).optional(),
@@ -20,7 +20,7 @@ export const createReportSchema = z.object({
 export const listReportSchema = z.object({
   query: z.object({
     status: z.enum(["open", "under_review", "resolved", "rejected"]).optional(),
-    entityType: z.enum(["user", "activity", "event", "message"]).optional(),
+    entityType: z.enum(["user", "activity", "event", "message", "community_post"]).optional(),
     page: z.coerce.number().min(1).optional(),
     limit: z.coerce.number().min(1).max(100).optional(),
   }),

@@ -3,6 +3,8 @@ import {
   createCommunityCommentSchema,
   createCommunityReplySchema,
   listCommunityPostsSchema,
+  reportCommunityPostSchema,
+  updateCommunityPostSchema,
 } from "../src/modules/community/community.schema";
 import { createCommunityPostSchema } from "../src/modules/community-creator/community-creator.schema";
 
@@ -35,6 +37,30 @@ describe("Community schemas", () => {
       params: { postId: validPostId },
       body: { text: "Hello world" },
     }).success).toBe(true);
+  });
+
+  it("accepts comments with an event attachment and no text", () => {
+    expect(createCommunityCommentSchema.safeParse({
+      params: { postId: validPostId },
+      body: { eventId: "6890e4caa12f9d001f1b0401" },
+    }).success).toBe(true);
+  });
+
+  it("accepts replies with an activity attachment and no text", () => {
+    expect(createCommunityReplySchema.safeParse({
+      params: { commentId: validCommentId },
+      body: { activityId: "6890e4caa12f9d001f1b0501" },
+    }).success).toBe(true);
+  });
+
+  it("rejects comment event and activity attachments together", () => {
+    expect(createCommunityCommentSchema.safeParse({
+      params: { postId: validPostId },
+      body: {
+        eventId: "6890e4caa12f9d001f1b0401",
+        activityId: "6890e4caa12f9d001f1b0501",
+      },
+    }).success).toBe(false);
   });
 
   it("rejects blank comments", () => {
@@ -94,6 +120,49 @@ describe("Community schemas", () => {
   it("accepts valid event id", () => {
     expect(createCommunityPostSchema.safeParse({
       body: { eventId: "6890e4caa12f9d001f1b0401" },
+    }).success).toBe(true);
+  });
+
+  it("accepts valid activity id", () => {
+    expect(createCommunityPostSchema.safeParse({
+      body: { activityId: "6890e4caa12f9d001f1b0501" },
+    }).success).toBe(true);
+  });
+
+  it("rejects creator event and activity attachments together", () => {
+    expect(createCommunityPostSchema.safeParse({
+      body: {
+        eventId: "6890e4caa12f9d001f1b0401",
+        activityId: "6890e4caa12f9d001f1b0501",
+      },
+    }).success).toBe(false);
+  });
+
+  it("accepts nullable edit fields", () => {
+    expect(updateCommunityPostSchema.safeParse({
+      params: { postId: validPostId },
+      body: {
+        text: null,
+        location: null,
+        eventId: null,
+      },
+    }).success).toBe(true);
+  });
+
+  it("rejects edit event and activity attachments together", () => {
+    expect(updateCommunityPostSchema.safeParse({
+      params: { postId: validPostId },
+      body: {
+        eventId: "6890e4caa12f9d001f1b0401",
+        activityId: "6890e4caa12f9d001f1b0501",
+      },
+    }).success).toBe(false);
+  });
+
+  it("accepts community report reasons", () => {
+    expect(reportCommunityPostSchema.safeParse({
+      params: { postId: validPostId },
+      body: { reason: "spam", details: "Repeated promo" },
     }).success).toBe(true);
   });
 

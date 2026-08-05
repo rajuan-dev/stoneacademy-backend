@@ -9,9 +9,13 @@ export interface ICommunityPost {
   media: Types.ObjectId[];
   location?: CommunityLocation;
   eventId?: Types.ObjectId | null;
+  activityId?: Types.ObjectId | null;
   link?: string | null;
   likeCount: number;
   commentCount: number;
+  isDeleted: boolean;
+  deletedAt?: Date | null;
+  deletedBy?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -71,6 +75,11 @@ const communityPostSchema = BaseSchemaUtil.createSchema<ICommunityPost>({
     ref: "Event",
     default: null,
   },
+  activityId: {
+    type: Schema.Types.ObjectId,
+    ref: "Activity",
+    default: null,
+  },
   link: {
     type: String,
     trim: true,
@@ -85,11 +94,26 @@ const communityPostSchema = BaseSchemaUtil.createSchema<ICommunityPost>({
     default: 0,
     min: 0,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    index: true,
+  },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
+  deletedBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
 });
 
 communityPostSchema.index({ createdAt: -1 });
 communityPostSchema.index({ authorId: 1, createdAt: -1 });
 communityPostSchema.index({ eventId: 1, createdAt: -1 });
+communityPostSchema.index({ activityId: 1, createdAt: -1 });
 
 export const CommunityPost = model<ICommunityPost>(
   "CommunityPost",

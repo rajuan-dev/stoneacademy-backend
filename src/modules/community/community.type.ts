@@ -35,6 +35,18 @@ export type CommunityEventSummary = {
   imageUrl: string | null;
 };
 
+export type CommunityActivitySummary = {
+  id: string;
+  title: string | null;
+  type: string | null;
+  startAt: string | null;
+  location: string | null;
+  hostName: string | null;
+  hostUsername: string | null;
+  hostProfileImageUrl: string | null;
+  imageUrl: string | null;
+};
+
 export type CommunityPostResponse = {
   id: string;
   author: CommunityAuthorResponse;
@@ -42,6 +54,7 @@ export type CommunityPostResponse = {
   media: CommunityMediaResponse[];
   location: CommunityLocation | null;
   event: CommunityEventSummary | null;
+  activity: CommunityActivitySummary | null;
   link: string | null;
   likeCount: number;
   commentCount: number;
@@ -54,7 +67,9 @@ export type CommunityCommentResponse = {
   postId: string;
   parentCommentId: string | null;
   author: CommunityAuthorResponse;
-  text: string;
+  text: string | null;
+  event: CommunityEventSummary | null;
+  activity: CommunityActivitySummary | null;
   isPostAuthor: boolean;
   replyCount: number;
   replies: CommunityCommentResponse[];
@@ -78,20 +93,37 @@ export type CreateCommunityPostInput = {
   text?: string;
   mediaIds?: string[];
   location?: CommunityLocation | null;
-  eventId?: string;
+  eventId?: string | null;
+  activityId?: string | null;
   link?: string;
+};
+
+export type UpdateCommunityPostInput = {
+  postId: string;
+  userId: string;
+  text?: string | null;
+  mediaIds?: string[] | null;
+  location?: unknown;
+  eventId?: string | null;
+  activityId?: string | null;
+  link?: string | null;
+  files?: Express.Multer.File[];
 };
 
 export type CreateCommunityCommentInput = {
   postId: string;
   authorId: string;
-  text: string;
+  text?: string;
+  eventId?: string;
+  activityId?: string;
 };
 
 export type CreateCommunityReplyInput = {
   commentId: string;
   authorId: string;
-  text: string;
+  text?: string;
+  eventId?: string;
+  activityId?: string;
 };
 
 export type CommunityLikeResult = {
@@ -123,5 +155,18 @@ export type PopulatedCommunityEvent = {
     label?: string | null;
   } | null;
   creatorId?: PopulatedCommunityUser | Types.ObjectId | null;
+  media?: Array<PopulatedCommunityMedia | Types.ObjectId> | null;
+};
+
+export type PopulatedCommunityActivity = {
+  _id: Types.ObjectId;
+  title?: string | null;
+  type?: string | null;
+  category?: string | null;
+  startAt?: Date | null;
+  location?: {
+    label?: string | null;
+  } | null;
+  hostId?: PopulatedCommunityUser | Types.ObjectId | null;
   media?: Array<PopulatedCommunityMedia | Types.ObjectId> | null;
 };

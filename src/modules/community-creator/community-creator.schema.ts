@@ -84,14 +84,25 @@ const locationSchema = z
   });
 
 export const createCommunityPostSchema = z.object({
-  body: z.object({
-    text: z.string().trim().max(2000).optional(),
-    mediaIds: z.preprocess(
-      parseStringArray,
-      z.array(objectIdSchema).optional(),
-    ),
-    location: locationSchema,
-    eventId: objectIdSchema.optional(),
-    link: z.string().trim().url().optional(),
-  }),
+  body: z
+    .object({
+      text: z.string().trim().max(2000).optional(),
+      mediaIds: z.preprocess(
+        parseStringArray,
+        z.array(objectIdSchema).optional(),
+      ),
+      location: locationSchema,
+      eventId: objectIdSchema.optional(),
+      activityId: objectIdSchema.optional(),
+      link: z.string().trim().url().optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.eventId && data.activityId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["activityId"],
+          message: "eventId and activityId cannot both be supplied",
+        });
+      }
+    }),
 });

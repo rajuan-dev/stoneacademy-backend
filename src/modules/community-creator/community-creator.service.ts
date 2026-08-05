@@ -1,10 +1,8 @@
 import { env } from "@/env";
 import { CommunityService } from "@/modules/community/community.service";
 import type { CommunityLocation } from "@/modules/community/community.type";
-import { EventService } from "@/modules/event/event.service";
 import { Media } from "@/modules/media/media.model";
 import { s3Service, type StorageUploadInput } from "@/services/s3.service";
-import { TransactionHelper } from "@/utils/transaction.utils";
 import {
   BadRequestException,
   ForbiddenException,
@@ -20,11 +18,9 @@ const ALLOWED_PREFIXES = ["image/", "video/"] as const;
 
 export class CommunityCreatorService {
   private communityService: CommunityService;
-  private eventService: EventService;
 
   constructor() {
     this.communityService = new CommunityService();
-    this.eventService = new EventService();
   }
 
   async createPost(input: CommunityCreatorServiceInput) {
@@ -34,7 +30,8 @@ export class CommunityCreatorService {
     );
     const uploadedMedia = await this.processUploadedMedia(input.userId, input.files);
     const location = this.normalizeLocation(input.body);
-    const eventId = await this.validateEvent(input.body.eventId);
+    const eventId = await this.validateEventOwnership(input.userId, input.body.eventId);
+    const activityId = await this.validateActivityOwnership(input.userId, input.body.activityId);
     const text = input.body.text?.trim() || undefined;
     const link = input.body.link?.trim() || undefined;
     const orderedMediaIds = [
@@ -47,6 +44,7 @@ export class CommunityCreatorService {
       && orderedMediaIds.length === 0
       && !location
       && !eventId
+      && !activityId
       && !link
     ) {
       await this.cleanupUploadedMedia(uploadedMedia);
@@ -60,6 +58,7 @@ export class CommunityCreatorService {
         mediaIds: orderedMediaIds,
         location,
         eventId,
+        activityId,
         link,
       });
     } catch (error) {
@@ -144,13 +143,12 @@ export class CommunityCreatorService {
     }
   }
 
-  async validateEvent(eventId?: string) {
-    if (!eventId) {
-      return undefined;
-    }
+  async validateEventOwnership(userId: string, eventId?: string) {
+    return this.communityService.validateEventOwnership(userId, eventId);
+  }
 
-    await this.eventService.getById(eventId);
-    return eventId;
+  async validateActivityOwnership(userId: string, activityId?: string) {
+    return this.communityService.validateActivityOwnership(userId, activityId);
   }
 
   normalizeLocation(body: CreateCommunityPostBody): CommunityLocation | null {

@@ -11,6 +11,8 @@ import {
   listCommunityCommentsSchema,
   listCommunityPostsSchema,
   listCommunityRepliesSchema,
+  reportCommunityPostSchema,
+  updateCommunityPostSchema,
 } from "./community.schema";
 import { CommunityService } from "./community.service";
 
@@ -38,18 +40,48 @@ export class CommunityController {
     ApiResponse.success(res, post, "Community post fetched successfully");
   });
 
-  likePost = asyncHandler(async (req: Request, res: Response) => {
+  togglePostLike = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(communityPostIdSchema, req);
     const userId = this.getAuthenticatedUserId(req);
-    const result = await this.service.likePost(validated.params.postId, userId);
-    ApiResponse.success(res, result, "Community post liked successfully");
+    const result = await this.service.togglePostLike(validated.params.postId, userId);
+    ApiResponse.success(
+      res,
+      result,
+      result.isLikedByCurrentUser
+        ? "Community post liked successfully"
+        : "Community post unliked successfully",
+    );
   });
 
-  unlikePost = asyncHandler(async (req: Request, res: Response) => {
+  updatePost = asyncHandler(async (req: Request, res: Response) => {
+    this.normalizeMultipartLocation(req);
+    const validated = await zParse(updateCommunityPostSchema, req);
+    const userId = this.getAuthenticatedUserId(req);
+    const post = await this.service.updatePost({
+      postId: validated.params.postId,
+      userId,
+      ...validated.body,
+      files: this.getUploadedFiles(req),
+    });
+    ApiResponse.success(res, post, "Community post updated successfully");
+  });
+
+  deletePost = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(communityPostIdSchema, req);
     const userId = this.getAuthenticatedUserId(req);
-    const result = await this.service.unlikePost(validated.params.postId, userId);
-    ApiResponse.success(res, result, "Community post unliked successfully");
+    await this.service.deletePost(validated.params.postId, userId);
+    ApiResponse.noContent(res, "Community post deleted successfully");
+  });
+
+  reportPost = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(reportCommunityPostSchema, req);
+    const userId = this.getAuthenticatedUserId(req);
+    const report = await this.service.reportPost(
+      validated.params.postId,
+      userId,
+      validated.body,
+    );
+    ApiResponse.created(res, report, "Report submitted successfully");
   });
 
   listComments = asyncHandler(async (req: Request, res: Response) => {
@@ -68,6 +100,8 @@ export class CommunityController {
       postId: validated.params.postId,
       authorId: userId,
       text: validated.body.text,
+      eventId: validated.body.eventId,
+      activityId: validated.body.activityId,
     });
     ApiResponse.created(res, comment, "Community comment created successfully");
   });
@@ -88,6 +122,8 @@ export class CommunityController {
       commentId: validated.params.commentId,
       authorId: userId,
       text: validated.body.text,
+      eventId: validated.body.eventId,
+      activityId: validated.body.activityId,
     });
     ApiResponse.created(res, reply, "Community reply created successfully");
   });
@@ -98,5 +134,40 @@ export class CommunityController {
       throw new UnauthorizedException(MESSAGES.AUTH.UNAUTHORIZED_ACCESS);
     }
     return userId;
+  }
+
+  private normalizeMultipartLocation(req: Request) {
+    const locationLatitude = (req.body as Record<string, unknown>)?.["location[latitude]"];
+    const locationLongitude = (req.body as Record<string, unknown>)?.["location[longitude]"];
+    const locationLabel = (req.body as Record<string, unknown>)?.["location[label]"];
+
+    if (
+      req.body
+      && !req.body.location
+      && locationLatitude !== undefined
+      && locationLongitude !== undefined
+    ) {
+      req.body.location = {
+        latitude: locationLatitude,
+        longitude: locationLongitude,
+        ...(locationLabel !== undefined ? { label: locationLabel } : {}),
+      };
+    }
+  }
+
+  private getUploadedFiles(req: Request) {
+    const rawFiles = req.files as
+      | Express.Multer.File[]
+      | Record<string, Express.Multer.File[]>
+      | undefined;
+
+    return Array.isArray(rawFiles)
+      ? rawFiles.filter(Boolean)
+      : [
+          ...(rawFiles?.media || []),
+          ...(rawFiles?.mediaFiles || []),
+          ...(rawFiles?.["mediaFiles[]"] || []),
+          ...(rawFiles?.files || []),
+        ].filter(Boolean);
   }
 }

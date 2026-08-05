@@ -1,6 +1,7 @@
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { Router } from "express";
 import { CommunityController } from "./community.controller";
+import { communityUpload } from "@/modules/community-creator/community-creator-upload";
 
 const router = Router();
 const controller = new CommunityController();
@@ -52,6 +53,7 @@ router.use(authMiddleware.verifyToken);
  *                       order: 0
  *                   location: null
  *                   event: null
+ *                   activity: null
  *                   link: null
  *                   likeCount: 10
  *                   commentCount: 4
@@ -121,6 +123,7 @@ router.get("/posts", controller.listPosts);
  *                 media: []
  *                 location: null
  *                 event: null
+ *                 activity: null
  *                 link: https://example.com
  *                 likeCount: 10
  *                 commentCount: 4
@@ -147,7 +150,7 @@ router.get("/posts/:postId", controller.getPost);
  * /community/posts/{postId}/like:
  *   post:
  *     tags: [Community]
- *     summary: Like a community post
+ *     summary: Toggle like state for a community post
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -158,10 +161,89 @@ router.get("/posts/:postId", controller.getPost);
  *           type: string
  *     responses:
  *       200:
- *         description: Community post liked
+ *         description: Community post like state changed
+ */
+router.post("/posts/:postId/like", controller.togglePostLike);
+
+/**
+ * @openapi
+ * /community/posts/{postId}/report:
+ *   post:
+ *     tags: [Community]
+ *     summary: Report a community post
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reason]
+ *             properties:
+ *               reason:
+ *                 type: string
+ *               details:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Report submitted
+ */
+router.post("/posts/:postId/report", controller.reportPost);
+
+/**
+ * @openapi
+ * /community/posts/{postId}:
+ *   patch:
+ *     tags: [Community]
+ *     summary: Edit a community post
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 nullable: true
+ *               mediaIds:
+ *                 type: array
+ *                 nullable: true
+ *                 items:
+ *                   type: string
+ *               location:
+ *                 type: object
+ *                 nullable: true
+ *               eventId:
+ *                 type: string
+ *                 nullable: true
+ *               activityId:
+ *                 type: string
+ *                 nullable: true
+ *               link:
+ *                 type: string
+ *                 nullable: true
+ *     responses:
+ *       200:
+ *         description: Community post updated
  *   delete:
  *     tags: [Community]
- *     summary: Unlike a community post
+ *     summary: Soft-delete a community post
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -171,11 +253,11 @@ router.get("/posts/:postId", controller.getPost);
  *         schema:
  *           type: string
  *     responses:
- *       200:
- *         description: Community post unliked
+ *       204:
+ *         description: Community post deleted
  */
-router.post("/posts/:postId/like", controller.likePost);
-router.delete("/posts/:postId/like", controller.unlikePost);
+router.patch("/posts/:postId", communityUpload, controller.updatePost);
+router.delete("/posts/:postId", controller.deletePost);
 
 /**
  * @openapi
@@ -257,11 +339,14 @@ router.delete("/posts/:postId/like", controller.unlikePost);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [text]
  *             properties:
  *               text:
  *                 type: string
  *                 maxLength: 4000
+ *               eventId:
+ *                 type: string
+ *               activityId:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Community comment created
@@ -280,6 +365,8 @@ router.delete("/posts/:postId/like", controller.unlikePost);
  *                   username: elena
  *                   avatarUrl: null
  *                 text: Great update
+ *                 event: null
+ *                 activity: null
  *                 isPostAuthor: false
  *                 replyCount: 0
  *                 replies: []
@@ -357,11 +444,14 @@ router.post("/posts/:postId/comments", controller.createComment);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [text]
  *             properties:
  *               text:
  *                 type: string
  *                 maxLength: 4000
+ *               eventId:
+ *                 type: string
+ *               activityId:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Community reply created
@@ -380,6 +470,8 @@ router.post("/posts/:postId/comments", controller.createComment);
  *                   username: sarah
  *                   avatarUrl: https://example.com/avatar.jpg
  *                 text: Thank you
+ *                 event: null
+ *                 activity: null
  *                 isPostAuthor: true
  *                 replyCount: 0
  *                 replies: []

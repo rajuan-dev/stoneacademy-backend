@@ -9,6 +9,7 @@ const {
 } = vi.hoisted(() => ({
   communityPostModel: {
     findById: vi.fn(),
+    findOne: vi.fn(),
     updateOne: vi.fn(),
   },
   communityCommentModel: {
@@ -34,10 +35,24 @@ vi.mock("../src/modules/community/community-like.model", () => ({
   CommunityLike: {},
 }));
 
-vi.mock("../src/modules/event/event.service", () => ({
-  EventService: class {
-    getById = eventServiceGetByIdMock;
-  },
+vi.mock("../src/modules/activity/activity.model", () => ({
+  Activity: {},
+}));
+
+vi.mock("../src/modules/event/event.model", () => ({
+  Event: {},
+}));
+
+vi.mock("../src/modules/media/media.model", () => ({
+  Media: {},
+}));
+
+vi.mock("../src/modules/report/report.service", () => ({
+  ReportService: class {},
+}));
+
+vi.mock("../src/services/s3.service", () => ({
+  s3Service: {},
 }));
 
 vi.mock("../src/utils/transaction.utils", () => ({
@@ -60,7 +75,7 @@ describe("CommunityService counter consistency", () => {
     });
     const sessionSpy = vi.fn().mockReturnValue({ exec: postExec });
     const selectSpy = vi.fn().mockReturnValue({ session: sessionSpy });
-    communityPostModel.findById.mockReturnValue({ select: selectSpy });
+    communityPostModel.findOne.mockReturnValue({ select: selectSpy });
     communityCommentModel.create.mockRejectedValueOnce(new Error("create failed"));
 
     const service = new CommunityService();
@@ -89,7 +104,7 @@ describe("CommunityService counter consistency", () => {
     const postSelect = vi.fn().mockReturnValue({ session: postSession });
 
     communityCommentModel.findById.mockReturnValue({ select: parentSelect });
-    communityPostModel.findById.mockReturnValue({ select: postSelect });
+    communityPostModel.findOne.mockReturnValue({ select: postSelect });
     communityCommentModel.create.mockRejectedValueOnce(new Error("reply create failed"));
 
     const service = new CommunityService();
@@ -108,7 +123,7 @@ describe("CommunityService counter consistency", () => {
     const postExec = vi.fn().mockResolvedValue(null);
     const sessionSpy = vi.fn().mockReturnValue({ exec: postExec });
     const selectSpy = vi.fn().mockReturnValue({ session: sessionSpy });
-    communityPostModel.findById.mockReturnValue({ select: selectSpy });
+    communityPostModel.findOne.mockReturnValue({ select: selectSpy });
 
     const service = new CommunityService();
 

@@ -10,6 +10,7 @@ export type CreateCommunityPostBody = {
     coordinates?: [number, number];
   };
   eventId?: string;
+  activityId?: string;
   link?: string;
 };
 
@@ -33,6 +34,7 @@ export type NormalizedCommunityCreatePostInput = {
   mediaIds: string[];
   location: CommunityLocation | null;
   eventId?: string;
+  activityId?: string;
   link?: string;
 };
 
