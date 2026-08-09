@@ -9,7 +9,9 @@ export interface ICommunityPost {
   media: Types.ObjectId[];
   location?: CommunityLocation;
   eventId?: Types.ObjectId | null;
+  eventIds?: Types.ObjectId[];
   activityId?: Types.ObjectId | null;
+  activityIds?: Types.ObjectId[];
   link?: string | null;
   likeCount: number;
   commentCount: number;
@@ -75,11 +77,23 @@ const communityPostSchema = BaseSchemaUtil.createSchema<ICommunityPost>({
     ref: "Event",
     default: null,
   },
+  eventIds: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Event",
+    },
+  ],
   activityId: {
     type: Schema.Types.ObjectId,
     ref: "Activity",
     default: null,
   },
+  activityIds: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Activity",
+    },
+  ],
   link: {
     type: String,
     trim: true,
@@ -113,7 +127,9 @@ const communityPostSchema = BaseSchemaUtil.createSchema<ICommunityPost>({
 communityPostSchema.index({ createdAt: -1 });
 communityPostSchema.index({ authorId: 1, createdAt: -1 });
 communityPostSchema.index({ eventId: 1, createdAt: -1 });
+communityPostSchema.index({ eventIds: 1, createdAt: -1 });
 communityPostSchema.index({ activityId: 1, createdAt: -1 });
+communityPostSchema.index({ activityIds: 1, createdAt: -1 });
 
 export const CommunityPost = model<ICommunityPost>(
   "CommunityPost",

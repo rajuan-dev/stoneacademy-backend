@@ -27,6 +27,14 @@ const parseStringArray = (value: unknown) => {
   return parsed;
 };
 
+const parseObjectIdArray = (value: unknown) => {
+  const parsed = parseStringArray(value);
+  if (parsed === undefined) {
+    return undefined;
+  }
+  return Array.isArray(parsed) ? parsed : [parsed];
+};
+
 const objectIdSchema = z
   .string()
   .trim()
@@ -92,16 +100,27 @@ export const createCommunityPostSchema = z.object({
         z.array(objectIdSchema).optional(),
       ),
       location: locationSchema,
-      eventId: objectIdSchema.optional(),
-      activityId: objectIdSchema.optional(),
+      eventId: z.preprocess(parseObjectIdArray, z.array(objectIdSchema).optional()),
+      eventIds: z.preprocess(parseObjectIdArray, z.array(objectIdSchema).optional()),
+      activityId: z.preprocess(parseObjectIdArray, z.array(objectIdSchema).optional()),
+      activityIds: z.preprocess(parseObjectIdArray, z.array(objectIdSchema).optional()),
       link: z.string().trim().url().optional(),
     })
     .superRefine((data, ctx) => {
-      if (data.eventId && data.activityId) {
+      const eventIds = [
+        ...(data.eventId ?? []),
+        ...(data.eventIds ?? []),
+      ];
+      const activityIds = [
+        ...(data.activityId ?? []),
+        ...(data.activityIds ?? []),
+      ];
+
+      if (eventIds.length && activityIds.length) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["activityId"],
-          message: "eventId and activityId cannot both be supplied",
+          message: "eventId/eventIds and activityId/activityIds cannot both be supplied",
         });
       }
     }),

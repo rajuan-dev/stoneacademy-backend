@@ -54,7 +54,9 @@ export type CommunityPostResponse = {
   media: CommunityMediaResponse[];
   location: CommunityLocation | null;
   event: CommunityEventSummary | null;
+  events: CommunityEventSummary[];
   activity: CommunityActivitySummary | null;
+  activities: CommunityActivitySummary[];
   link: string | null;
   likeCount: number;
   commentCount: number;
@@ -94,7 +96,9 @@ export type CreateCommunityPostInput = {
   mediaIds?: string[];
   location?: CommunityLocation | null;
   eventId?: string | null;
+  eventIds?: string[] | null;
   activityId?: string | null;
+  activityIds?: string[] | null;
   link?: string;
 };
 
@@ -105,7 +109,9 @@ export type UpdateCommunityPostInput = {
   mediaIds?: string[] | null;
   location?: unknown;
   eventId?: string | null;
+  eventIds?: string[] | null;
   activityId?: string | null;
+  activityIds?: string[] | null;
   link?: string | null;
   files?: Express.Multer.File[];
 };

@@ -39,9 +39,25 @@ const controller = new CommunityCreatorController();
  *               location[longitude]:
  *                 type: number
  *               eventId:
- *                 type: string
+ *                 oneOf:
+ *                   - type: string
+ *                   - type: array
+ *                     items:
+ *                       type: string
+ *               eventIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
  *               activityId:
- *                 type: string
+ *                 oneOf:
+ *                   - type: string
+ *                   - type: array
+ *                     items:
+ *                       type: string
+ *               activityIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
  *               link:
  *                 type: string
  *               media:
@@ -62,9 +78,25 @@ const controller = new CommunityCreatorController();
  *               location:
  *                 type: object
  *               eventId:
- *                 type: string
+ *                 oneOf:
+ *                   - type: string
+ *                   - type: array
+ *                     items:
+ *                       type: string
+ *               eventIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
  *               activityId:
- *                 type: string
+ *                 oneOf:
+ *                   - type: string
+ *                   - type: array
+ *                     items:
+ *                       type: string
+ *               activityIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
  *               link:
  *                 type: string
  *     responses:
@@ -91,7 +123,9 @@ const controller = new CommunityCreatorController();
  *                     order: 0
  *                 location: null
  *                 event: null
+ *                 events: []
  *                 activity: null
+ *                 activities: []
  *                 link: null
  *                 likeCount: 0
  *                 commentCount: 0

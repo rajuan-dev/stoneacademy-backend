@@ -53,6 +53,24 @@ describe("Community schemas", () => {
     }).success).toBe(true);
   });
 
+  it("accepts null unused comment attachment ids", () => {
+    const result = createCommunityCommentSchema.safeParse({
+      params: { postId: validPostId },
+      body: {
+        text: "Test",
+        parentCommentId: null,
+        eventId: null,
+        activityId: "6890e4caa12f9d001f1b0501",
+      },
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.body.eventId).toBeUndefined();
+      expect(result.data.body.activityId).toBe("6890e4caa12f9d001f1b0501");
+    }
+  });
+
   it("rejects comment event and activity attachments together", () => {
     expect(createCommunityCommentSchema.safeParse({
       params: { postId: validPostId },

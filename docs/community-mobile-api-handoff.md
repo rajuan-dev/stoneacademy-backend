@@ -65,6 +65,7 @@ Validation and business errors use the existing backend error envelope. Ownershi
   ],
   "location": null,
   "event": null,
+  "events": [],
   "activity": {
     "id": "6890e4caa12f9d001f1b0501",
     "title": "Morning Run",
@@ -76,6 +77,19 @@ Validation and business errors use the existing backend error envelope. Ownershi
     "hostProfileImageUrl": null,
     "imageUrl": null
   },
+  "activities": [
+    {
+      "id": "6890e4caa12f9d001f1b0501",
+      "title": "Morning Run",
+      "type": "run",
+      "startAt": "2026-08-15T06:00:00.000Z",
+      "location": "Central Park",
+      "hostName": "Sarah Miller",
+      "hostUsername": "sarah",
+      "hostProfileImageUrl": null,
+      "imageUrl": null
+    }
+  ],
   "link": null,
   "likeCount": 10,
   "commentCount": 4,
@@ -84,7 +98,7 @@ Validation and business errors use the existing backend error envelope. Ownershi
 }
 ```
 
-A post can include `event` or `activity`, not both.
+A post can include events or activities, not both. `event` and `activity` are the first linked item for backward compatibility; use `events` and `activities` for the full lists.
 
 ## Comment And Reply Shape
 
@@ -121,7 +135,7 @@ Query:
 - `limit`: optional, max `100`
 - `q`: optional text search
 
-Only non-deleted posts are returned.
+Only non-deleted posts are returned. Active ads are injected into the response using the same pattern as the home `/feed`: after every 3 community posts when ads are available. Ad items have `kind: "ad"` and include `id`, `name`, `imageUrl`, `linkUrl`, `country`, `state`, `city`, and `createdAt`.
 
 `GET /community/posts/:postId`
 
@@ -167,17 +181,25 @@ Fields:
 - `mediaIds`: optional ordered array
 - `media`: optional uploaded image/video files for multipart
 - `location`: optional object or JSON string
-- `eventId`: optional
-- `activityId`: optional
+- `eventId`: optional single ID or array of IDs
+- `eventIds`: optional array of IDs
+- `activityId`: optional single ID or array of IDs
+- `activityIds`: optional array of IDs
 - `link`: optional URL
 
 Rules:
 
 - At least one content field is required.
-- `eventId` and `activityId` cannot both be supplied.
-- `eventId` must belong to the authenticated user as `Event.creatorId`.
-- `activityId` must belong to the authenticated user as `Activity.hostId`.
+- Event fields and activity fields cannot both be supplied on the same post.
+- Every event ID must belong to the authenticated user as `Event.creatorId`.
+- Every activity ID must belong to the authenticated user as `Activity.hostId`.
 - Existing `mediaIds` must belong to the authenticated user.
+
+Multipart examples:
+
+- Single event: `eventId={{eventId}}`
+- Multiple events: `eventId=["{{eventId1}}","{{eventId2}}"]` or `eventIds=["{{eventId1}}","{{eventId2}}"]`
+- Multiple activities: `activityId=["{{activityId1}}","{{activityId2}}"]` or `activityIds=["{{activityId1}}","{{activityId2}}"]`
 
 ## Edit Post
 

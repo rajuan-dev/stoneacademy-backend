@@ -29,9 +29,28 @@ const parseStringArray = (value: unknown) => {
   return parsed;
 };
 
+const parseObjectIdArray = (value: unknown) => {
+  const parsed = parseStringArray(value);
+  if (parsed === undefined) return undefined;
+  return Array.isArray(parsed) ? parsed : [parsed];
+};
+
 const nullableObjectIdSchema = z.preprocess(
   (value) => (value === "" || value === "null" ? null : value),
   objectIdSchema.nullable().optional(),
+);
+
+const optionalObjectIdSchema = z.preprocess(
+  (value) => (value === "" || value === "null" || value === null ? undefined : value),
+  objectIdSchema.optional(),
+);
+
+const nullableObjectIdArraySchema = z.preprocess(
+  (value) => {
+    if (value === "" || value === "null" || value === null) return null;
+    return parseObjectIdArray(value);
+  },
+  z.array(objectIdSchema).nullable().optional(),
 );
 
 const pageLimitSchema = z.object({
@@ -62,8 +81,8 @@ export const communityCommentIdSchema = z.object({
 const commentBodySchema = z
   .object({
     text: z.string().trim().max(4000).optional(),
-    eventId: objectIdSchema.optional(),
-    activityId: objectIdSchema.optional(),
+    eventId: optionalObjectIdSchema,
+    activityId: optionalObjectIdSchema,
   })
   .superRefine((data, ctx) => {
     if (data.eventId && data.activityId) {
@@ -124,18 +143,29 @@ export const updateCommunityPostSchema = z.object({
       ),
       location: z.preprocess(parseObject, z.any().nullable().optional()),
       eventId: nullableObjectIdSchema,
+      eventIds: nullableObjectIdArraySchema,
       activityId: nullableObjectIdSchema,
+      activityIds: nullableObjectIdArraySchema,
       link: z.string().trim().url().nullable().optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {
       message: "At least one field must be provided",
     })
     .superRefine((data, ctx) => {
-      if (data.eventId && data.activityId) {
+      const eventIds = [
+        ...(data.eventId ? [data.eventId] : []),
+        ...(data.eventIds ?? []),
+      ];
+      const activityIds = [
+        ...(data.activityId ? [data.activityId] : []),
+        ...(data.activityIds ?? []),
+      ];
+
+      if (eventIds.length && activityIds.length) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["activityId"],
-          message: "eventId and activityId cannot both be supplied",
+          message: "eventId/eventIds and activityId/activityIds cannot both be supplied",
         });
       }
     }),

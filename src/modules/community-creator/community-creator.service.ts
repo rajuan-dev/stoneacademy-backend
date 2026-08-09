@@ -30,8 +30,14 @@ export class CommunityCreatorService {
     );
     const uploadedMedia = await this.processUploadedMedia(input.userId, input.files);
     const location = this.normalizeLocation(input.body);
-    const eventId = await this.validateEventOwnership(input.userId, input.body.eventId);
-    const activityId = await this.validateActivityOwnership(input.userId, input.body.activityId);
+    const eventIds = await this.validateEventOwnership(
+      input.userId,
+      this.normalizeIds(input.body.eventIds, input.body.eventId),
+    );
+    const activityIds = await this.validateActivityOwnership(
+      input.userId,
+      this.normalizeIds(input.body.activityIds, input.body.activityId),
+    );
     const text = input.body.text?.trim() || undefined;
     const link = input.body.link?.trim() || undefined;
     const orderedMediaIds = [
@@ -43,8 +49,8 @@ export class CommunityCreatorService {
       !text
       && orderedMediaIds.length === 0
       && !location
-      && !eventId
-      && !activityId
+      && eventIds.length === 0
+      && activityIds.length === 0
       && !link
     ) {
       await this.cleanupUploadedMedia(uploadedMedia);
@@ -57,8 +63,10 @@ export class CommunityCreatorService {
         text,
         mediaIds: orderedMediaIds,
         location,
-        eventId,
-        activityId,
+        eventId: eventIds[0] ?? null,
+        eventIds,
+        activityId: activityIds[0] ?? null,
+        activityIds,
         link,
       });
     } catch (error) {
@@ -143,12 +151,12 @@ export class CommunityCreatorService {
     }
   }
 
-  async validateEventOwnership(userId: string, eventId?: string) {
-    return this.communityService.validateEventOwnership(userId, eventId);
+  async validateEventOwnership(userId: string, eventIds: string[]) {
+    return this.communityService.validateEventOwnershipMany(userId, eventIds);
   }
 
-  async validateActivityOwnership(userId: string, activityId?: string) {
-    return this.communityService.validateActivityOwnership(userId, activityId);
+  async validateActivityOwnership(userId: string, activityIds: string[]) {
+    return this.communityService.validateActivityOwnershipMany(userId, activityIds);
   }
 
   normalizeLocation(body: CreateCommunityPostBody): CommunityLocation | null {
@@ -182,5 +190,13 @@ export class CommunityCreatorService {
       Media.deleteMany({ _id: { $in: media.map((item) => item.id) } }).exec(),
       ...media.map((item) => s3Service.deleteFile(item.s3Key)),
     ]);
+  }
+
+  private normalizeIds(primary?: string[], legacy?: string | string[]) {
+    const values = [
+      ...(primary ?? []),
+      ...(Array.isArray(legacy) ? legacy : legacy ? [legacy] : []),
+    ];
+    return [...new Set(values.map((id) => id.trim()).filter(Boolean))];
   }
 }

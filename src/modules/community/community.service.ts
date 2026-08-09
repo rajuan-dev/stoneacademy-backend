@@ -1,10 +1,15 @@
 import { PAGINATION } from "@/constants/app.constants";
 import { env } from "@/env";
 import { Activity } from "@/modules/activity/activity.model";
+import { Ad } from "@/modules/ads/ads.model";
 import { Event } from "@/modules/event/event.model";
 import { Media } from "@/modules/media/media.model";
 import { ReportService } from "@/modules/report/report.service";
 import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+import {
+  buildGeographyFilter,
+  getUserGeography,
+} from "@/utils/geography.utils";
 import {
   BadRequestException,
   ForbiddenException,
@@ -40,7 +45,9 @@ type CommunityPostDocument = HydratedDocument<ICommunityPost> & {
   authorId: Types.ObjectId | PopulatedCommunityUser;
   media: Array<Types.ObjectId | PopulatedCommunityMedia>;
   eventId?: Types.ObjectId | PopulatedCommunityEvent | null;
+  eventIds?: Array<Types.ObjectId | PopulatedCommunityEvent>;
   activityId?: Types.ObjectId | PopulatedCommunityActivity | null;
+  activityIds?: Array<Types.ObjectId | PopulatedCommunityActivity>;
 };
 
 type CommunityCommentDocument = HydratedDocument<ICommunityComment> & {
@@ -68,18 +75,26 @@ export class CommunityService {
     const limit = input.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
     const filter: FilterQuery<ICommunityPost> = { isDeleted: false };
+    const viewerGeography = await getUserGeography(input.currentUserId);
+    const adFilter: FilterQuery<any> = {
+      status: "active",
+      ...buildGeographyFilter({
+        country: viewerGeography.country,
+      }),
+    };
 
     if (input.q) {
       filter.text = new RegExp(this.escapeRegex(input.q), "i");
+      adFilter.name = new RegExp(this.escapeRegex(input.q), "i");
     }
 
-    const [posts, totalItems] = await Promise.all([
+    const [posts, totalPosts, ads] = await Promise.all([
       this.populatePostQuery(CommunityPost.find(filter))
         .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
+        .limit(limit * 2)
         .exec() as Promise<CommunityPostDocument[]>,
       CommunityPost.countDocuments(filter),
+      Ad.find(adFilter).sort({ createdAt: -1 }).limit(limit * 2).exec(),
     ]);
 
     const postIds = posts.map((post) => post._id);
@@ -96,9 +111,14 @@ export class CommunityService {
       likeRows.map((row: { postId: Types.ObjectId }) => row.postId.toString()),
     );
 
+    const postItems = posts.map((post) =>
+      this.mapPostResponse(post, likedPostIds.has(post._id.toString())));
+    const adItems = ads.map((item: any) => this.mapAdResponse(item));
+    const merged = this.injectAdsIntoFeed(postItems, adItems);
+    const totalItems = totalPosts + adItems.length;
+
     return {
-      data: posts.map((post) =>
-        this.mapPostResponse(post, likedPostIds.has(post._id.toString()))),
+      data: merged.slice(skip, skip + limit),
       pagination: {
         currentPage: page,
         itemsPerPage: limit,
@@ -123,13 +143,18 @@ export class CommunityService {
   }
 
   async createPost(input: CreateCommunityPostInput) {
+    const eventIds = input.eventIds ?? (input.eventId ? [input.eventId] : []);
+    const activityIds = input.activityIds ?? (input.activityId ? [input.activityId] : []);
+
     const created = await CommunityPost.create({
       authorId: input.authorId,
       text: input.text,
       media: input.mediaIds ?? [],
       location: input.location ?? undefined,
-      eventId: input.eventId ?? null,
-      activityId: input.activityId ?? null,
+      eventId: eventIds[0] ?? null,
+      eventIds,
+      activityId: activityIds[0] ?? null,
+      activityIds,
       link: input.link,
       isDeleted: false,
     });
@@ -185,42 +210,54 @@ export class CommunityService {
           post.link = input.link?.trim() || null;
         }
 
-        let nextEventId = input.eventId !== undefined
-          ? input.eventId
-          : post.eventId?.toString() ?? null;
-        let nextActivityId = input.activityId !== undefined
-          ? input.activityId
-          : post.activityId?.toString() ?? null;
+        const currentEventIds = this.getEntityIds(post.eventIds, post.eventId);
+        const currentActivityIds = this.getEntityIds(post.activityIds, post.activityId);
+        const hasEventInput = input.eventId !== undefined || input.eventIds !== undefined;
+        const hasActivityInput = input.activityId !== undefined || input.activityIds !== undefined;
+        let nextEventIds = hasEventInput
+          ? this.normalizeEntityIds(input.eventIds, input.eventId)
+          : currentEventIds;
+        let nextActivityIds = hasActivityInput
+          ? this.normalizeEntityIds(input.activityIds, input.activityId)
+          : currentActivityIds;
 
-        if (input.eventId) nextActivityId = null;
-        if (input.activityId) nextEventId = null;
+        if (hasEventInput && nextEventIds.length) nextActivityIds = [];
+        if (hasActivityInput && nextActivityIds.length) nextEventIds = [];
 
-        if (nextEventId && nextActivityId) {
-          throw new BadRequestException("eventId and activityId cannot both be supplied");
+        if (nextEventIds.length && nextActivityIds.length) {
+          throw new BadRequestException("eventId/eventIds and activityId/activityIds cannot both be supplied");
         }
 
-        if (input.eventId !== undefined) {
-          if (input.eventId) {
-            await this.validateEventOwnership(input.userId, input.eventId);
+        if (hasEventInput) {
+          if (nextEventIds.length) {
+            await this.validateEventOwnershipMany(input.userId, nextEventIds);
           }
-          post.eventId = input.eventId ? input.eventId as any : null;
-          if (input.eventId) post.activityId = null;
+          post.eventId = nextEventIds[0] ? nextEventIds[0] as any : null;
+          post.eventIds = nextEventIds as any;
+          if (nextEventIds.length) {
+            post.activityId = null;
+            post.activityIds = [];
+          }
         }
 
-        if (input.activityId !== undefined) {
-          if (input.activityId) {
-            await this.validateActivityOwnership(input.userId, input.activityId);
+        if (hasActivityInput) {
+          if (nextActivityIds.length) {
+            await this.validateActivityOwnershipMany(input.userId, nextActivityIds);
           }
-          post.activityId = input.activityId ? input.activityId as any : null;
-          if (input.activityId) post.eventId = null;
+          post.activityId = nextActivityIds[0] ? nextActivityIds[0] as any : null;
+          post.activityIds = nextActivityIds as any;
+          if (nextActivityIds.length) {
+            post.eventId = null;
+            post.eventIds = [];
+          }
         }
 
         if (!this.hasPostContent({
           text: post.text,
           mediaIds: post.media?.map((id: any) => id.toString()) ?? [],
           location: post.location ?? null,
-          eventId: post.eventId?.toString() ?? null,
-          activityId: post.activityId?.toString() ?? null,
+          eventIds: this.getEntityIds(post.eventIds, post.eventId),
+          activityIds: this.getEntityIds(post.activityIds, post.activityId),
           link: post.link,
         })) {
           throw new BadRequestException("Community post must include at least one content field");
@@ -653,22 +690,48 @@ export class CommunityService {
 
   async validateEventOwnership(userId: string, eventId?: string | null) {
     if (!eventId) return undefined;
-    const event = await Event.findById(eventId).select("_id creatorId").exec();
-    if (!event) throw new NotFoundException("Event not found");
-    if (event.creatorId.toString() !== userId) {
-      throw new ForbiddenException("You do not have access to this event");
-    }
+    await this.validateEventOwnershipMany(userId, [eventId]);
     return eventId;
   }
 
   async validateActivityOwnership(userId: string, activityId?: string | null) {
     if (!activityId) return undefined;
-    const activity = await Activity.findById(activityId).select("_id hostId").exec();
-    if (!activity) throw new NotFoundException("Activity not found");
-    if (activity.hostId.toString() !== userId) {
-      throw new ForbiddenException("You do not have access to this activity");
-    }
+    await this.validateActivityOwnershipMany(userId, [activityId]);
     return activityId;
+  }
+
+  async validateEventOwnershipMany(userId: string, eventIds: string[]) {
+    if (!eventIds.length) return [];
+
+    const events = await Event.find({ _id: { $in: eventIds } }).select("_id creatorId").exec();
+    const eventsById = new Map(events.map((event) => [event._id.toString(), event]));
+
+    return eventIds.map((eventId) => {
+      const event = eventsById.get(eventId);
+      if (!event) throw new NotFoundException("Event not found");
+      if (event.creatorId.toString() !== userId) {
+        throw new ForbiddenException("You do not have access to this event");
+      }
+      return eventId;
+    });
+  }
+
+  async validateActivityOwnershipMany(userId: string, activityIds: string[]) {
+    if (!activityIds.length) return [];
+
+    const activities = await Activity.find({ _id: { $in: activityIds } }).select("_id hostId").exec();
+    const activitiesById = new Map(
+      activities.map((activity) => [activity._id.toString(), activity]),
+    );
+
+    return activityIds.map((activityId) => {
+      const activity = activitiesById.get(activityId);
+      if (!activity) throw new NotFoundException("Activity not found");
+      if (activity.hostId.toString() !== userId) {
+        throw new ForbiddenException("You do not have access to this activity");
+      }
+      return activityId;
+    });
   }
 
   hasPostContent(input: {
@@ -676,7 +739,9 @@ export class CommunityService {
     mediaIds?: string[];
     location?: CommunityLocation | null;
     eventId?: string | null;
+    eventIds?: string[];
     activityId?: string | null;
+    activityIds?: string[];
     link?: string | null;
   }) {
     return Boolean(
@@ -684,7 +749,9 @@ export class CommunityService {
       || input.mediaIds?.length
       || input.location
       || input.eventId
+      || input.eventIds?.length
       || input.activityId
+      || input.activityIds?.length
       || input.link?.trim(),
     );
   }
@@ -748,14 +815,54 @@ export class CommunityService {
       text: post.text?.trim() || null,
       media: this.mapMediaList(post.media),
       location: post.location ?? null,
-      event: this.mapEventSummary(post.eventId),
-      activity: this.mapActivitySummary(post.activityId),
+      event: this.mapEventSummaryList(post.eventIds, post.eventId)[0] ?? null,
+      events: this.mapEventSummaryList(post.eventIds, post.eventId),
+      activity: this.mapActivitySummaryList(post.activityIds, post.activityId)[0] ?? null,
+      activities: this.mapActivitySummaryList(post.activityIds, post.activityId),
       link: post.link?.trim() || null,
       likeCount: post.likeCount,
       commentCount: post.commentCount,
       isLikedByCurrentUser,
       createdAt: post.createdAt.toISOString(),
     };
+  }
+
+  private mapAdResponse(ad: any) {
+    return {
+      kind: "ad",
+      id: ad._id.toString(),
+      name: ad.name,
+      imageUrl: ad.imageUrl,
+      linkUrl: ad.linkUrl,
+      country: ad.country || null,
+      state: ad.state || null,
+      city: ad.city || null,
+      createdAt: ad.createdAt,
+    };
+  }
+
+  private injectAdsIntoFeed(contentItems: any[], adItems: any[]) {
+    if (!adItems.length) return contentItems;
+    if (!contentItems.length) return adItems;
+
+    const merged: any[] = [];
+    let contentIndex = 0;
+    let adIndex = 0;
+    const interval = 3;
+
+    while (contentIndex < contentItems.length || adIndex < adItems.length) {
+      for (let i = 0; i < interval && contentIndex < contentItems.length; i += 1) {
+        merged.push(contentItems[contentIndex]);
+        contentIndex += 1;
+      }
+
+      if (adIndex < adItems.length) {
+        merged.push(adItems[adIndex]);
+        adIndex += 1;
+      }
+    }
+
+    return merged;
   }
 
   mapCommentResponse(
@@ -856,7 +963,23 @@ export class CommunityService {
         ],
       })
       .populate({
+        path: "eventIds",
+        select: EVENT_SELECT,
+        populate: [
+          { path: "creatorId", select: POST_AUTHOR_SELECT },
+          { path: "media", select: ATTACHMENT_MEDIA_SELECT },
+        ],
+      })
+      .populate({
         path: "activityId",
+        select: ACTIVITY_SELECT,
+        populate: [
+          { path: "hostId", select: POST_AUTHOR_SELECT },
+          { path: "media", select: ATTACHMENT_MEDIA_SELECT },
+        ],
+      })
+      .populate({
+        path: "activityIds",
         select: ACTIVITY_SELECT,
         populate: [
           { path: "hostId", select: POST_AUTHOR_SELECT },
@@ -952,6 +1075,47 @@ export class CommunityService {
       creatorProfileImageUrl: creator?.profileImageUrl || null,
       imageUrl: firstMediaUrl,
     };
+  }
+
+  private mapEventSummaryList(
+    events: Array<Types.ObjectId | PopulatedCommunityEvent> | null | undefined,
+    fallback?: Types.ObjectId | PopulatedCommunityEvent | null,
+  ): CommunityEventSummary[] {
+    const items = events?.length ? events : fallback ? [fallback] : [];
+    return items
+      .map((event) => this.mapEventSummary(event))
+      .filter((event): event is CommunityEventSummary => Boolean(event));
+  }
+
+  private mapActivitySummaryList(
+    activities: Array<Types.ObjectId | PopulatedCommunityActivity> | null | undefined,
+    fallback?: Types.ObjectId | PopulatedCommunityActivity | null,
+  ): CommunityActivitySummary[] {
+    const items = activities?.length ? activities : fallback ? [fallback] : [];
+    return items
+      .map((activity) => this.mapActivitySummary(activity))
+      .filter((activity): activity is CommunityActivitySummary => Boolean(activity));
+  }
+
+  private normalizeEntityIds(ids?: string[] | null, legacyId?: string | null) {
+    const values = [
+      ...(ids ?? []),
+      ...(legacyId ? [legacyId] : []),
+    ];
+    return [...new Set(values.map((id) => id.trim()).filter(Boolean))];
+  }
+
+  private getEntityIds(
+    ids?: Array<Types.ObjectId | PopulatedCommunityEvent | PopulatedCommunityActivity> | null,
+    legacyId?: Types.ObjectId | PopulatedCommunityEvent | PopulatedCommunityActivity | null,
+  ) {
+    const values = ids?.length ? ids : legacyId ? [legacyId] : [];
+    return values.map((id) => {
+      if (this.isPopulatedEvent(id) || this.isPopulatedActivity(id)) {
+        return id._id.toString();
+      }
+      return String(id);
+    });
   }
 
   private getAuthorId(author: Types.ObjectId | PopulatedCommunityUser) {
