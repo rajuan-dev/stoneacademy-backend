@@ -397,6 +397,7 @@ export class UserController {
     const result = await this.userService.getCreatorFullProfile(
       validated.params.id,
       validated.query,
+      req.user?.userId,
     );
     ApiResponse.success(res, result, "Creator profile fetched successfully");
   });

@@ -25,6 +25,8 @@ import type { IUser } from "./user.interface";
 import { UserRepository } from "./user.repository";
 import { Activity } from "@/modules/activity/activity.model";
 import { ActivityParticipant } from "@/modules/activity/activity-participant.model";
+import { CommunityLike } from "@/modules/community/community-like.model";
+import { CommunityPost } from "@/modules/community/community-post.model";
 import { Event } from "@/modules/event/event.model";
 import { EventParticipant } from "@/modules/event/event-participant.model";
 import { Review } from "@/modules/review/review.model";
@@ -723,6 +725,7 @@ export class UserService {
       page?: number;
       limit?: number;
     },
+    viewerUserId?: string,
   ) {
     const user = await this.userRepository.findById(userId);
     if (!user) {
@@ -738,6 +741,7 @@ export class UserService {
       hostedEvents,
       joinedActivities,
       joinedEvents,
+      communityPosts,
       ratings,
       gallery,
     ] = await Promise.all([
@@ -749,6 +753,7 @@ export class UserService {
       this.listHostedEvents(userId, { page, limit }),
       this.listJoinedActivities(userId, { page, limit }),
       this.listJoinedEvents(userId, { page, limit }),
+      this.listCommunityPostsForProfile(userId, { page, limit }, viewerUserId),
       this.listMyRatings(userId, { page, limit }),
       this.getMyGalleryMedia(userId, {
         page,
@@ -805,6 +810,7 @@ export class UserService {
       hostedEvents,
       joinedActivities,
       joinedEvents,
+      communityPosts,
       ratings,
       gallery,
     };
@@ -1250,6 +1256,86 @@ export class UserService {
     };
   }
 
+  async listCommunityPostsForProfile(
+    userId: string,
+    query: { page?: number; limit?: number },
+    viewerUserId?: string,
+  ) {
+    const page = query.page ?? PAGINATION.DEFAULT_PAGE;
+    const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+    const filter = { authorId: userId, isDeleted: false };
+
+    const [posts, totalItems] = await Promise.all([
+      CommunityPost.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("authorId", "fullName email profileImageUrl")
+        .populate("media", "url type mimeType")
+        .populate({
+          path: "eventId",
+          select: "title type category startAt location creatorId media",
+          populate: [
+            { path: "creatorId", select: "fullName email profileImageUrl" },
+            { path: "media", select: "url type mimeType" },
+          ],
+        })
+        .populate({
+          path: "eventIds",
+          select: "title type category startAt location creatorId media",
+          populate: [
+            { path: "creatorId", select: "fullName email profileImageUrl" },
+            { path: "media", select: "url type mimeType" },
+          ],
+        })
+        .populate({
+          path: "activityId",
+          select: "title type category startAt location hostId media",
+          populate: [
+            { path: "hostId", select: "fullName email profileImageUrl" },
+            { path: "media", select: "url type mimeType" },
+          ],
+        })
+        .populate({
+          path: "activityIds",
+          select: "title type category startAt location hostId media",
+          populate: [
+            { path: "hostId", select: "fullName email profileImageUrl" },
+            { path: "media", select: "url type mimeType" },
+          ],
+        })
+        .lean(),
+      CommunityPost.countDocuments(filter),
+    ]);
+
+    const postIds = posts.map((post: any) => post._id);
+    const likedRows = viewerUserId && postIds.length
+      ? await CommunityLike.find({
+          postId: { $in: postIds },
+          userId: viewerUserId,
+        })
+          .select("postId")
+          .lean()
+      : [];
+    const likedPostIds = new Set(
+      likedRows.map((row: any) => row.postId.toString()),
+    );
+
+    return {
+      data: posts.map((post: any) =>
+        this.formatCommunityPostCard(post, likedPostIds.has(post._id.toString()))),
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems,
+        pageCount: Math.ceil(totalItems / limit),
+        hasNext: page * limit < totalItems,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
   async getMyProfileOverview(
     userId: string,
     query?: { recentLimit?: number; mediaLimit?: number },
@@ -1551,6 +1637,107 @@ export class UserService {
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
     };
+  }
+
+  private formatCommunityPostCard(post: any, isLikedByCurrentUser: boolean) {
+    const events = this.formatCommunityEventAttachments(post.eventIds, post.eventId);
+    const activities = this.formatCommunityActivityAttachments(post.activityIds, post.activityId);
+
+    return {
+      id: post._id.toString(),
+      author: this.formatCommunityAuthor(post.authorId),
+      text: post.text?.trim() || null,
+      media: Array.isArray(post.media)
+        ? post.media.map((media: any, index: number) => ({
+            id: media._id?.toString?.() || media.toString?.() || null,
+            type: media.type === "video" ? "VIDEO" : "IMAGE",
+            url: media.url || null,
+            thumbnailUrl: null,
+            order: index,
+          }))
+        : [],
+      location: post.location ?? null,
+      event: events[0] ?? null,
+      events,
+      activity: activities[0] ?? null,
+      activities,
+      link: post.link?.trim() || null,
+      likeCount: post.likeCount ?? 0,
+      commentCount: post.commentCount ?? 0,
+      isLikedByCurrentUser,
+      createdAt: post.createdAt instanceof Date
+        ? post.createdAt.toISOString()
+        : post.createdAt,
+    };
+  }
+
+  private formatCommunityAuthor(author?: any) {
+    if (!author) {
+      return {
+        id: null,
+        name: null,
+        username: null,
+        avatarUrl: null,
+      };
+    }
+
+    return {
+      id: author._id?.toString?.() || author.toString?.() || null,
+      name: author.fullName || null,
+      username: author.email ? String(author.email).split("@")[0] : null,
+      avatarUrl: author.profileImageUrl || null,
+    };
+  }
+
+  private formatCommunityEventAttachments(events?: any[], fallback?: any) {
+    const items = Array.isArray(events) && events.length ? events : fallback ? [fallback] : [];
+    return items
+      .filter((event) => event && event._id)
+      .map((event) => {
+        const creator = event.creatorId && event.creatorId._id ? event.creatorId : null;
+        const firstMedia = Array.isArray(event.media) ? event.media[0] : null;
+
+        return {
+          id: event._id.toString(),
+          title: event.title || null,
+          type: event.type || event.category || null,
+          startAt: event.startAt instanceof Date
+            ? event.startAt.toISOString()
+            : event.startAt || null,
+          location: event.location?.label || null,
+          creatorName: creator?.fullName || null,
+          creatorUsername: creator?.email ? String(creator.email).split("@")[0] : null,
+          creatorProfileImageUrl: creator?.profileImageUrl || null,
+          imageUrl: firstMedia?.url || null,
+        };
+      });
+  }
+
+  private formatCommunityActivityAttachments(activities?: any[], fallback?: any) {
+    const items = Array.isArray(activities) && activities.length
+      ? activities
+      : fallback ? [fallback] : [];
+
+    return items
+      .filter((activity) => activity && activity._id)
+      .map((activity) => {
+        const host = activity.hostId && activity.hostId._id ? activity.hostId : null;
+        const firstMedia = Array.isArray(activity.media) ? activity.media[0] : null;
+
+        return {
+          id: activity._id.toString(),
+          title: activity.title || null,
+          type: activity.type || activity.category || null,
+          startAt: activity.startAt instanceof Date
+            ? activity.startAt.toISOString()
+            : activity.startAt || null,
+          location: activity.location?.label || null,
+          hostName: host?.fullName || null,
+          hostUsername: host?.email ? String(host.email).split("@")[0] : null,
+          hostProfileImageUrl: host?.profileImageUrl || null,
+          imageUrl: firstMedia?.url || null,
+        };
+      });
   }
 
   private calculatePayablePrice(ticketPrice: number, discountPercentage: number) {

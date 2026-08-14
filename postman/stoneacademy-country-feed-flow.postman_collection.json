@@ -303,8 +303,10 @@
         },
         {
           "name": "Get Creator Full Profile",
+          "description": "Returns profile, overview, hosted/joined activities and events, ratings, gallery, and communityPosts. communityPosts uses the same page and limit query values.",
           "request": {
             "method": "GET",
+            "description": "Response includes data.communityPosts = { data, pagination }. Each community post includes author, media, event/events, activity/activities, link, likeCount, commentCount, isLikedByCurrentUser, and createdAt.",
             "url": {
               "raw": "{{baseUrl}}/users/{{creatorUserId}}/creator-profile?page=1&limit=10&recentLimit=10&mediaLimit=6",
               "host": ["{{baseUrl}}"],
