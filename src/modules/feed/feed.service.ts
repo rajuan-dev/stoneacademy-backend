@@ -19,8 +19,10 @@ export class FeedService {
 
   async list(query: {
     q?: string;
+    kind?: "all" | "activity" | "event" | "ad";
     category?: string;
     type?: string;
+    country?: string;
     state?: string;
     city?: string;
     paid?: "all" | "free" | "paid";
@@ -38,7 +40,7 @@ export class FeedService {
     const skip = (page - 1) * limit;
     const viewerGeography = await getUserGeography(query.userId);
     const geographyFilter = buildGeographyFilter({
-      country: viewerGeography.country,
+      country: query.country ?? viewerGeography.country,
       state: query.state,
       city: query.city,
     });
@@ -56,14 +58,20 @@ export class FeedService {
     const sharedRadiusMiles = this.toMiles(query.radius, query.radiusUnit);
     const sharedSort = this.toSharedSort(query.sort);
 
-    const includeActivities = query.paid !== "paid";
-    const includeAds = !query.paid || query.paid === "all";
+    const includeActivities =
+      (!query.kind || query.kind === "all" || query.kind === "activity")
+      && query.paid !== "paid";
+    const includeEvents = !query.kind || query.kind === "all" || query.kind === "event";
+    const includeAds =
+      (!query.kind || query.kind === "all" || query.kind === "ad")
+      && (!query.paid || query.paid === "all");
 
     const [activityResult, eventResult, ads] = await Promise.all([
       includeActivities
         ? this.activityService.list({
             q: query.q,
             category: query.category ?? query.type,
+            country: query.country,
             state: query.state,
             city: query.city,
             lat: query.lat,
@@ -75,20 +83,23 @@ export class FeedService {
             viewerUserId: query.userId,
           })
         : Promise.resolve({ data: [] as any[] }),
-      this.eventService.list({
-        q: query.q,
-        category: query.category ?? query.type,
-        state: query.state,
-        city: query.city,
-        lat: query.lat,
-        lng: query.lng,
-        radiusMiles: sharedRadiusMiles,
-        paid: query.paid === "all" ? undefined : query.paid,
-        sort: sharedSort,
-        page: 1,
-        limit: limit * 2,
-        viewerUserId: query.userId,
-      }),
+      includeEvents
+        ? this.eventService.list({
+            q: query.q,
+            category: query.category ?? query.type,
+            country: query.country,
+            state: query.state,
+            city: query.city,
+            lat: query.lat,
+            lng: query.lng,
+            radiusMiles: sharedRadiusMiles,
+            paid: query.paid === "all" ? undefined : query.paid,
+            sort: sharedSort,
+            page: 1,
+            limit: limit * 2,
+            viewerUserId: query.userId,
+          })
+        : Promise.resolve({ data: [] as any[] }),
       includeAds
         ? Ad.find(adFilter).sort({ createdAt: -1 }).limit(limit * 2).exec()
         : Promise.resolve([]),

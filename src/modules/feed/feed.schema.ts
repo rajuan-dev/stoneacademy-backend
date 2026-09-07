@@ -5,6 +5,8 @@ export const listFeedSchema = z.object({
     q: z.string().trim().max(200).optional(),
     category: z.string().trim().max(100).optional(),
     type: z.string().trim().max(100).optional(),
+    kind: z.enum(["all", "activity", "event", "ad"]).optional(),
+    country: z.string().trim().max(100).optional(),
     state: z.string().trim().max(100).optional(),
     city: z.string().trim().max(100).optional(),
     paid: z.enum(["all", "free", "paid"]).optional(),

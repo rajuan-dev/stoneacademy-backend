@@ -32,6 +32,7 @@ type ListQuery = {
   type?: string;
   dateFrom?: Date;
   dateTo?: Date;
+  country?: string;
   lat?: number;
   lng?: number;
   radiusMiles?: number;
@@ -64,7 +65,7 @@ export class EventService {
     };
     const viewerGeography = await getUserGeography(query.viewerUserId);
     Object.assign(filter, buildGeographyFilter({
-      country: viewerGeography.country,
+      country: query.country ?? viewerGeography.country,
       state: query.state,
       city: query.city,
     }));
