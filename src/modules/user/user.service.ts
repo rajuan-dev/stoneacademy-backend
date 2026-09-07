@@ -291,7 +291,7 @@ export class UserService {
     email: string;
     passwordHash: string;
     fullName: string;
-    country: string;
+    country?: string;
     dob?: Date;
     role: (typeof ROLES)[keyof typeof ROLES];
     status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];

@@ -5,7 +5,7 @@ import { model, type Document } from "mongoose";
 export interface IPendingRegistration extends Document {
   email: string;
   fullName: string;
-  country: string;
+  country?: string;
   dob?: Date;
   passwordHash: string;
   role: (typeof ROLES)[keyof typeof ROLES];
@@ -35,7 +35,6 @@ const pendingRegistrationSchema =
     },
     country: {
       type: String,
-      required: true,
       trim: true,
       index: true,
     },

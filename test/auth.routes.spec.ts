@@ -54,6 +54,20 @@ describe("Auth routes", () => {
     expect(res.body.success).toBe(true);
   });
 
+  it("registers a user without country", async () => {
+    const res = await request(app)
+      .post("/api/v1/auth/register")
+      .send({
+        email: "nocountry@example.com",
+        password: "StrongP@ssw0rd",
+        confirmPassword: "StrongP@ssw0rd",
+        fullName: "No Country User",
+      })
+      .expect(201);
+
+    expect(res.body.success).toBe(true);
+  });
+
   it("sends OTP", async () => {
     const res = await request(app)
       .post("/api/v1/auth/otp/send")
