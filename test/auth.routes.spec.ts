@@ -15,6 +15,10 @@ vi.mock("../src/modules/auth/auth.service", () => {
       user: { _id: "u1", email: "test@example.com", fullName: "Test User" },
       tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
     });
+    loginWithGoogle = vi.fn().mockResolvedValue({
+      user: { _id: "u1", email: "test@example.com", fullName: "Test User" },
+      tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
+    });
     sendOtp = vi.fn().mockResolvedValue({
       expiresAt: new Date().toISOString(),
       expiresInMinutes: 10,
@@ -93,5 +97,18 @@ describe("Auth routes", () => {
       .expect(200);
 
     expect(res.body.success).toBe(true);
+  });
+
+  it("logs in with Google", async () => {
+    const res = await request(app)
+      .post("/api/v1/auth/google")
+      .send({
+        idToken: "valid-google-id-token",
+        fullName: "Test User",
+      })
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.accessToken).toBe("access");
   });
 });

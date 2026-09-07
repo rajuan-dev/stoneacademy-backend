@@ -79,6 +79,7 @@ export type UserCreatePayload = {
   };
   role: (typeof ROLES)[keyof typeof ROLES];
   status?: (typeof USER_STATUS)[keyof typeof USER_STATUS];
+  accountStatus?: (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
   emailVerifiedAt?: Date | null;
   cleanerPercentage?: number;
 };

@@ -2,6 +2,7 @@
 
 import {
   AUTH,
+  ACCOUNT_STATUS,
   MESSAGES,
   OTP_PURPOSES,
   ROLES,
@@ -49,15 +50,15 @@ export class AuthService {
   private userService: UserService;
   private adminAccountService: AdminAccountService;
   private emailService: EmailService;
-  private googleClient?: OAuth2Client;
+  private googleClient: OAuth2Client;
+  private googleClientIds: string[];
 
   constructor() {
     this.userService = new UserService();
     this.adminAccountService = new AdminAccountService();
     this.emailService = new EmailService();
-    if (env.GOOGLE_CLIENT_ID) {
-      this.googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
-    }
+    this.googleClientIds = this.getGoogleClientIds();
+    this.googleClient = new OAuth2Client();
   }
 
   async login(payload: LoginPayload): Promise<AuthServiceResponse> {
@@ -149,13 +150,13 @@ export class AuthService {
     idToken: string;
     fullName?: string;
   }): Promise<AuthServiceResponse> {
-    if (!env.GOOGLE_CLIENT_ID || !this.googleClient) {
+    if (this.googleClientIds.length === 0) {
       throw new BadRequestException("Google auth is not configured");
     }
 
     const ticket = await this.googleClient.verifyIdToken({
       idToken: payload.idToken,
-      audience: env.GOOGLE_CLIENT_ID,
+      audience: this.googleClientIds,
     });
 
     const googlePayload = ticket.getPayload();
@@ -176,8 +177,13 @@ export class AuthService {
         fullName,
         role: ROLES.USER,
         status: USER_STATUS.ACTIVE,
+        accountStatus: ACCOUNT_STATUS.ACTIVE,
         emailVerifiedAt: new Date(),
       });
+      if (googlePayload.picture) {
+        user.profileImageUrl = googlePayload.picture;
+        await user.save();
+      }
     } else {
       if (user.status === USER_STATUS.BLOCKED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
@@ -188,6 +194,9 @@ export class AuthService {
       if (!user.emailVerified) {
         user.emailVerified = true;
         user.emailVerifiedAt = new Date();
+      }
+      if (user.accountStatus !== ACCOUNT_STATUS.ACTIVE) {
+        user.accountStatus = ACCOUNT_STATUS.ACTIVE;
       }
       if (!user.profileImageUrl && googlePayload.picture) {
         user.profileImageUrl = googlePayload.picture;
@@ -610,6 +619,14 @@ export class AuthService {
       refreshToken,
       expiresIn: AUTH.ACCESS_TOKEN_EXPIRY,
     };
+  }
+
+  private getGoogleClientIds(): string[] {
+    return [env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_IDS]
+      .filter(Boolean)
+      .flatMap((value) => String(value).split(","))
+      .map((value) => value.trim())
+      .filter(Boolean);
   }
 
   async logout(

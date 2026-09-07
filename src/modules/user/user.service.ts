@@ -277,7 +277,7 @@ export class UserService {
       status: payload.status ?? USER_STATUS.ACTIVE,
       emailVerified: Boolean(payload.emailVerifiedAt),
       emailVerifiedAt: payload.emailVerifiedAt ?? null,
-      accountStatus: ACCOUNT_STATUS.PENDING,
+      accountStatus: payload.accountStatus ?? ACCOUNT_STATUS.PENDING,
       cleanerPercentage: payload.role === ROLES.CLEANER
         ? payload.cleanerPercentage
         : undefined,
