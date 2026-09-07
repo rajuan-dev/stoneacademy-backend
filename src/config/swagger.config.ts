@@ -59,12 +59,15 @@ const swaggerDefinition: swaggerJsdoc.OAS3Definition = {
             example: "1997-11-28",
           },
           role: { type: "string", enum: ["user"], example: "user" },
+          country: { type: "string", example: "Bangladesh" },
         },
       },
       AuthRegisterResponse: {
         type: "object",
         properties: {
-          email: { type: "string", format: "email" },
+          user: { $ref: "#/components/schemas/UserProfile" },
+          accessToken: { type: "string", description: "JWT access token" },
+          expiresIn: { type: "string", example: "7d" },
           verification: {
             type: "object",
             properties: {

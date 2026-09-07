@@ -60,6 +60,10 @@ export type AuthControllerResponse = {
   expiresIn: string;
 };
 
+export type RegisterControllerResponse = AuthControllerResponse & {
+  verification: { expiresAt: Date; expiresInMinutes: number };
+};
+
 /**
  * Change password payload
  */

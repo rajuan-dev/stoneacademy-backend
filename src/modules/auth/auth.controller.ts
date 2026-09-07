@@ -20,7 +20,7 @@ import {
   requestPasswordResetSchema,
 } from "./auth.schema";
 import { AuthService } from "./auth.service";
-import { AuthControllerResponse } from "./auth.type";
+import { AuthControllerResponse, RegisterControllerResponse } from "./auth.type";
 import type { OtpPurpose } from "../otp/otp.model";
 
 export class AuthController {
@@ -44,7 +44,20 @@ export class AuthController {
       },
     });
 
-    ApiResponse.created(res, result, MESSAGES.AUTH.REGISTER_SUCCESS);
+    res.cookie(
+      COOKIE_CONFIG.REFRESH_TOKEN.name,
+      result.tokens.refreshToken,
+      COOKIE_CONFIG.REFRESH_TOKEN.options
+    );
+
+    const response: RegisterControllerResponse = {
+      user: result.user,
+      accessToken: result.tokens.accessToken,
+      expiresIn: result.tokens.expiresIn,
+      verification: result.verification,
+    };
+
+    ApiResponse.created(res, response, MESSAGES.AUTH.REGISTER_SUCCESS);
   });
 
   /**

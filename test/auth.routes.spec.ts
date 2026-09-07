@@ -6,6 +6,7 @@ vi.mock("../src/modules/auth/auth.service", () => {
   class AuthService {
     register = vi.fn().mockResolvedValue({
       user: { _id: "u1", email: "test@example.com", fullName: "Test User" },
+      tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
       verification: {
         expiresAt: new Date().toISOString(),
         expiresInMinutes: 10,
@@ -52,6 +53,8 @@ describe("Auth routes", () => {
       .expect(201);
 
     expect(res.body.success).toBe(true);
+    expect(res.body.data.accessToken).toBe("access");
+    expect(res.body.data.expiresIn).toBe("7d");
   });
 
   it("registers a user without country", async () => {
@@ -66,6 +69,8 @@ describe("Auth routes", () => {
       .expect(201);
 
     expect(res.body.success).toBe(true);
+    expect(res.body.data.accessToken).toBe("access");
+    expect(res.body.data.expiresIn).toBe("7d");
   });
 
   it("sends OTP", async () => {

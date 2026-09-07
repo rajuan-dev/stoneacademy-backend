@@ -321,8 +321,7 @@ export class AuthService {
     };
   }
 
-  async register(payload: RegisterPayload): Promise<{
-    email: string;
+  async register(payload: RegisterPayload): Promise<AuthServiceResponse & {
     verification: { expiresAt: Date; expiresInMinutes: number };
   }> {
     if (payload.role && payload.role !== ROLES.USER) {
@@ -351,27 +350,24 @@ export class AuthService {
       expiresIn: String(otp.expiresInMinutes),
     });
 
-    await PendingRegistration.findOneAndUpdate(
-      { email },
-      {
-        email,
-        fullName: payload.fullName,
-        country: normalizeGeographyValue(payload.country),
-        dob: payload.dob,
-        passwordHash,
-        role: ROLES.USER,
-        expiresAt: otp.expiresAt,
-        meta: payload.meta,
-      },
-      {
-        upsert: true,
-        new: true,
-        runValidators: true,
-      },
-    ).exec();
+    const user = await this.userService.createUserWithHashedPassword({
+      email,
+      passwordHash,
+      fullName: payload.fullName,
+      country: normalizeGeographyValue(payload.country),
+      dob: payload.dob,
+      role: ROLES.USER,
+      status: USER_STATUS.ACTIVE,
+      emailVerifiedAt: null,
+    });
+
+    const tokens = this.generateTokensForSubject(
+      this.buildTokenSubjectFromUser(user),
+    );
 
     return {
-      email,
+      user: this.userService.toUserResponse(user),
+      tokens,
       verification: {
         expiresAt: otp.expiresAt,
         expiresInMinutes: otp.expiresInMinutes,
