@@ -40,6 +40,32 @@ router.get("/me", authMiddleware.verifyToken, userController.getProfile);
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               phone:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               dob:
+ *                 type: string
+ *                 format: date
+ *               country:
+ *                 type: string
+ *                 description: Optional. User country can be updated here.
+ *               state:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *               bio:
+ *                 type: string
+ *               location:
+ *                 type: object
  *         multipart/form-data:
  *           schema:
  *             type: object
@@ -55,6 +81,15 @@ router.get("/me", authMiddleware.verifyToken, userController.getProfile);
  *               dob:
  *                 type: string
  *                 format: date
+ *               country:
+ *                 type: string
+ *                 description: Optional. User country can be updated here.
+ *               state:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               bio:
+ *                 type: string
  *               gender:
  *                 type: string
  *               location:
