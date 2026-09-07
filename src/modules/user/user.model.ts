@@ -52,6 +52,24 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         trim: true,
         index: true,
       },
+      firebaseUid: {
+        type: String,
+        trim: true,
+        sparse: true,
+        index: true,
+      },
+      appleUid: {
+        type: String,
+        trim: true,
+        sparse: true,
+        index: true,
+      },
+      authProvider: {
+        type: String,
+        enum: ["email", "google", "apple"],
+        default: "email",
+        index: true,
+      },
       phone: {
         type: String,
         trim: true,
@@ -328,6 +346,8 @@ userSchema.index({ status: 1, isDeleted: 1, createdAt: -1 });
 userSchema.index({ role: 1, status: 1, isDeleted: 1, createdAt: -1 });
 userSchema.index({ "location.coordinates": "2dsphere" });
 userSchema.index({ country: 1, state: 1, city: 1, role: 1, status: 1 });
+userSchema.index({ firebaseUid: 1, isDeleted: 1 }, { sparse: true });
+userSchema.index({ appleUid: 1, isDeleted: 1 }, { sparse: true });
 
 userSchema.pre(/^find/, function (this: Query<any, IUser>) {
   if (!this.getOptions().includeDeleted) {

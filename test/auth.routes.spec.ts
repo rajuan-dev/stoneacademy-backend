@@ -19,6 +19,10 @@ vi.mock("../src/modules/auth/auth.service", () => {
       user: { _id: "u1", email: "test@example.com", fullName: "Test User" },
       tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
     });
+    loginWithApple = vi.fn().mockResolvedValue({
+      user: { _id: "u1", email: "apple@example.com", fullName: "Apple User" },
+      tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
+    });
     sendOtp = vi.fn().mockResolvedValue({
       expiresAt: new Date().toISOString(),
       expiresInMinutes: 10,
@@ -105,6 +109,24 @@ describe("Auth routes", () => {
       .send({
         idToken: "valid-google-id-token",
         fullName: "Test User",
+      })
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.accessToken).toBe("access");
+  });
+
+  it("logs in with Apple", async () => {
+    const res = await request(app)
+      .post("/api/v1/auth/apple")
+      .send({
+        idToken: "valid-firebase-id-token",
+        fullName: "Apple User",
+        user: {
+          uid: "firebase-uid",
+          email: "apple@privaterelay.appleid.com",
+          appleUserIdentifier: "apple-sub",
+        },
       })
       .expect(200);
 

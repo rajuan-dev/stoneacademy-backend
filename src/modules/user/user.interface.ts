@@ -10,6 +10,9 @@ export interface IUser extends Document {
   _id: Types.ObjectId;
   email: string;
   passwordHash?: string;
+  firebaseUid?: string;
+  appleUid?: string;
+  authProvider?: "email" | "google" | "apple";
   phoneNumber?: string;
   phone?: string;
   address?: string;

@@ -8,6 +8,7 @@ import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
 import type { NextFunction, Request, Response } from "express";
 import {
+  appleAuthSchema,
   changePasswordSchema,
   adminLoginSchema,
   googleAuthSchema,
@@ -280,6 +281,29 @@ export class AuthController {
   googleAuth = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(googleAuthSchema, req);
     const result = await this.authService.loginWithGoogle(validated.body);
+
+    res.cookie(
+      COOKIE_CONFIG.REFRESH_TOKEN.name,
+      result.tokens.refreshToken,
+      COOKIE_CONFIG.REFRESH_TOKEN.options
+    );
+
+    const response: AuthControllerResponse = {
+      user: result.user,
+      accessToken: result.tokens.accessToken,
+      expiresIn: result.tokens.expiresIn,
+    };
+
+    ApiResponse.success(res, response, MESSAGES.AUTH.LOGIN_SUCCESS);
+  });
+
+  /**
+   * Apple login/signup via Firebase ID token
+   * POST /auth/apple
+   */
+  appleAuth = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(appleAuthSchema, req);
+    const result = await this.authService.loginWithApple(validated.body);
 
     res.cookie(
       COOKIE_CONFIG.REFRESH_TOKEN.name,

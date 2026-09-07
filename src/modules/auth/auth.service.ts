@@ -8,6 +8,7 @@ import {
   ROLES,
   USER_STATUS,
 } from "@/constants/app.constants";
+import { getFirebaseAdmin } from "@/config/firebase-admin.config";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
 import { EmailService } from "@/services/email.service";
@@ -19,6 +20,8 @@ import {
 } from "@/utils/app-error.utils";
 import { comparePassword, hashPassword } from "@/utils/password.utils";
 import { OAuth2Client } from "google-auth-library";
+import type { DecodedIdToken } from "firebase-admin/auth";
+import { randomUUID } from "node:crypto";
 import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
 import { otpService } from "../otp/otp.service";
 import type { IUser } from "../user/user.interface";
@@ -202,6 +205,109 @@ export class AuthService {
         user.profileImageUrl = googlePayload.picture;
       }
       await user.save();
+    }
+
+    await this.userService.updateLastLogin(user._id.toString());
+    const tokens = this.generateTokensForSubject(
+      this.buildTokenSubjectFromUser(user),
+    );
+
+    return {
+      user: this.userService.toUserResponse(user),
+      tokens,
+    };
+  }
+
+  async loginWithApple(payload: {
+    idToken: string;
+    fullName?: string;
+    user?: {
+      uid?: string;
+      email?: string;
+      name?: string;
+      fullName?: string;
+      appleUserIdentifier?: string;
+    };
+  }): Promise<AuthServiceResponse> {
+    let decodedToken: DecodedIdToken;
+    try {
+      decodedToken = await getFirebaseAdmin().auth().verifyIdToken(payload.idToken);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      logger.warn({ error }, "Apple Firebase token verification failed");
+      throw new UnauthorizedException("Invalid or expired authentication token");
+    }
+
+    const firebaseProvider = decodedToken.firebase?.sign_in_provider;
+    if (firebaseProvider && firebaseProvider !== "apple.com") {
+      throw new UnauthorizedException("Invalid Apple authentication token");
+    }
+
+    const firebaseUid = decodedToken.uid || payload.user?.uid;
+    const appleUid = payload.user?.appleUserIdentifier || firebaseUid;
+    const email = decodedToken.email || payload.user?.email;
+    const fullName = this.resolveAppleFullName(payload);
+
+    let user = appleUid ? await this.userService.getUserByAppleUid(appleUid) : null;
+    if (!user && firebaseUid) {
+      user = await this.userService.getUserByFirebaseUid(firebaseUid);
+    }
+    if (!user && email) {
+      user = await this.userService.getUserByEmail(email);
+    }
+
+    if (!user) {
+      user = await this.userService.createUser({
+        email: email || this.buildAppleFallbackEmail(appleUid || firebaseUid),
+        fullName,
+        firebaseUid,
+        appleUid,
+        authProvider: "apple",
+        role: ROLES.USER,
+        status: USER_STATUS.ACTIVE,
+        accountStatus: ACCOUNT_STATUS.ACTIVE,
+        emailVerifiedAt: new Date(),
+      });
+    } else {
+      if (user.status === USER_STATUS.BLOCKED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
+      }
+      if (user.status === USER_STATUS.DELETED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
+      }
+
+      let shouldSave = false;
+      if (!user.firebaseUid && firebaseUid) {
+        user.firebaseUid = firebaseUid;
+        shouldSave = true;
+      }
+      if (!user.appleUid && appleUid) {
+        user.appleUid = appleUid;
+        shouldSave = true;
+      }
+      if (!user.authProvider || user.authProvider === "email") {
+        user.authProvider = "apple";
+        shouldSave = true;
+      }
+      if (!user.emailVerified) {
+        user.emailVerified = true;
+        user.emailVerifiedAt = new Date();
+        shouldSave = true;
+      }
+      if (user.accountStatus !== ACCOUNT_STATUS.ACTIVE) {
+        user.accountStatus = ACCOUNT_STATUS.ACTIVE;
+        shouldSave = true;
+      }
+      if (this.shouldBackfillAppleName(user.fullName, fullName)) {
+        user.fullName = fullName;
+        shouldSave = true;
+      }
+
+      if (shouldSave) {
+        await user.save();
+      }
     }
 
     await this.userService.updateLastLogin(user._id.toString());
@@ -627,6 +733,28 @@ export class AuthService {
       .flatMap((value) => String(value).split(","))
       .map((value) => value.trim())
       .filter(Boolean);
+  }
+
+  private resolveAppleFullName(payload: {
+    fullName?: string;
+    user?: { name?: string; fullName?: string };
+  }) {
+    return payload.fullName
+      || payload.user?.name
+      || payload.user?.fullName
+      || "Apple User";
+  }
+
+  private buildAppleFallbackEmail(uid?: string) {
+    return `${uid || randomUUID()}@appleid.apple.com`;
+  }
+
+  private shouldBackfillAppleName(currentName: string, nextName: string) {
+    return Boolean(
+      nextName
+      && nextName !== "Apple User"
+      && (!currentName || currentName === "Apple User" || currentName === "User"),
+    );
   }
 
   async logout(

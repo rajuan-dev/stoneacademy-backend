@@ -256,6 +256,9 @@ export class UserService {
     return this.userRepository.create({
       email: payload.email.toLowerCase(),
       passwordHash: hashedPassword,
+      firebaseUid: payload.firebaseUid,
+      appleUid: payload.appleUid,
+      authProvider: payload.authProvider ?? "email",
       fullName: payload.fullName,
       phoneNumber: payload.phone,
       phone: payload.phone,
@@ -453,6 +456,14 @@ export class UserService {
 
   async getUserByEmail(email: string): Promise<IUser | null> {
     return this.userRepository.findByEmail(email);
+  }
+
+  async getUserByFirebaseUid(firebaseUid: string): Promise<IUser | null> {
+    return this.userRepository.findByFirebaseUid(firebaseUid);
+  }
+
+  async getUserByAppleUid(appleUid: string): Promise<IUser | null> {
+    return this.userRepository.findByAppleUid(appleUid);
   }
 
   async getUserByEmailWithPassword(email: string): Promise<IUser | null> {

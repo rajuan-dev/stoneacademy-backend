@@ -48,6 +48,9 @@ const envSchema = z.object({
 
   GOOGLE_CLIENT_ID: z.string().trim().optional(),
   GOOGLE_CLIENT_IDS: z.string().trim().optional(),
+  FIREBASE_PROJECT_ID: z.string().trim().optional(),
+  FIREBASE_CLIENT_EMAIL: z.string().trim().optional(),
+  FIREBASE_PRIVATE_KEY: z.string().trim().optional(),
 
   STRIPE_SECRET_KEY: z.string().optional().default(""),
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),

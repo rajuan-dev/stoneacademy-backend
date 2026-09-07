@@ -88,3 +88,19 @@ export const googleAuthSchema = z.object({
     fullName: z.string().trim().min(2).max(100).optional(),
   }),
 });
+
+export const appleAuthSchema = z.object({
+  body: z.object({
+    idToken: z.string().min(10),
+    fullName: z.string().trim().min(2).max(100).optional(),
+    user: z
+      .object({
+        uid: z.string().trim().min(1).optional(),
+        email: z.string().email().optional(),
+        name: z.string().trim().min(1).max(100).optional(),
+        fullName: z.string().trim().min(1).max(100).optional(),
+        appleUserIdentifier: z.string().trim().min(1).optional(),
+      })
+      .optional(),
+  }),
+});

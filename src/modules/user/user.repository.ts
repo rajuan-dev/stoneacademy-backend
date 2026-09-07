@@ -20,6 +20,14 @@ export class UserRepository extends BaseRepository<IUser> {
       .exec();
   }
 
+  async findByFirebaseUid(firebaseUid: string): Promise<IUser | null> {
+    return this.model.findOne({ firebaseUid, isDeleted: false }).exec();
+  }
+
+  async findByAppleUid(appleUid: string): Promise<IUser | null> {
+    return this.model.findOne({ appleUid, isDeleted: false }).exec();
+  }
+
   async findByEmailWithPassword(email: string): Promise<IUser | null> {
     return this.model
       .findOne({ email: email.toLowerCase(), isDeleted: false })

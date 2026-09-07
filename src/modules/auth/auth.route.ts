@@ -80,6 +80,32 @@ router.post("/google", authController.googleAuth);
 
 /**
  * @openapi
+ * /auth/apple:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Apple login/signup with Firebase ID token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [idToken]
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *               fullName:
+ *                 type: string
+ *               user:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Logged in
+ */
+router.post("/apple", authController.appleAuth);
+
+/**
+ * @openapi
  * /auth/otp/send:
  *   post:
  *     tags: [Auth]

@@ -63,6 +63,9 @@ export type UserResponse = {
 export type UserCreatePayload = {
   email: string;
   password?: string;
+  firebaseUid?: string;
+  appleUid?: string;
+  authProvider?: "email" | "google" | "apple";
   fullName: string;
   phone?: string;
   country?: string;
