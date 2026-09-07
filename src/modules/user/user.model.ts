@@ -42,7 +42,7 @@ const locationSchema = new Schema(
 const userSchema = BaseSchemaUtil.createSchema<IUser>({
   ...BaseSchemaUtil.mergeDefinitions(
     BaseSchemaUtil.emailField(true),
-    BaseSchemaUtil.passwordField(),
+    BaseSchemaUtil.passwordField(false),
     BaseSchemaUtil.phoneField(),
     BaseSchemaUtil.softDeleteFields(),
     {

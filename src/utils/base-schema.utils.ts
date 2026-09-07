@@ -96,11 +96,11 @@ export class BaseSchemaUtil {
     } as const;
   }
 
-  static passwordField() {
+  static passwordField(required: boolean = true) {
     return {
       passwordHash: {
         type: String,
-        required: true,
+        required,
         minlength: 8,
         select: false,
       },
