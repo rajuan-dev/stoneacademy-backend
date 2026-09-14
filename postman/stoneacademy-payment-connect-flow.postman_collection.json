@@ -1,0 +1,1424 @@
+{
+  "info": {
+    "_postman_id": "7d60c10a-36a7-4a3d-8ef9-2f6d9c0a3101",
+    "name": "StoneAcademy - Payment + Stripe Connect Full Flow",
+    "description": "Complete frontend/backend integration collection for StoneAcademy payments: host Stripe Connect onboarding, event-ticket platform charge checkout, cancellation refunds, completion settlement transfers, creator withdrawal/payout, admin billing, subscription payments, and Stripe webhook reference requests. Do not place Stripe secret keys in this collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.exercisewithme.org/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "hostAccessToken",
+      "value": ""
+    },
+    {
+      "key": "adminAccessToken",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": "user@example.com"
+    },
+    {
+      "key": "hostEmail",
+      "value": "host@example.com"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@example.com"
+    },
+    {
+      "key": "password",
+      "value": "Password123!"
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    },
+    {
+      "key": "creatorId",
+      "value": ""
+    },
+    {
+      "key": "transactionId",
+      "value": ""
+    },
+    {
+      "key": "payoutId",
+      "value": ""
+    },
+    {
+      "key": "paymentIntentId",
+      "value": ""
+    },
+    {
+      "key": "paymentIntentClientSecret",
+      "value": ""
+    },
+    {
+      "key": "subscriptionPaymentIntentId",
+      "value": ""
+    },
+    {
+      "key": "subscriptionClientSecret",
+      "value": ""
+    },
+    {
+      "key": "stripeSignature",
+      "value": ""
+    },
+    {
+      "key": "refreshUrl",
+      "value": "https://app.exercisewithme.org/host/stripe/refresh"
+    },
+    {
+      "key": "returnUrl",
+      "value": "https://app.exercisewithme.org/host/stripe/return"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Auth Helpers",
+      "item": [
+        {
+          "name": "Login Buyer - Save accessToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const token = json?.data?.accessToken || json?.data?.token;",
+                  "if (token) pm.collectionVariables.set('accessToken', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "response": [
+            {
+              "name": "200 - Login successful",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}"
+                },
+                "url": "{{baseUrl}}/auth/login"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOi...\",\n    \"user\": {\n      \"_id\": \"66e900000000000000000001\",\n      \"email\": \"user@example.com\",\n      \"role\": \"user\"\n    }\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Host - Save hostAccessToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const token = json?.data?.accessToken || json?.data?.token;",
+                  "if (token) pm.collectionVariables.set('hostAccessToken', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{hostEmail}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Login Admin - Save adminAccessToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const token = json?.data?.accessToken || json?.data?.token;",
+                  "if (token) pm.collectionVariables.set('adminAccessToken', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "1. Host Stripe Connect Onboarding",
+      "item": [
+        {
+          "name": "Get Host Stripe Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/hosts/me"
+          },
+          "response": [
+            {
+              "name": "200 - Host Stripe state",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{hostAccessToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/hosts/me"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Host profile fetched successfully\",\n  \"data\": {\n    \"_id\": \"66e800000000000000000001\",\n    \"email\": \"host@example.com\",\n    \"fullName\": \"Example Host\",\n    \"stripeAccountId\": \"acct_123\",\n    \"stripeOnboardingCompleted\": true,\n    \"stripeDetailsSubmitted\": true,\n    \"stripeChargesEnabled\": true,\n    \"stripePayoutsEnabled\": true,\n    \"stripeDisabledReason\": null,\n    \"hasStripeAccount\": true\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Stripe Connected Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const id = json?.data?.stripeAccountId;",
+                  "if (id) pm.collectionVariables.set('stripeAccountId', id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{hostEmail}}\"\n}"
+            },
+            "url": "{{baseUrl}}/hosts/create-stripe-account"
+          },
+          "response": [
+            {
+              "name": "200 - Connected account ready",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"host@example.com\"\n}"
+                },
+                "url": "{{baseUrl}}/hosts/create-stripe-account"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Stripe connected account ready\",\n  \"data\": {\n    \"stripeAccountId\": \"acct_123\",\n    \"stripeOnboardingCompleted\": false\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Stripe Onboarding Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const url = json?.data?.url;",
+                  "if (url) pm.collectionVariables.set('onboardingUrl', url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshUrl\": \"{{refreshUrl}}\",\n  \"returnUrl\": \"{{returnUrl}}\"\n}"
+            },
+            "url": "{{baseUrl}}/hosts/create-onboarding-link"
+          },
+          "response": [
+            {
+              "name": "200 - Onboarding link created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshUrl\": \"https://app.exercisewithme.org/host/stripe/refresh\",\n  \"returnUrl\": \"https://app.exercisewithme.org/host/stripe/return\"\n}"
+                },
+                "url": "{{baseUrl}}/hosts/create-onboarding-link"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Stripe onboarding link created\",\n  \"data\": {\n    \"stripeAccountId\": \"acct_123\",\n    \"url\": \"https://connect.stripe.com/setup/s/acct_123/...\",\n    \"expiresAt\": 1790000000\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sync Stripe Onboarding Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/hosts/sync-onboarding-status"
+          },
+          "response": [
+            {
+              "name": "200 - Onboarding status synced",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/hosts/sync-onboarding-status"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Stripe onboarding status synced\",\n  \"data\": {\n    \"stripeAccountId\": \"acct_123\",\n    \"stripeOnboardingCompleted\": true,\n    \"chargesEnabled\": true,\n    \"detailsSubmitted\": true,\n    \"payoutsEnabled\": true,\n    \"disabledReason\": null\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Stripe Dashboard Login Link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/hosts/create-dashboard-login-link"
+          },
+          "response": [
+            {
+              "name": "200 - Dashboard link",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/hosts/create-dashboard-login-link"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Stripe dashboard login link created\",\n  \"data\": {\n    \"stripeAccountId\": \"acct_123\",\n    \"url\": \"https://connect.stripe.com/express/...\",\n    \"createdAt\": \"2026-09-14T15:00:00.000Z\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Event Ticket Checkout",
+      "item": [
+        {
+          "name": "Get Event Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Join Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/events/{{eventId}}/join-status"
+          },
+          "response": [
+            {
+              "name": "200 - Join status before payment",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/events/{{eventId}}/join-status"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Event join status fetched successfully\",\n  \"data\": {\n    \"eventId\": \"66f000000000000000000001\",\n    \"isJoined\": false,\n    \"joinedAt\": null,\n    \"paymentRequired\": true,\n    \"paymentVerified\": false,\n    \"paymentStatus\": null,\n    \"providerReference\": null\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Event Checkout Intent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const data = json?.data || {};",
+                  "if (data.paymentIntentId) pm.collectionVariables.set('paymentIntentId', data.paymentIntentId);",
+                  "if (data.paymentIntentClientSecret) pm.collectionVariables.set('paymentIntentClientSecret', data.paymentIntentClientSecret);",
+                  "if (data.transaction?._id) pm.collectionVariables.set('transactionId', data.transaction._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/billing/events/{{eventId}}/checkout-intent"
+          },
+          "response": [
+            {
+              "name": "200 - Checkout intent created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/billing/events/{{eventId}}/checkout-intent"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Checkout intent created successfully\",\n  \"data\": {\n    \"paymentIntentClientSecret\": \"pi_123_secret_abc\",\n    \"paymentIntentId\": \"pi_123\",\n    \"transaction\": {\n      \"_id\": \"66f100000000000000000001\",\n      \"eventId\": \"66f000000000000000000001\",\n      \"payerId\": \"66e900000000000000000001\",\n      \"creatorId\": \"66e800000000000000000001\",\n      \"grossAmount\": 100,\n      \"grossAmountMinor\": 10000,\n      \"currency\": \"USD\",\n      \"platformFeeAmount\": 10,\n      \"platformFeeAmountMinor\": 1000,\n      \"creatorShareAmount\": 90,\n      \"creatorShareAmountMinor\": 9000,\n      \"paymentStatus\": \"pending\",\n      \"creatorEarningStatus\": \"pending\",\n      \"refundStatus\": \"none\",\n      \"transferStatus\": \"not_created\",\n      \"paymentArchitecture\": \"platform_charge_delayed_transfer\",\n      \"provider\": \"stripe\",\n      \"providerReference\": \"pi_123\",\n      \"stripePaymentIntentId\": \"pi_123\"\n    }\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Join Paid Event After Stripe Success - Fallback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerReference\": \"{{paymentIntentId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/events/{{eventId}}/join"
+          },
+          "response": [
+            {
+              "name": "200 - Joined after verified payment",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"providerReference\": \"pi_123\"\n}"
+                },
+                "url": "{{baseUrl}}/events/{{eventId}}/join"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Joined event successfully\",\n  \"data\": {\n    \"_id\": \"66f200000000000000000001\",\n    \"eventId\": \"66f000000000000000000001\",\n    \"userId\": \"66e900000000000000000001\",\n    \"status\": \"joined\",\n    \"joinedAt\": \"2026-09-14T15:00:00.000Z\",\n    \"paymentTransactionId\": \"66f100000000000000000001\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Join Free Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/events/{{eventId}}/join"
+          },
+          "response": []
+        },
+        {
+          "name": "List My Payment Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/billing/transactions/me?page=1&limit=20&status=succeeded"
+          },
+          "response": [
+            {
+              "name": "200 - My transactions",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/billing/transactions/me?page=1&limit=20&status=succeeded"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Transactions fetched successfully\",\n  \"data\": [\n    {\n      \"_id\": \"66f100000000000000000001\",\n      \"eventId\": \"66f000000000000000000001\",\n      \"grossAmount\": 100,\n      \"currency\": \"USD\",\n      \"paymentStatus\": \"succeeded\",\n      \"refundStatus\": \"none\",\n      \"transferStatus\": \"not_created\",\n      \"providerReference\": \"pi_123\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"pageSize\": 20,\n    \"totalItems\": 1,\n    \"totalPages\": 1\n  },\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Cancellation + Refunds",
+      "item": [
+        {
+          "name": "Attendee Leave Event - Paid Tickets Are Blocked",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/events/{{eventId}}/leave"
+          },
+          "response": [
+            {
+              "name": "400 - Paid ticket cannot self-refund",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/events/{{eventId}}/leave"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Paid event tickets are non-refundable and cannot be cancelled by attendee.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Creator Cancel Own Event",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": [
+            {
+              "name": "200 - Event cancelled by creator",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/events/{{eventId}}"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Event cancelled successfully\",\n  \"data\": {\n    \"_id\": \"66f000000000000000000001\",\n    \"status\": \"cancelled\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Admin Cancel Event - Triggers Refunds",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/events/{{eventId}}/status"
+          },
+          "response": [
+            {
+              "name": "200 - Admin cancelled event",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"cancelled\"\n}"
+                },
+                "url": "{{baseUrl}}/admin/events/{{eventId}}/status"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Event status updated\",\n  \"data\": {\n    \"_id\": \"66f000000000000000000001\",\n    \"status\": \"cancelled\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Admin Get Event Refund Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/events/{{eventId}}/refunds/status"
+          },
+          "response": [
+            {
+              "name": "200 - Refund summary",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/admin/events/{{eventId}}/refunds/status"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Event refund status fetched\",\n  \"data\": {\n    \"eventId\": \"66f000000000000000000001\",\n    \"eventStatus\": \"cancelled\",\n    \"totalSuccessfulPaidTickets\": 3,\n    \"refundPending\": 1,\n    \"refundSucceeded\": 2,\n    \"refundFailed\": 0,\n    \"refundNone\": 0,\n    \"totalRefundedAmountMinor\": 20000,\n    \"totalRefundedAmount\": 200,\n    \"failedTransactionIds\": []\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Admin Retry Failed Event Refunds",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/events/{{eventId}}/refunds/retry-failed"
+          },
+          "response": [
+            {
+              "name": "200 - Failed refunds retried",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/admin/events/{{eventId}}/refunds/retry-failed"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Failed event refunds retried\",\n  \"data\": {\n    \"eventId\": \"66f000000000000000000001\",\n    \"totalFailed\": 1,\n    \"retried\": 1,\n    \"succeeded\": 1,\n    \"stillFailed\": 0,\n    \"skipped\": 0,\n    \"results\": [\n      {\n        \"transactionId\": \"66f100000000000000000001\",\n        \"status\": \"succeeded\"\n      }\n    ]\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Completion + Settlement",
+      "item": [
+        {
+          "name": "Admin Complete Event - Triggers 90% Creator Transfer",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/events/{{eventId}}/status"
+          },
+          "response": [
+            {
+              "name": "200 - Event completed",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"completed\"\n}"
+                },
+                "url": "{{baseUrl}}/admin/events/{{eventId}}/status"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Event status updated\",\n  \"data\": {\n    \"_id\": \"66f000000000000000000001\",\n    \"status\": \"completed\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Creator Get Earnings After Settlement",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/billing/earnings/me"
+          },
+          "response": [
+            {
+              "name": "200 - Earnings summary",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/billing/earnings/me"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Earnings fetched successfully\",\n  \"data\": {\n    \"totalGross\": 300,\n    \"totalPlatformFee\": 30,\n    \"totalCreatorShare\": 270,\n    \"pendingCreatorShare\": 180,\n    \"transferredCreatorShare\": 90,\n    \"transactionsCount\": 3,\n    \"totalPaidOut\": 0,\n    \"availableBalance\": 90,\n    \"ledgerAvailableBalance\": 90,\n    \"currency\": \"USD\",\n    \"stripe\": {\n      \"accountId\": \"acct_123\",\n      \"onboardingCompleted\": true,\n      \"chargesEnabled\": true,\n      \"payoutsEnabled\": true,\n      \"availableBalance\": 90,\n      \"pendingBalance\": 0,\n      \"currency\": \"USD\"\n    }\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Admin List Earning Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/earnings/transactions?page=1&limit=20&status=succeeded"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Get Earning Transaction Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/earnings/transactions/{{transactionId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Generate Earning Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/earnings/transactions/{{transactionId}}/invoice"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Creator Withdrawal + Payout Requests",
+      "item": [
+        {
+          "name": "Creator Self Withdrawal - Stripe Payout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50,\n  \"currency\": \"USD\",\n  \"note\": \"Weekly withdrawal\"\n}"
+            },
+            "url": "{{baseUrl}}/billing/payouts/withdraw"
+          },
+          "response": [
+            {
+              "name": "201 - Withdrawal processed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 50,\n  \"currency\": \"USD\",\n  \"note\": \"Weekly withdrawal\"\n}"
+                },
+                "url": "{{baseUrl}}/billing/payouts/withdraw"
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Withdrawal processed successfully\",\n  \"data\": {\n    \"payoutId\": \"66f300000000000000000001\",\n    \"stripePayoutId\": \"po_123\",\n    \"amount\": 50,\n    \"currency\": \"USD\",\n    \"status\": \"paid\",\n    \"payoutMethod\": \"self_withdrawal\",\n    \"stripeStatus\": \"paid\",\n    \"availableBefore\": 90,\n    \"pendingBalance\": 0,\n    \"stripeAccountId\": \"acct_123\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Creator Submit Manual Payout Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?._id) pm.collectionVariables.set('payoutId', json.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50,\n  \"currency\": \"USD\",\n  \"note\": \"Please review payout\"\n}"
+            },
+            "url": "{{baseUrl}}/billing/payouts/request"
+          },
+          "response": [
+            {
+              "name": "201 - Payout request submitted",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 50,\n  \"currency\": \"USD\",\n  \"note\": \"Please review payout\"\n}"
+                },
+                "url": "{{baseUrl}}/billing/payouts/request"
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Payout request submitted successfully\",\n  \"data\": {\n    \"_id\": \"66f300000000000000000001\",\n    \"creatorId\": \"66e800000000000000000001\",\n    \"amount\": 50,\n    \"currency\": \"USD\",\n    \"status\": \"requested\",\n    \"payoutMethod\": \"admin_request\",\n    \"note\": \"Please review payout\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Creator List My Payouts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/billing/payouts/me?page=1&limit=20"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Admin Billing + Payout Operations",
+      "item": [
+        {
+          "name": "Admin List All Payment Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/billing/admin/transactions?page=1&limit=20&status=succeeded"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin List Payout Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/billing/admin/payouts?page=1&limit=20"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Update Payout Request Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"note\": \"Approved after review\"\n}"
+            },
+            "url": "{{baseUrl}}/billing/admin/payouts/{{payoutId}}/status"
+          },
+          "response": [
+            {
+              "name": "200 - Payout status updated",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"approved\",\n  \"note\": \"Approved after review\"\n}"
+                },
+                "url": "{{baseUrl}}/billing/admin/payouts/{{payoutId}}/status"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Payout status updated successfully\",\n  \"data\": {\n    \"_id\": \"66f300000000000000000001\",\n    \"creatorId\": \"66e800000000000000000001\",\n    \"amount\": 50,\n    \"currency\": \"USD\",\n    \"status\": \"approved\",\n    \"note\": \"Approved after review\",\n    \"reviewedBy\": \"66e700000000000000000001\",\n    \"reviewedAt\": \"2026-09-14T15:00:00.000Z\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Admin Legacy Creator Payout Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 90,\n  \"currency\": \"USD\",\n  \"note\": \"Manual review payout request\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/event-creators/{{creatorId}}/payout"
+          },
+          "response": [
+            {
+              "name": "200 - Manual review payout created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 90,\n  \"currency\": \"USD\",\n  \"note\": \"Manual review payout request\"\n}"
+                },
+                "url": "{{baseUrl}}/admin/event-creators/{{creatorId}}/payout"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Event creator payout processed\",\n  \"data\": {\n    \"payoutId\": \"66f300000000000000000001\",\n    \"creatorId\": \"66e800000000000000000001\",\n    \"amount\": 90,\n    \"currency\": \"USD\",\n    \"status\": \"requested\",\n    \"pendingAmountBefore\": 180,\n    \"pendingAmountAfter\": 180\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Subscription Payments",
+      "item": [
+        {
+          "name": "Get Subscription Fees",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/subscriptions/fees"
+          },
+          "response": [
+            {
+              "name": "200 - Subscription fees",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/subscriptions/fees"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription fees fetched successfully\",\n  \"data\": {\n    \"monthlyFee\": 9.99,\n    \"yearlyFee\": 99.99,\n    \"currency\": \"USD\"\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get My Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/subscriptions/me"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Subscription Checkout Intent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const data = json?.data || {};",
+                  "if (data.paymentIntentId) pm.collectionVariables.set('subscriptionPaymentIntentId', data.paymentIntentId);",
+                  "if (data.clientSecret) pm.collectionVariables.set('subscriptionClientSecret', data.clientSecret);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"monthly\"\n}"
+            },
+            "url": "{{baseUrl}}/subscriptions/checkout-intent"
+          },
+          "response": [
+            {
+              "name": "200 - Subscription checkout intent",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plan\": \"monthly\"\n}"
+                },
+                "url": "{{baseUrl}}/subscriptions/checkout-intent"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription checkout intent created\",\n  \"data\": {\n    \"subscriptionId\": \"sub_123\",\n    \"clientSecret\": \"pi_456_secret_def\",\n    \"paymentIntentId\": \"pi_456\",\n    \"subscription\": {\n      \"plan\": \"monthly\",\n      \"status\": \"pending\",\n      \"paymentProvider\": \"stripe\"\n    }\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Confirm Subscription Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentIntentId\": \"{{subscriptionPaymentIntentId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/subscriptions/confirm-payment"
+          },
+          "response": [
+            {
+              "name": "200 - Subscription activated",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paymentIntentId\": \"pi_456\"\n}"
+                },
+                "url": "{{baseUrl}}/subscriptions/confirm-payment"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription activated successfully\",\n  \"data\": {\n    \"subscription\": {\n      \"plan\": \"monthly\",\n      \"status\": \"paid\",\n      \"paymentProvider\": \"stripe\"\n    },\n    \"isSubscribed\": true\n  },\n  \"meta\": null,\n  \"timestamp\": \"2026-09-14T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/subscriptions/cancel"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Stripe Webhooks - Backend/Stripe Dashboard Only",
+      "item": [
+        {
+          "name": "Normal Stripe Webhook - Your Account Snapshot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Stripe-Signature",
+                "value": "{{stripeSignature}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test_payment_intent_succeeded\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_123\",\n      \"object\": \"payment_intent\",\n      \"metadata\": {\n        \"paymentType\": \"event_ticket\",\n        \"transactionId\": \"66f100000000000000000001\"\n      },\n      \"latest_charge\": \"ch_123\"\n    }\n  }\n}"
+            },
+            "url": "{{baseUrl}}/billing/webhook"
+          },
+          "response": [
+            {
+              "name": "200 - Webhook processed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": "{{baseUrl}}/billing/webhook"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Stripe Connect Webhook - Connected Accounts Snapshot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Stripe-Signature",
+                "value": "{{stripeSignature}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test_account_updated\",\n  \"type\": \"account.updated\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"acct_123\",\n      \"object\": \"account\",\n      \"charges_enabled\": true,\n      \"payouts_enabled\": true,\n      \"details_submitted\": true,\n      \"requirements\": {\n        \"disabled_reason\": null\n      }\n    }\n  }\n}"
+            },
+            "url": "{{baseUrl}}/stripe/webhook"
+          },
+          "response": [
+            {
+              "name": "200 - Connect webhook processed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": "{{baseUrl}}/stripe/webhook"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
