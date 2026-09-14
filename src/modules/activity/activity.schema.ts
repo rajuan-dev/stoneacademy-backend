@@ -1,18 +1,21 @@
 // file: src/modules/activity/activity.schema.ts
 
-import { ACTIVITY_STATUS } from "@/constants/app.constants";
 import { z } from "zod";
 
-const parseObject = (value: unknown) => {
-  if (typeof value !== "string") return value;
+import { ACTIVITY_STATUS } from "@/constants/app.constants";
+
+function parseObject(value: unknown) {
+  if (typeof value !== "string")
+    return value;
   try {
     return JSON.parse(value);
-  } catch {
+  }
+  catch {
     return value;
   }
-};
+}
 
-const normalizeLocationInput = (value: unknown) => {
+function normalizeLocationInput(value: unknown) {
   if (value === null || value === undefined || value === "" || value === "null") {
     return undefined;
   }
@@ -59,12 +62,13 @@ const normalizeLocationInput = (value: unknown) => {
   }
 
   return undefined;
-};
+}
 
 const locationSchema = z
   .preprocess(normalizeLocationInput, z.any().optional())
   .transform((value) => {
-    if (!value || typeof value !== "object") return undefined;
+    if (!value || typeof value !== "object")
+      return undefined;
 
     const obj = value as any;
     if (Array.isArray(obj.coordinates) && obj.coordinates.length === 2) {
@@ -149,7 +153,7 @@ export const updateActivitySchema = z.object({
         .enum(Object.values(ACTIVITY_STATUS) as [string, ...string[]])
         .optional(),
     })
-    .refine((data) => Object.keys(data).length > 0, {
+    .refine(data => Object.keys(data).length > 0, {
       message: "At least one field must be provided",
     }),
 });

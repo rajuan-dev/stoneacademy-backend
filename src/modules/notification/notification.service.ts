@@ -1,5 +1,6 @@
 import { PAGINATION } from "@/constants/app.constants";
 import { NotFoundException } from "@/utils/app-error.utils";
+
 import { User } from "../user/user.model";
 import { Notification } from "./notification.model";
 
@@ -41,10 +42,14 @@ export class NotificationService {
     const skip = (page - 1) * limit;
 
     const filter: Record<string, unknown> = { userId };
-    if (query.type) filter.type = query.type;
-    if (typeof query.isRead === "boolean") filter.isRead = query.isRead;
-    if (query.entityType) filter["data.entityType"] = query.entityType;
-    if (query.entityId) filter["data.entityId"] = query.entityId;
+    if (query.type)
+      filter.type = query.type;
+    if (typeof query.isRead === "boolean")
+      filter.isRead = query.isRead;
+    if (query.entityType)
+      filter["data.entityType"] = query.entityType;
+    if (query.entityId)
+      filter["data.entityId"] = query.entityId;
 
     const [data, totalItems] = await Promise.all([
       Notification.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
@@ -146,7 +151,8 @@ export class NotificationService {
     payload?: Record<string, unknown>;
   }) {
     const enabled = await this.isNotificationEnabled(data.userId, data.type);
-    if (!enabled) return null;
+    if (!enabled)
+      return null;
 
     return Notification.create({
       userId: data.userId,
@@ -166,13 +172,14 @@ export class NotificationService {
       payload?: Record<string, unknown>;
     }>,
   ) {
-    const results = await Promise.all(items.map((item) => this.create(item)));
+    const results = await Promise.all(items.map(item => this.create(item)));
     return results.filter(Boolean);
   }
 
   private async isNotificationEnabled(userId: string, type: string) {
     const preferenceKey = this.mapTypeToPreference(type);
-    if (!preferenceKey) return true;
+    if (!preferenceKey)
+      return true;
 
     const user = await User.findById(userId)
       .select("notificationPreferences")

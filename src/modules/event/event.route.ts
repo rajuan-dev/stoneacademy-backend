@@ -1,6 +1,8 @@
-import { authMiddleware } from "@/middlewares/auth.middleware";
-import upload from "@/config/multer.config";
 import { Router } from "express";
+
+import upload from "@/config/multer.config";
+import { authMiddleware } from "@/middlewares/auth.middleware";
+
 import { EventController } from "./event.controller";
 
 const router = Router();

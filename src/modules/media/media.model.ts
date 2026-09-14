@@ -1,9 +1,12 @@
 // file: src/modules/media/media.model.ts
 
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IMedia {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IMedia = {
   _id: Types.ObjectId;
   ownerId: Types.ObjectId;
   ownerModel?: "User" | "Admin";
@@ -18,7 +21,7 @@ export interface IMedia {
   durationSec?: number;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const mediaSchema = BaseSchemaUtil.createSchema<IMedia>({
   ownerId: {

@@ -1,7 +1,9 @@
-import { ROLES } from "@/constants/app.constants";
-import upload from "@/config/multer.config";
-import { authMiddleware } from "@/middlewares/auth.middleware";
 import { Router } from "express";
+
+import upload from "@/config/multer.config";
+import { ROLES } from "@/constants/app.constants";
+import { authMiddleware } from "@/middlewares/auth.middleware";
+
 import { AdminController } from "./admin.controller";
 
 const router = Router();
@@ -29,6 +31,8 @@ router.post("/users/:id/unblock", controller.unblockUser);
 router.get("/activities", controller.listActivities);
 router.patch("/activities/:id/status", controller.updateActivityStatus);
 router.get("/events", controller.listEvents);
+router.get("/events/:eventId/refunds/status", controller.getEventRefundStatus);
+router.post("/events/:eventId/refunds/retry-failed", controller.retryFailedEventRefunds);
 router.patch("/events/:id/status", controller.updateEventStatus);
 router.get("/subscriptions", controller.listSubscriptions);
 router.get("/subscriptions/fees", controller.getSubscriptionFees);

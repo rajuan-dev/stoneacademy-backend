@@ -11,6 +11,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from "@/utils/app-error.utils";
+
 import type {
   ICreateOTPRequest,
   ICreateOTPResponse,
@@ -22,6 +23,7 @@ import type {
   IVerifyOTPRequest,
   IVerifyOTPResponse,
 } from "./email-verification.types";
+
 // import { ICreateOTPResponse } from "./email-verification.interface";
 import { EmailVerificationOTPRepository } from "./email-verification.repository";
 
@@ -45,6 +47,7 @@ export class EmailVerificationService {
     OTP_EXPIRY_MINUTES: 5,
     OTP_LENGTH: 4,
   };
+
   constructor(
     config?: Partial<typeof EmailVerificationService.prototype.config>,
   ) {
@@ -69,13 +72,11 @@ export class EmailVerificationService {
   /**
    * Create initial OTP for email verification
    *
-   * @param userId - User ID
-   * @param email - User email
+   * @param request - OTP creation request
    * @returns OTP and expiration details
    *
    * @throws BadRequestException if user already verified
    * @throws Error if OTP creation fails
-  
    */
   async createOTP(request: ICreateOTPRequest): Promise<ICreateOTPResponse> {
     // Step 1: Invalidate previous OTPs for this user
@@ -89,13 +90,8 @@ export class EmailVerificationService {
     // Step 3: Generate OTP
     const otpGenerated = this.otpService.generate("EMAIL_VERIFICATION");
 
-    // Step 4: Calculate expiration time
-    const expiresAt = new Date(
-      Date.now() + this.config.OTP_EXPIRY_MINUTES * 60 * 1000,
-    );
-
     // Step 5: Save OTP to database
-    const record = await this.repository.createOTP({
+    await this.repository.createOTP({
       userId: request.userId,
       email: request.email,
       userType: request.userType,
@@ -235,8 +231,8 @@ export class EmailVerificationService {
     const eligibility = await this.checkResendEligibility(existingOTP);
     if (!eligibility.canResend) {
       throw new BadRequestException(
-        eligibility.reason ||
-          "Too many resend attempts. Please try again later.",
+        eligibility.reason
+        || "Too many resend attempts. Please try again later.",
       );
     }
 
@@ -287,6 +283,7 @@ export class EmailVerificationService {
       expiresInMinutes,
     };
   }
+
   /**
    * CHECK RESEND ELIGIBILITY
    * Rate limiting: prevent spam/abuse
@@ -301,8 +298,8 @@ export class EmailVerificationService {
 
     // Check 1: Minimum interval between resends
     if (otpRecord.lastAttemptAt) {
-      const secondsSinceLastAttempt =
-        (now.getTime() - otpRecord.lastAttemptAt.getTime()) / 1000;
+      const secondsSinceLastAttempt
+        = (now.getTime() - otpRecord.lastAttemptAt.getTime()) / 1000;
 
       if (secondsSinceLastAttempt < this.config.MIN_RESEND_INTERVAL_SECONDS) {
         const waitSeconds = Math.ceil(

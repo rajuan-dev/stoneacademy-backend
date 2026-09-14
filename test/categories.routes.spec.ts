@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
 import request from "supertest";
-import app from "../src/app";
+import { describe, expect, it, vi } from "vitest";
+
+import app from "../src/app.js";
 
 vi.mock("../src/modules/category/category.service", () => {
   class CategoryService {

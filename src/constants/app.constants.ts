@@ -65,6 +65,38 @@ export const PAYMENT_STATUS = {
   REFUNDED: "refunded",
 } as const;
 
+export const CREATOR_EARNING_STATUS = {
+  PENDING: "pending",
+  AVAILABLE: "available",
+  TRANSFERRED: "transferred",
+  CANCELLED: "cancelled",
+} as const;
+
+export const REFUND_STATUS = {
+  NONE: "none",
+  PENDING: "pending",
+  SUCCEEDED: "succeeded",
+  FAILED: "failed",
+} as const;
+
+export const TRANSFER_STATUS = {
+  NOT_CREATED: "not_created",
+  PENDING: "pending",
+  SUCCEEDED: "succeeded",
+  FAILED: "failed",
+} as const;
+
+export const PAYMENT_ARCHITECTURE = {
+  LEGACY_DESTINATION_CHARGE: "legacy_destination_charge",
+  PLATFORM_CHARGE_DELAYED_TRANSFER: "platform_charge_delayed_transfer",
+} as const;
+
+export const DISPUTE_STATUS = {
+  NONE: "none",
+  OPEN: "open",
+  CLOSED: "closed",
+} as const;
+
 export const ORDER_STATUS = {
   PENDING: "pending",
   PLACED: "placed",

@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IPayoutRequest {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IPayoutRequest = {
   _id: Types.ObjectId;
   creatorId: Types.ObjectId;
   amount: number;
@@ -15,7 +18,7 @@ export interface IPayoutRequest {
   reviewedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const payoutRequestSchema = BaseSchemaUtil.createSchema<IPayoutRequest>({
   creatorId: {

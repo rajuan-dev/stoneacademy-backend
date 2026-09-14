@@ -1,3 +1,5 @@
+import type { FilterQuery } from "mongoose";
+
 import { PAGINATION } from "@/constants/app.constants";
 import { ActivityService } from "@/modules/activity/activity.service";
 import { Ad } from "@/modules/ads/ads.model";
@@ -6,7 +8,6 @@ import {
   buildGeographyFilter,
   getUserGeography,
 } from "@/utils/geography.utils";
-import type { FilterQuery } from "mongoose";
 
 export class FeedService {
   private activityService: ActivityService;
@@ -58,13 +59,13 @@ export class FeedService {
     const sharedRadiusMiles = this.toMiles(query.radius, query.radiusUnit);
     const sharedSort = this.toSharedSort(query.sort);
 
-    const includeActivities =
-      (!query.kind || query.kind === "all" || query.kind === "activity")
-      && query.paid !== "paid";
+    const includeActivities
+      = (!query.kind || query.kind === "all" || query.kind === "activity")
+        && query.paid !== "paid";
     const includeEvents = !query.kind || query.kind === "all" || query.kind === "event";
-    const includeAds =
-      (!query.kind || query.kind === "all" || query.kind === "ad")
-      && (!query.paid || query.paid === "all");
+    const includeAds
+      = (!query.kind || query.kind === "all" || query.kind === "ad")
+        && (!query.paid || query.paid === "all");
 
     const [activityResult, eventResult, ads] = await Promise.all([
       includeActivities
@@ -179,13 +180,13 @@ export class FeedService {
       adFilter.name = new RegExp(query.category, "i");
     }
 
-    const includeActivities =
-      (!query.kind || query.kind === "all" || query.kind === "activity")
-      && query.paid !== "paid";
+    const includeActivities
+      = (!query.kind || query.kind === "all" || query.kind === "activity")
+        && query.paid !== "paid";
     const includeEvents = !query.kind || query.kind === "all" || query.kind === "event";
-    const includeAds =
-      (!query.kind || query.kind === "all" || query.kind === "ad")
-      && (!query.paid || query.paid === "all");
+    const includeAds
+      = (!query.kind || query.kind === "all" || query.kind === "ad")
+        && (!query.paid || query.paid === "all");
     const hasGeo = query.lat !== undefined && query.lng !== undefined;
     const sharedRadiusMiles = this.toMiles(query.radius, query.radiusUnit);
     const sharedSort = this.toSharedSort(query.sort);
@@ -270,8 +271,10 @@ export class FeedService {
   }
 
   private injectAdsIntoFeed(contentItems: any[], adItems: any[]) {
-    if (!adItems.length) return contentItems;
-    if (!contentItems.length) return adItems;
+    if (!adItems.length)
+      return contentItems;
+    if (!contentItems.length)
+      return adItems;
 
     const merged: any[] = [];
     let contentIndex = 0;
@@ -352,7 +355,8 @@ export class FeedService {
   }
 
   private toMiles(radius?: number, radiusUnit?: "km" | "mile" | "miles") {
-    if (!radius || radius <= 0) return undefined;
+    if (!radius || radius <= 0)
+      return undefined;
     if (radiusUnit === "km") {
       return Number((radius * 0.621371).toFixed(4));
     }
@@ -360,7 +364,8 @@ export class FeedService {
   }
 
   private toSharedSort(sort?: "distance" | "time" | "popular" | "recent") {
-    if (!sort || sort === "recent") return undefined;
+    if (!sort || sort === "recent")
+      return undefined;
     return sort;
   }
 
@@ -370,11 +375,12 @@ export class FeedService {
     }
 
     if (paid === "paid") {
-      return items.filter((item) => item.kind === "event" && item.priceType === "paid");
+      return items.filter(item => item.kind === "event" && item.priceType === "paid");
     }
 
     return items.filter((item) => {
-      if (item.kind === "activity") return true;
+      if (item.kind === "activity")
+        return true;
       return item.kind === "event" && item.priceType === "free";
     });
   }

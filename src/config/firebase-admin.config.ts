@@ -1,13 +1,15 @@
-import { env } from "@/env";
-import { BadRequestException } from "@/utils/app-error.utils";
 import admin from "firebase-admin";
 
-const getFirebasePrivateKey = () => {
-  if (!env.FIREBASE_PRIVATE_KEY) return undefined;
-  return env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
-};
+import { env } from "@/env";
+import { BadRequestException } from "@/utils/app-error.utils";
 
-export const getFirebaseAdmin = () => {
+function getFirebasePrivateKey() {
+  if (!env.FIREBASE_PRIVATE_KEY)
+    return undefined;
+  return env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
+}
+
+export function getFirebaseAdmin() {
   if (admin.apps.length > 0) {
     return admin;
   }
@@ -26,4 +28,4 @@ export const getFirebaseAdmin = () => {
   });
 
   return admin;
-};
+}

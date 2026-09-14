@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+import { model, Schema } from "mongoose";
+
 import type { ChatMessageType, ChatThreadType, IChatMessage, IChatThread } from "./chat.interface";
 
 const chatThreadSchema = new Schema<IChatThread>(
@@ -22,7 +23,7 @@ const chatThreadSchema = new Schema<IChatThread>(
       unique: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // ensure direct threads are unique through directKey (see directKey unique index)
@@ -62,7 +63,7 @@ const chatMessageSchema = new Schema<IChatMessage>(
       index: true,
     },
   },
-  { timestamps: true, collection: "messages" }
+  { timestamps: true, collection: "messages" },
 );
 
 chatMessageSchema.index({ threadId: 1, createdAt: -1 });

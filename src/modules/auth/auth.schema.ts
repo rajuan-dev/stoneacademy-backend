@@ -1,7 +1,8 @@
 // file: src/modules/auth/auth.schema.ts
 
-import { MESSAGES, OTP_PURPOSES, ROLES } from "@/constants/app.constants";
 import { z } from "zod";
+
+import { MESSAGES, OTP_PURPOSES, ROLES } from "@/constants/app.constants";
 
 /**
  * Register schema with conditional password validation
@@ -15,7 +16,7 @@ export const registerSchema = z.object({
     country: z.string().trim().min(2).max(100).optional(),
     dob: z.coerce.date().optional(),
     role: z.enum([ROLES.USER]).optional().default(ROLES.USER),
-  }).refine((data) => data.password === data.confirmPassword, {
+  }).refine(data => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   }),
@@ -76,7 +77,7 @@ export const changePasswordSchema = z.object({
         .string()
         .min(8, MESSAGES.VALIDATION.PASSWORD_TOO_SHORT),
     })
-    .refine((data) => data.newPassword === data.confirmNewPassword, {
+    .refine(data => data.newPassword === data.confirmNewPassword, {
       message: "New password and confirm new password must match",
       path: ["confirmNewPassword"],
     }),

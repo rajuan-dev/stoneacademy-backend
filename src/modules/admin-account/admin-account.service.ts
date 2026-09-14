@@ -1,14 +1,18 @@
-import { env } from "@/env";
 import type { UserResponse } from "@/modules/user/user.type";
+import type { StorageUploadInput } from "@/services/s3.service";
+
+import { env } from "@/env";
 import { Media } from "@/modules/media/media.model";
-import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+import { s3Service } from "@/services/s3.service";
 import {
   BadRequestException,
   ConflictException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import { AdminAccount, AdminRefreshTokenBlacklist } from "./admin-account.model";
+
 import type { IAdminAccount } from "./admin-account.interface";
+
+import { AdminAccount, AdminRefreshTokenBlacklist } from "./admin-account.model";
 
 export class AdminAccountService {
   async findByEmailWithPassword(email: string): Promise<IAdminAccount | null> {
@@ -200,7 +204,8 @@ export class AdminAccountService {
 
   private async removeMediaAsset(mediaId: string): Promise<void> {
     const media = await Media.findById(mediaId).exec();
-    if (!media) return;
+    if (!media)
+      return;
 
     if (media.s3Key) {
       await this.safeDeleteS3Object(media.s3Key);
@@ -212,18 +217,21 @@ export class AdminAccountService {
   private async safeDeleteS3Object(key: string): Promise<void> {
     try {
       await s3Service.deleteFile(key);
-    } catch {
+    }
+    catch {
       // Keep profile update successful even if storage cleanup fails.
     }
   }
 
   private extractS3KeyFromUrl(url: string): string | null {
-    if (!url) return null;
+    if (!url)
+      return null;
     try {
       const parsed = new URL(url);
       const pathname = parsed.pathname.replace(/^\/+/, "");
       return pathname || null;
-    } catch {
+    }
+    catch {
       return null;
     }
   }

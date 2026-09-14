@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-const normalizeTag = (value: unknown) => {
-  if (typeof value !== "string") return value;
+function normalizeTag(value: unknown) {
+  if (typeof value !== "string")
+    return value;
   const normalized = value.trim().toLowerCase().replace(/\s+/g, "_");
 
   const aliases: Record<string, string> = {
@@ -13,7 +14,7 @@ const normalizeTag = (value: unknown) => {
   };
 
   return aliases[normalized] || normalized;
-};
+}
 
 const quickFeedbackTag = z.preprocess(
   normalizeTag,

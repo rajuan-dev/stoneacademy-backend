@@ -1,6 +1,8 @@
+import { Router } from "express";
+
 import { ROLES } from "@/constants/app.constants";
 import { authMiddleware } from "@/middlewares/auth.middleware";
-import { Router } from "express";
+
 import { SettingsController } from "./settings.controller";
 
 const router = Router();

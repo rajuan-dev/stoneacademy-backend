@@ -1,10 +1,12 @@
+import { model, Schema } from "mongoose";
+
 import {
   ACCOUNT_STATUS,
   ROLES,
   USER_STATUS,
 } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema } from "mongoose";
+
 import type { IAdminAccount } from "./admin-account.interface";
 
 const adminAccountSchema = BaseSchemaUtil.createSchema<IAdminAccount>(

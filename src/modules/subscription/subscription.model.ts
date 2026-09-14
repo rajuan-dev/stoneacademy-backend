@@ -1,8 +1,11 @@
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { SUBSCRIPTION_STATUS } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
 
-export interface ISubscription {
+export type ISubscription = {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   plan: "monthly" | "yearly";
@@ -21,7 +24,7 @@ export interface ISubscription {
   latestPaymentIntentId?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const subscriptionSchema = BaseSchemaUtil.createSchema<ISubscription>({
   userId: {

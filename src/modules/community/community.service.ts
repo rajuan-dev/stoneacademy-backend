@@ -1,3 +1,7 @@
+import type { FilterQuery, HydratedDocument, Types } from "mongoose";
+
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import { PAGINATION } from "@/constants/app.constants";
 import { env } from "@/env";
 import { Activity } from "@/modules/activity/activity.model";
@@ -5,21 +9,20 @@ import { Ad } from "@/modules/ads/ads.model";
 import { Event } from "@/modules/event/event.model";
 import { Media } from "@/modules/media/media.model";
 import { ReportService } from "@/modules/report/report.service";
-import { s3Service, type StorageUploadInput } from "@/services/s3.service";
-import {
-  buildGeographyFilter,
-  getUserGeography,
-} from "@/utils/geography.utils";
+import { s3Service } from "@/services/s3.service";
 import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
+import {
+  buildGeographyFilter,
+  getUserGeography,
+} from "@/utils/geography.utils";
 import { TransactionHelper } from "@/utils/transaction.utils";
-import type { FilterQuery, HydratedDocument, Types } from "mongoose";
-import { CommunityComment, type ICommunityComment } from "./community-comment.model";
-import { CommunityLike } from "./community-like.model";
-import { CommunityPost, type ICommunityPost } from "./community-post.model";
+
+import type { ICommunityComment } from "./community-comment.model";
+import type { ICommunityPost } from "./community-post.model";
 import type {
   CommunityActivitySummary,
   CommunityAuthorResponse,
@@ -40,6 +43,10 @@ import type {
   PopulatedCommunityUser,
   UpdateCommunityPostInput,
 } from "./community.type";
+
+import { CommunityComment } from "./community-comment.model";
+import { CommunityLike } from "./community-like.model";
+import { CommunityPost } from "./community-post.model";
 
 type CommunityPostDocument = HydratedDocument<ICommunityPost> & {
   authorId: Types.ObjectId | PopulatedCommunityUser;
@@ -97,7 +104,7 @@ export class CommunityService {
       Ad.find(adFilter).sort({ createdAt: -1 }).limit(limit * 2).exec(),
     ]);
 
-    const postIds = posts.map((post) => post._id);
+    const postIds = posts.map(post => post._id);
     const likeRows = postIds.length
       ? await CommunityLike.find({
           postId: { $in: postIds },
@@ -111,7 +118,7 @@ export class CommunityService {
       likeRows.map((row: { postId: Types.ObjectId }) => row.postId.toString()),
     );
 
-    const postItems = posts.map((post) =>
+    const postItems = posts.map(post =>
       this.mapPostResponse(post, likedPostIds.has(post._id.toString())));
     const adItems = ads.map((item: any) => this.mapAdResponse(item));
     const merged = this.injectAdsIntoFeed(postItems, adItems);
@@ -186,15 +193,16 @@ export class CommunityService {
           await this.validateExistingMedia(input.userId, input.mediaIds);
           post.media = [
             ...input.mediaIds,
-            ...uploadedMedia.map((item) => item.id),
+            ...uploadedMedia.map(item => item.id),
           ] as any;
-        } else if (uploadedMedia.length) {
+        }
+        else if (uploadedMedia.length) {
           const existingMediaIds = Array.isArray(post.media)
             ? post.media.map((mediaId: any) => mediaId.toString())
             : [];
           post.media = [
             ...existingMediaIds,
-            ...uploadedMedia.map((item) => item.id),
+            ...uploadedMedia.map(item => item.id),
           ] as any;
         }
 
@@ -221,8 +229,10 @@ export class CommunityService {
           ? this.normalizeEntityIds(input.activityIds, input.activityId)
           : currentActivityIds;
 
-        if (hasEventInput && nextEventIds.length) nextActivityIds = [];
-        if (hasActivityInput && nextActivityIds.length) nextEventIds = [];
+        if (hasEventInput && nextEventIds.length)
+          nextActivityIds = [];
+        if (hasActivityInput && nextActivityIds.length)
+          nextEventIds = [];
 
         if (nextEventIds.length && nextActivityIds.length) {
           throw new BadRequestException("eventId/eventIds and activityId/activityIds cannot both be supplied");
@@ -274,7 +284,8 @@ export class CommunityService {
       }).select("_id").lean();
 
       return this.mapPostResponse(post, Boolean(like));
-    } catch (error) {
+    }
+    catch (error) {
       await this.cleanupUploadedMedia(uploadedMedia);
       throw error;
     }
@@ -339,7 +350,8 @@ export class CommunityService {
           { $inc: { likeCount: 1 } },
           { session },
         ).exec();
-      } catch (error: unknown) {
+      }
+      catch (error: unknown) {
         const maybeMongoError = error as { code?: number };
         if (maybeMongoError.code !== 11000) {
           throw error;
@@ -417,7 +429,7 @@ export class CommunityService {
       }),
     ]);
 
-    const commentIds = comments.map((comment) => comment._id);
+    const commentIds = comments.map(comment => comment._id);
     const previewReplyIds = commentIds.length
       ? await CommunityComment.aggregate<{ _id: Types.ObjectId }>([
           { $match: { parentCommentId: { $in: commentIds } } },
@@ -429,8 +441,8 @@ export class CommunityService {
 
     const previewReplies = previewReplyIds.length
       ? await this.populateCommentQuery(CommunityComment.find({
-          _id: { $in: previewReplyIds.map((item) => item._id) },
-        })).exec() as CommunityCommentDocument[]
+        _id: { $in: previewReplyIds.map(item => item._id) },
+      })).exec() as CommunityCommentDocument[]
       : [];
 
     const firstReplyByParent = new Map<string, CommunityCommentDocument>();
@@ -544,7 +556,7 @@ export class CommunityService {
     ]);
 
     return {
-      data: replies.map((reply) =>
+      data: replies.map(reply =>
         this.mapCommentResponse(reply, post.authorId.toString(), [])),
       pagination: {
         currentPage: page,
@@ -626,16 +638,18 @@ export class CommunityService {
   }
 
   async validateExistingMedia(userId: string, mediaIds: string[]) {
-    if (!mediaIds.length) return [];
+    if (!mediaIds.length)
+      return [];
 
     const mediaDocs = await Media.find({ _id: { $in: mediaIds } })
       .select("ownerId type")
       .lean();
-    const mediaById = new Map(mediaDocs.map((media) => [media._id.toString(), media]));
+    const mediaById = new Map(mediaDocs.map(media => [media._id.toString(), media]));
 
     return mediaIds.map((mediaId) => {
       const media = mediaById.get(mediaId);
-      if (!media) throw new NotFoundException("Media not found");
+      if (!media)
+        throw new NotFoundException("Media not found");
       if (media.ownerId.toString() !== userId) {
         throw new ForbiddenException("You do not have access to this media");
       }
@@ -647,15 +661,16 @@ export class CommunityService {
   }
 
   async processUploadedMedia(userId: string, files: Express.Multer.File[]) {
-    if (!files.length) return [];
+    if (!files.length)
+      return [];
 
     for (const file of files) {
-      if (!ALLOWED_PREFIXES.some((prefix) => file.mimetype.startsWith(prefix))) {
+      if (!ALLOWED_PREFIXES.some(prefix => file.mimetype.startsWith(prefix))) {
         throw new BadRequestException("Only image and video uploads are supported");
       }
     }
 
-    const uploadsInput: StorageUploadInput[] = files.map((file) => ({
+    const uploadsInput: StorageUploadInput[] = files.map(file => ({
       buffer: file.buffer,
       mimeType: file.mimetype,
       originalName: file.originalname,
@@ -682,33 +697,38 @@ export class CommunityService {
         id: doc._id.toString(),
         s3Key: uploads[index].key,
       }));
-    } catch (error) {
-      await Promise.allSettled(uploads.map((upload) => s3Service.deleteFile(upload.key)));
+    }
+    catch (error) {
+      await Promise.allSettled(uploads.map(upload => s3Service.deleteFile(upload.key)));
       throw error;
     }
   }
 
   async validateEventOwnership(userId: string, eventId?: string | null) {
-    if (!eventId) return undefined;
+    if (!eventId)
+      return undefined;
     await this.validateEventOwnershipMany(userId, [eventId]);
     return eventId;
   }
 
   async validateActivityOwnership(userId: string, activityId?: string | null) {
-    if (!activityId) return undefined;
+    if (!activityId)
+      return undefined;
     await this.validateActivityOwnershipMany(userId, [activityId]);
     return activityId;
   }
 
   async validateEventOwnershipMany(userId: string, eventIds: string[]) {
-    if (!eventIds.length) return [];
+    if (!eventIds.length)
+      return [];
 
     const events = await Event.find({ _id: { $in: eventIds } }).select("_id creatorId").exec();
-    const eventsById = new Map(events.map((event) => [event._id.toString(), event]));
+    const eventsById = new Map(events.map(event => [event._id.toString(), event]));
 
     return eventIds.map((eventId) => {
       const event = eventsById.get(eventId);
-      if (!event) throw new NotFoundException("Event not found");
+      if (!event)
+        throw new NotFoundException("Event not found");
       if (event.creatorId.toString() !== userId) {
         throw new ForbiddenException("You do not have access to this event");
       }
@@ -717,16 +737,18 @@ export class CommunityService {
   }
 
   async validateActivityOwnershipMany(userId: string, activityIds: string[]) {
-    if (!activityIds.length) return [];
+    if (!activityIds.length)
+      return [];
 
     const activities = await Activity.find({ _id: { $in: activityIds } }).select("_id hostId").exec();
     const activitiesById = new Map(
-      activities.map((activity) => [activity._id.toString(), activity]),
+      activities.map(activity => [activity._id.toString(), activity]),
     );
 
     return activityIds.map((activityId) => {
       const activity = activitiesById.get(activityId);
-      if (!activity) throw new NotFoundException("Activity not found");
+      if (!activity)
+        throw new NotFoundException("Activity not found");
       if (activity.hostId.toString() !== userId) {
         throw new ForbiddenException("You do not have access to this activity");
       }
@@ -842,8 +864,10 @@ export class CommunityService {
   }
 
   private injectAdsIntoFeed(contentItems: any[], adItems: any[]) {
-    if (!adItems.length) return contentItems;
-    if (!contentItems.length) return adItems;
+    if (!adItems.length)
+      return contentItems;
+    if (!contentItems.length)
+      return adItems;
 
     const merged: any[] = [];
     let contentIndex = 0;
@@ -880,7 +904,7 @@ export class CommunityService {
       activity: this.mapActivitySummary(comment.activityId),
       isPostAuthor: this.getAuthorId(comment.authorId) === postAuthorId,
       replyCount: comment.replyCount,
-      replies: replies.map((reply) => this.mapCommentResponse(reply, postAuthorId, [])),
+      replies: replies.map(reply => this.mapCommentResponse(reply, postAuthorId, [])),
       createdAt: comment.createdAt.toISOString(),
     };
   }
@@ -932,10 +956,11 @@ export class CommunityService {
   }
 
   private async cleanupUploadedMedia(media: Array<{ id: string; s3Key: string }>) {
-    if (!media.length) return;
+    if (!media.length)
+      return;
     await Promise.allSettled([
-      Media.deleteMany({ _id: { $in: media.map((item) => item.id) } }).exec(),
-      ...media.map((item) => s3Service.deleteFile(item.s3Key)),
+      Media.deleteMany({ _id: { $in: media.map(item => item.id) } }).exec(),
+      ...media.map(item => s3Service.deleteFile(item.s3Key)),
     ]);
   }
 
@@ -1083,7 +1108,7 @@ export class CommunityService {
   ): CommunityEventSummary[] {
     const items = events?.length ? events : fallback ? [fallback] : [];
     return items
-      .map((event) => this.mapEventSummary(event))
+      .map(event => this.mapEventSummary(event))
       .filter((event): event is CommunityEventSummary => Boolean(event));
   }
 
@@ -1093,7 +1118,7 @@ export class CommunityService {
   ): CommunityActivitySummary[] {
     const items = activities?.length ? activities : fallback ? [fallback] : [];
     return items
-      .map((activity) => this.mapActivitySummary(activity))
+      .map(activity => this.mapActivitySummary(activity))
       .filter((activity): activity is CommunityActivitySummary => Boolean(activity));
   }
 
@@ -1102,7 +1127,7 @@ export class CommunityService {
       ...(ids ?? []),
       ...(legacyId ? [legacyId] : []),
     ];
-    return [...new Set(values.map((id) => id.trim()).filter(Boolean))];
+    return [...new Set(values.map(id => id.trim()).filter(Boolean))];
   }
 
   private getEntityIds(
@@ -1149,7 +1174,8 @@ export class CommunityService {
   private parseJson(value: string) {
     try {
       return JSON.parse(value);
-    } catch {
+    }
+    catch {
       return value;
     }
   }

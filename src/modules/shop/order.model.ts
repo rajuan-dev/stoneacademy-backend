@@ -1,16 +1,19 @@
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { ORDER_STATUS } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
 
-export interface IOrderItem {
+export type IOrderItem = {
   productId: Types.ObjectId;
   name: string;
   quantity: number;
   unitPrice: number;
   currency: string;
-}
+};
 
-export interface IOrder {
+export type IOrder = {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   items: IOrderItem[];
@@ -19,7 +22,7 @@ export interface IOrder {
   status: (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const orderItemSchema = new Schema<IOrderItem>(
   {

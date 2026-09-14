@@ -1,12 +1,16 @@
 // file: src/modules/otp/otp.service.ts
 
+import crypto from "node:crypto";
+
 import { AUTH, OTP_PURPOSES } from "@/constants/app.constants";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
-import { BadRequestException } from "@/utils/app-error.utils";
-import crypto from "crypto";
 import { OTPService } from "@/services/otp.service";
-import { OtpCode, type IOtpCode, type OtpPurpose } from "./otp.model";
+import { BadRequestException } from "@/utils/app-error.utils";
+
+import type { IOtpCode, OtpPurpose } from "./otp.model";
+
+import { OtpCode } from "./otp.model";
 
 const DEFAULT_RESEND_COOLDOWN_SECONDS = 60;
 
@@ -62,7 +66,8 @@ export class OtpService {
       existing.consumedAt = undefined;
       existing.meta = params.meta;
       await existing.save();
-    } else {
+    }
+    else {
       await OtpCode.create({
         email,
         purpose: params.purpose,

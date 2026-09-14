@@ -1,13 +1,15 @@
+import type { Request, Response } from "express";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
-import { SettingsService } from "./settings.service";
+
 import {
   updatePlatformSettingsSchema,
   updateSettingsProfileSchema,
   updateSettingsSecuritySchema,
 } from "./settings.schema";
+import { SettingsService } from "./settings.service";
 
 export class SettingsController {
   private service: SettingsService;

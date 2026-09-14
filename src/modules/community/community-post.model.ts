@@ -1,8 +1,12 @@
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+
 import type { CommunityLocation } from "./community.type";
 
-export interface ICommunityPost {
+export type ICommunityPost = {
   _id: Types.ObjectId;
   authorId: Types.ObjectId;
   text?: string | null;
@@ -20,7 +24,7 @@ export interface ICommunityPost {
   deletedBy?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const pointSchema = new Schema(
   {

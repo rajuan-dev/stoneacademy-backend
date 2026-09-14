@@ -1,5 +1,9 @@
 // file: src/modules/user/user.controller.ts
 
+import type { Request, Response } from "express";
+
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import { MESSAGES } from "@/constants/app.constants";
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import {
@@ -8,23 +12,22 @@ import {
 } from "@/utils/app-error.utils";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
-import type { StorageUploadInput } from "@/services/s3.service";
+
 import {
   cleanerIdSchema,
-  creatorFullProfileSchema,
   createCleanerSchema,
+  creatorFullProfileSchema,
   galleryRemoveSchema,
+  hostProfileSchema,
   listCleanersSchema,
+  listHostedContentSchema,
   listJoinedContentSchema,
   listMyGallerySchema,
   listMyRatingsSchema,
   listOverviewSchema,
-  listHostedContentSchema,
-  hostProfileSchema,
-  userIdSchema,
   updateCleanerSchema,
   updateProfileSchema,
+  userIdSchema,
 } from "./user.schema";
 import { UserService } from "./user.service";
 
@@ -42,14 +45,14 @@ export class UserController {
       res,
       result.data,
       result.pagination,
-      "Cleaners fetched successfully"
+      "Cleaners fetched successfully",
     );
   });
 
   getCleaner = asyncHandler(async (req: Request, res: Response) => {
     const validated = await zParse(cleanerIdSchema, req);
     const cleaner = await this.userService.getCleanerById(
-      validated.params.cleanerId
+      validated.params.cleanerId,
     );
     ApiResponse.success(res, cleaner, "Cleaner fetched successfully");
   });
@@ -96,7 +99,8 @@ export class UserController {
 
     const profileBody: Record<string, unknown> = {};
     Object.keys(normalizedBody).forEach((key) => {
-      if (!allowedProfileKeys.has(key)) return;
+      if (!allowedProfileKeys.has(key))
+        return;
       profileBody[key] = normalizedBody[key];
     });
 
@@ -114,7 +118,8 @@ export class UserController {
     if (typeof profileBody.location === "string") {
       try {
         profileBody.location = JSON.parse(profileBody.location);
-      } catch {
+      }
+      catch {
         throw new BadRequestException("location must be a valid JSON object");
       }
     }
@@ -201,7 +206,7 @@ export class UserController {
       throw new BadRequestException("Gallery files are required");
     }
 
-    const uploads: StorageUploadInput[] = files.map((file) => ({
+    const uploads: StorageUploadInput[] = files.map(file => ({
       buffer: file.buffer,
       mimeType: file.mimetype,
       originalName: file.originalname,
@@ -279,7 +284,7 @@ export class UserController {
       throw new BadRequestException("Video files are required");
     }
 
-    const uploads: StorageUploadInput[] = files.map((file) => ({
+    const uploads: StorageUploadInput[] = files.map(file => ({
       buffer: file.buffer,
       mimeType: file.mimetype,
       originalName: file.originalname,
@@ -443,7 +448,7 @@ export class UserController {
     const validated = await zParse(updateCleanerSchema, req);
     const cleaner = await this.userService.updateCleaner(
       validated.params.cleanerId,
-      validated.body
+      validated.body,
     );
     ApiResponse.success(res, cleaner, "Cleaner updated successfully");
   });

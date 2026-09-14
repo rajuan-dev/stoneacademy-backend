@@ -1,15 +1,19 @@
+import type { Request, Response } from "express";
+
+import { Router } from "express";
+
 import { ROLES } from "@/constants/app.constants";
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import { Router, type Request, type Response } from "express";
+
 import {
-  adminReportActionSchema,
   adminDismissReportSchema,
+  adminReportActionSchema,
   adminResolveReportSchema,
-  listReportSchema,
   createReportSchema,
+  listReportSchema,
   reportIdSchema,
   updateReportStatusSchema,
 } from "./report.schema";
@@ -108,8 +112,8 @@ adminReportRouter.post(
     const validated = await zParse(adminResolveReportSchema, req);
     const adminId = req.user?.userId as string;
     const requestedStatus = validated.body.status;
-    const status =
-      requestedStatus === "under_review"
+    const status
+      = requestedStatus === "under_review"
         ? "under_review"
         : requestedStatus === "closed"
           ? "resolved"

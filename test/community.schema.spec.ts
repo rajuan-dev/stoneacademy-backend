@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+
+import { createCommunityPostSchema } from "../src/modules/community-creator/community-creator.schema";
 import {
   createCommunityCommentSchema,
   createCommunityReplySchema,
@@ -6,7 +8,6 @@ import {
   reportCommunityPostSchema,
   updateCommunityPostSchema,
 } from "../src/modules/community/community.schema";
-import { createCommunityPostSchema } from "../src/modules/community-creator/community-creator.schema";
 
 describe("Community schemas", () => {
   const validPostId = "6890e4caa12f9d001f1b0001";

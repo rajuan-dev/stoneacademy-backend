@@ -1,8 +1,11 @@
+import type { Document } from "mongoose";
+
+import { model } from "mongoose";
+
 import { ROLES } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, type Document } from "mongoose";
 
-export interface IPendingRegistration extends Document {
+export type IPendingRegistration = {
   email: string;
   fullName: string;
   country?: string;
@@ -16,10 +19,10 @@ export interface IPendingRegistration extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
-}
+} & Document;
 
-const pendingRegistrationSchema =
-  BaseSchemaUtil.createSchema<IPendingRegistration>({
+const pendingRegistrationSchema
+  = BaseSchemaUtil.createSchema<IPendingRegistration>({
     email: {
       type: String,
       required: true,

@@ -30,7 +30,7 @@ export const createProductSchema = z.object({
       stock: z.coerce.number().min(0).optional(),
       isActive: z.coerce.boolean().optional(),
     })
-    .refine((body) => Boolean(body.ctaUrl || body.destinationUrl), {
+    .refine(body => Boolean(body.ctaUrl || body.destinationUrl), {
       message: "Destination URL is required",
       path: ["destinationUrl"],
     }),

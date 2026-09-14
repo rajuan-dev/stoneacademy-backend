@@ -1,14 +1,17 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-interface ITicketMessage {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+type ITicketMessage = {
   senderId: Types.ObjectId;
   senderRole: "user" | "admin";
   message: string;
   createdAt: Date;
-}
+};
 
-export interface ISupportTicket {
+export type ISupportTicket = {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   category: string;
@@ -17,7 +20,7 @@ export interface ISupportTicket {
   messages: ITicketMessage[];
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const supportTicketSchema = BaseSchemaUtil.createSchema<ISupportTicket>({
   userId: {

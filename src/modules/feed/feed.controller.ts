@@ -1,7 +1,9 @@
+import type { Request, Response } from "express";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
+
 import { listFeedSchema, searchFilterSchema } from "./feed.schema";
 import { FeedService } from "./feed.service";
 

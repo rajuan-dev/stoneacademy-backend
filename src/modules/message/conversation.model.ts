@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IConversation {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IConversation = {
   _id: Types.ObjectId;
   type: "direct" | "support";
   participantIds: Types.ObjectId[];
@@ -11,7 +14,7 @@ export interface IConversation {
   createdBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const conversationSchema = BaseSchemaUtil.createSchema<IConversation>({
   type: {

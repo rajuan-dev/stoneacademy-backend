@@ -1,11 +1,14 @@
+import type { Secret, SignOptions } from "jsonwebtoken";
+
+import jwt from "jsonwebtoken";
+import crypto from "node:crypto";
+
 // file: src/modules/auth/auth.utils.ts
 import { AUTH, OTP } from "@/constants/app.constants";
 import { ErrorCodeEnum } from "@/enums/error-code.enum";
 import { env } from "@/env";
 import { UnauthorizedException } from "@/utils/app-error.utils";
-import crypto from "crypto";
-import jwt from "jsonwebtoken";
-import type { SignOptions, Secret } from "jsonwebtoken";
+
 import type { JWTPayload } from "../user/user.type";
 
 export class AuthUtil {
@@ -28,7 +31,8 @@ export class AuthUtil {
     try {
       const decoded = jwt.verify(token, env.JWT_SECRET as Secret);
       return decoded as JWTPayload;
-    } catch {
+    }
+    catch {
       throw new UnauthorizedException(
         "Invalid or expired access token",
         ErrorCodeEnum.AUTH_TOKEN_INVALID,
@@ -40,7 +44,8 @@ export class AuthUtil {
     try {
       const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET as Secret);
       return decoded as JWTPayload;
-    } catch {
+    }
+    catch {
       throw new UnauthorizedException(
         "Invalid or expired refresh token",
         ErrorCodeEnum.AUTH_TOKEN_INVALID,
@@ -57,15 +62,16 @@ export class AuthUtil {
   }
 
   static generateOTP(): string {
-    const min = Math.pow(10, OTP.LENGTH - 1);
-    const max = Math.pow(10, OTP.LENGTH) - 1;
+    const min = 10 ** (OTP.LENGTH - 1);
+    const max = 10 ** OTP.LENGTH - 1;
     return Math.floor(Math.random() * (max - min + 1) + min).toString();
   }
 
   static getTokenExpirationTime(expiryString: string): Date {
     const expiryDate = new Date();
     const match = expiryString.match(/(\d+)([dhms])/);
-    if (!match) return expiryDate;
+    if (!match)
+      return expiryDate;
 
     const value = Number.parseInt(match[1]);
     const unit = match[2];
@@ -95,7 +101,7 @@ export class AuthUtil {
   }
 
   static isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@](?:[^\s@]|[^\s@]*[\t\v\f @\xA0\u1680\u2000-\u200A\u202F\u205F\u3000\uFEFF])[^\s@]+$/;
     return emailRegex.test(email);
   }
 

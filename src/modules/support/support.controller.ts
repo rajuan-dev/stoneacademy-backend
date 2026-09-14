@@ -1,9 +1,13 @@
+import type { Request, Response } from "express";
+
+import { Router } from "express";
+
 import { ROLES } from "@/constants/app.constants";
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import { Router, type Request, type Response } from "express";
+
 import {
   addReplySchema,
   createTicketSchema,

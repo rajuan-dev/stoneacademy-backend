@@ -1,24 +1,24 @@
 import { z } from "zod";
 
-const normalizeHostThreadBody = (value: unknown) => {
+function normalizeHostThreadBody(value: unknown) {
   const body = (value || {}) as Record<string, unknown>;
 
-  const targetId =
-    body.targetId
-    || body.activityId
-    || body.eventId
-    || undefined;
+  const targetId
+    = body.targetId
+      || body.activityId
+      || body.eventId
+      || undefined;
 
-  const hostUserId =
-    body.hostUserId
-    || body.hostId
-    || undefined;
+  const hostUserId
+    = body.hostUserId
+      || body.hostId
+      || undefined;
 
   return {
     targetId: typeof targetId === "string" ? targetId.trim() : targetId,
     hostUserId: typeof hostUserId === "string" ? hostUserId.trim() : hostUserId,
   };
-};
+}
 
 export const createHostThreadSchema = z.object({
   body: z
@@ -29,7 +29,7 @@ export const createHostThreadSchema = z.object({
         hostUserId: z.string().min(1).optional(),
       }),
     )
-    .refine((data) => Boolean(data.targetId || data.hostUserId), {
+    .refine(data => Boolean(data.targetId || data.hostUserId), {
       message: "Provide targetId or hostUserId",
     }),
 });

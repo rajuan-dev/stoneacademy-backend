@@ -1,8 +1,10 @@
 // file: src/modules/activity/activity.route.ts
 
-import { authMiddleware } from "@/middlewares/auth.middleware";
-import upload from "@/config/multer.config";
 import { Router } from "express";
+
+import upload from "@/config/multer.config";
+import { authMiddleware } from "@/middlewares/auth.middleware";
+
 import { ActivityController } from "./activity.controller";
 
 const router = Router();

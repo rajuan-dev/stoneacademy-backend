@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { createEventSchema } from "../src/modules/event/event.schema";
 
 describe("Event schema", () => {

@@ -1,14 +1,17 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface ISettings {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type ISettings = {
   _id: Types.ObjectId;
   key: string;
   value: Record<string, any>;
   updatedBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const settingsSchema = BaseSchemaUtil.createSchema<ISettings>({
   key: {

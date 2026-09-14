@@ -1,5 +1,6 @@
-import { ACCOUNT_STATUS, GENDERS } from "@/constants/app.constants";
 import { z } from "zod";
+
+import { ACCOUNT_STATUS, GENDERS } from "@/constants/app.constants";
 
 export const createCleanerSchema = z.object({
   body: z.object({
@@ -42,14 +43,14 @@ export const updateCleanerSchema = z.object({
         .optional(),
     })
     .refine(
-      (data) =>
-        data.fullName ||
-        data.email ||
-        data.phoneNumber ||
-        data.cleanerPercentage !== undefined ||
-        data.address ||
-        data.accountStatus,
-      { message: "At least one field must be provided for update" }
+      data =>
+        data.fullName
+        || data.email
+        || data.phoneNumber
+        || data.cleanerPercentage !== undefined
+        || data.address
+        || data.accountStatus,
+      { message: "At least one field must be provided for update" },
     ),
 });
 
@@ -81,19 +82,19 @@ export const updateProfileSchema = z.object({
         .optional(),
     })
     .refine(
-      (data) =>
-        data.fullName ||
-        data.email ||
-        data.phone ||
-        data.phoneNumber ||
-        data.dob ||
-        data.country ||
-        data.state ||
-        data.city ||
-        data.gender ||
-        data.bio !== undefined ||
-        data.location,
-      { message: "At least one field must be provided for update" }
+      data =>
+        data.fullName
+        || data.email
+        || data.phone
+        || data.phoneNumber
+        || data.dob
+        || data.country
+        || data.state
+        || data.city
+        || data.gender
+        || data.bio !== undefined
+        || data.location,
+      { message: "At least one field must be provided for update" },
     ),
 });
 

@@ -33,7 +33,7 @@ export const updateReportStatusSchema = z.object({
   body: z.object({
     status: z.enum(["under_review", "resolved", "rejected"]),
     adminNote: z.string().trim().max(3000).optional(),
-    }),
+  }),
 });
 
 export const reportIdSchema = z.object({

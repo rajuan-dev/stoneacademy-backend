@@ -27,10 +27,11 @@ async function connectDB(retries = 3, retryDelay = 5000) {
     try {
       await mongoose.connect(env.MONGO_URI);
       return;
-    } catch (error) {
+    }
+    catch (error) {
       if (attempt < retries) {
         logger.warn(
-          `Attempt ${attempt} failed. Retrying in ${retryDelay / 1000} seconds...`
+          `Attempt ${attempt} failed. Retrying in ${retryDelay / 1000} seconds...`,
         );
         await new Promise(resolve => setTimeout(resolve, retryDelay));
         continue;

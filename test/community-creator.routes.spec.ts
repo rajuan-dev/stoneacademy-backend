@@ -1,6 +1,8 @@
+import { Buffer } from "node:buffer";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import app from "../src/app";
+
+import app from "../src/app.js";
 import {
   BadRequestException,
   ForbiddenException,

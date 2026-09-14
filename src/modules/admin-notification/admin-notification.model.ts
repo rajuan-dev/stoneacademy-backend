@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IAdminNotification {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IAdminNotification = {
   _id: Types.ObjectId;
   adminId?: Types.ObjectId | null;
   type: string;
@@ -12,7 +15,7 @@ export interface IAdminNotification {
   readAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const adminNotificationSchema = BaseSchemaUtil.createSchema<IAdminNotification>({
   adminId: {

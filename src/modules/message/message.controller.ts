@@ -1,8 +1,10 @@
+import type { Request, Response } from "express";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { realtimeService } from "@/services/realtime.service";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
+
 import {
   createDirectConversationSchema,
   listConversationsSchema,
@@ -71,14 +73,14 @@ export class MessageController {
 
     realtimeService.emitChatMessageCreated({
       conversationId: result.conversation._id.toString(),
-      participantIds: result.conversation.participantIds.map((id) => id.toString()),
+      participantIds: result.conversation.participantIds.map(id => id.toString()),
       message: {
         _id: result.message._id.toString(),
         conversationId: result.message.conversationId.toString(),
         senderId: result.message.senderId.toString(),
         text: result.message.text,
-        mediaIds: result.message.mediaIds.map((id) => id.toString()),
-        readBy: result.message.readBy.map((entry) => ({
+        mediaIds: result.message.mediaIds.map(id => id.toString()),
+        readBy: result.message.readBy.map(entry => ({
           userId: entry.userId.toString(),
           readAt: entry.readAt,
         })),

@@ -1,5 +1,6 @@
 import { PAGINATION } from "@/constants/app.constants";
 import { NotFoundException } from "@/utils/app-error.utils";
+
 import { AdminNotification } from "./admin-notification.model";
 
 export class AdminNotificationService {

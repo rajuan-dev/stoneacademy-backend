@@ -1,6 +1,7 @@
 // file: src/core/middleware/rbac.middleware.ts
 
 import type { NextFunction, Request, Response } from "express";
+
 import { MESSAGES } from "@/constants/app.constants";
 import {
   ForbiddenException,
@@ -30,4 +31,3 @@ export function requireRoles(...roles: string[]) {
     return next();
   };
 }
-

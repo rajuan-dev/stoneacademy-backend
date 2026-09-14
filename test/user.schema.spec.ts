@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { updateProfileSchema } from "../src/modules/user/user.schema";
 
 describe("User profile schema", () => {

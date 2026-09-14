@@ -18,7 +18,7 @@ import { logger } from "./pino-logger.js";
 
 // Zod error formatter
 function formatZodError(res: Response, error: z.ZodError, requestId?: string) {
-  const errors = error?.issues?.map((err) => ({
+  const errors = error?.issues?.map(err => ({
     field: err.path.join("."),
     message: err.message,
     code: err.code,
@@ -86,8 +86,8 @@ function handleMongoDBError(error: any, requestId?: string) {
 
   // MongoDB Connection Error
   if (
-    error.name === "MongoNetworkError" ||
-    error.name === "MongooseServerSelectionError"
+    error.name === "MongoNetworkError"
+    || error.name === "MongooseServerSelectionError"
   ) {
     return {
       statusCode: HTTPSTATUS.SERVICE_UNAVAILABLE,
@@ -104,7 +104,7 @@ export const errorHandler: ErrorRequestHandler = (
   error,
   req: Request,
   res: Response,
-  _: NextFunction
+  _: NextFunction,
 ): any => {
   const requestId = req.id || (req.headers["x-request-id"] as string);
 
@@ -124,7 +124,7 @@ export const errorHandler: ErrorRequestHandler = (
       params: req.params,
       query: req.query,
     },
-    `Error occurred on ${req.method} ${req.path}`
+    `Error occurred on ${req.method} ${req.path}`,
   );
 
   if (error instanceof SyntaxError && "body" in error) {

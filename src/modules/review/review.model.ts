@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IReview {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IReview = {
   _id: Types.ObjectId;
   reviewerId: Types.ObjectId;
   targetUserId: Types.ObjectId;
@@ -12,7 +15,7 @@ export interface IReview {
   comment?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const reviewSchema = BaseSchemaUtil.createSchema<IReview>({
   reviewerId: {

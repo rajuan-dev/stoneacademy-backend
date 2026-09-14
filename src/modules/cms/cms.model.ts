@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface ICmsPage {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type ICmsPage = {
   _id: Types.ObjectId;
   slug: string;
   title: string;
@@ -10,7 +13,7 @@ export interface ICmsPage {
   updatedBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const cmsPageSchema = BaseSchemaUtil.createSchema<ICmsPage>({
   slug: {

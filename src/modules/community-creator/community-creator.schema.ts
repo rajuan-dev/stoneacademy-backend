@@ -1,18 +1,19 @@
 import { Types } from "mongoose";
 import { z } from "zod";
 
-const parseObject = (value: unknown) => {
+function parseObject(value: unknown) {
   if (typeof value !== "string") {
     return value;
   }
   try {
     return JSON.parse(value);
-  } catch {
+  }
+  catch {
     return value;
   }
-};
+}
 
-const parseStringArray = (value: unknown) => {
+function parseStringArray(value: unknown) {
   if (value === undefined || value === null || value === "" || value === "null") {
     return undefined;
   }
@@ -25,31 +26,31 @@ const parseStringArray = (value: unknown) => {
     return [parsed];
   }
   return parsed;
-};
+}
 
-const parseObjectIdArray = (value: unknown) => {
+function parseObjectIdArray(value: unknown) {
   const parsed = parseStringArray(value);
   if (parsed === undefined) {
     return undefined;
   }
   return Array.isArray(parsed) ? parsed : [parsed];
-};
+}
 
 const objectIdSchema = z
   .string()
   .trim()
   .min(1)
-  .refine((value) => Types.ObjectId.isValid(value), {
+  .refine(value => Types.ObjectId.isValid(value), {
     message: "Invalid ObjectId",
   });
 
-const normalizeLocationInput = (value: unknown) => {
+function normalizeLocationInput(value: unknown) {
   if (value === null || value === undefined || value === "" || value === "null") {
     return undefined;
   }
 
   return parseObject(value);
-};
+}
 
 const coordinateTupleSchema = z.tuple([
   z.coerce.number().min(-180).max(180),

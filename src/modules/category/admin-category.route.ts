@@ -1,8 +1,10 @@
 // file: src/modules/category/admin-category.route.ts
 
+import { Router } from "express";
+
 import { ROLES } from "@/constants/app.constants";
 import { authMiddleware } from "@/middlewares/auth.middleware";
-import { Router } from "express";
+
 import { CategoryController } from "./category.controller";
 
 const router = Router();

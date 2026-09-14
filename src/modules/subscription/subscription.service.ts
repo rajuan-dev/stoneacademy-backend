@@ -1,3 +1,6 @@
+import type { HydratedDocument } from "mongoose";
+import type Stripe from "stripe";
+
 import {
   PAYMENT_STATUS,
   ROLES,
@@ -9,12 +12,13 @@ import {
   BadRequestException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import Stripe from "stripe";
-import type { HydratedDocument } from "mongoose";
+
+import type { ISubscription } from "./subscription.model";
+
 import { SettingsService } from "../settings/settings.service";
 import { User } from "../user/user.model";
 import { SubscriptionPayment } from "./subscription-payment.model";
-import { Subscription, type ISubscription } from "./subscription.model";
+import { Subscription } from "./subscription.model";
 
 type SubscriptionDocument = HydratedDocument<ISubscription>;
 type BillingPlan = "monthly" | "yearly";
@@ -346,11 +350,11 @@ export class SubscriptionService {
     const mappedStatus = this.mapStripeSubscriptionStatus(stripeSubscription.status);
     const currentPeriodStart = this.fromUnixSeconds(
       stripeSubscription.items.data[0]?.current_period_start
-        || stripeSubscription.start_date,
+      || stripeSubscription.start_date,
     );
     const currentPeriodEnd = this.fromUnixSeconds(
       stripeSubscription.items.data[0]?.current_period_end
-        || stripeSubscription.billing_cycle_anchor,
+      || stripeSubscription.billing_cycle_anchor,
     );
     const latestInvoice = this.asInvoice(stripeSubscription.latest_invoice);
     const latestPaymentIntent = latestInvoice

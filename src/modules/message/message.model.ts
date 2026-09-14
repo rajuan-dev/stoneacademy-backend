@@ -1,12 +1,15 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IMessageRead {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IMessageRead = {
   userId: Types.ObjectId;
   readAt: Date;
-}
+};
 
-export interface IMessage {
+export type IMessage = {
   _id: Types.ObjectId;
   conversationId: Types.ObjectId;
   senderId: Types.ObjectId;
@@ -15,7 +18,7 @@ export interface IMessage {
   readBy: IMessageRead[];
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const messageSchema = BaseSchemaUtil.createSchema<IMessage>({
   conversationId: {
@@ -57,6 +60,6 @@ const messageSchema = BaseSchemaUtil.createSchema<IMessage>({
 });
 
 messageSchema.index({ conversationId: 1, createdAt: -1 });
-messageSchema.index({ conversationId: 1, "readBy.userId": 1 });
+messageSchema.index({ "conversationId": 1, "readBy.userId": 1 });
 
 export const Message = model<IMessage>("Message", messageSchema);

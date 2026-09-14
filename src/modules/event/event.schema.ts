@@ -1,16 +1,19 @@
-import { ACTIVITY_STATUS } from "@/constants/app.constants";
 import { z } from "zod";
 
-const parseObject = (value: unknown) => {
-  if (typeof value !== "string") return value;
+import { ACTIVITY_STATUS } from "@/constants/app.constants";
+
+function parseObject(value: unknown) {
+  if (typeof value !== "string")
+    return value;
   try {
     return JSON.parse(value);
-  } catch {
+  }
+  catch {
     return value;
   }
-};
+}
 
-const normalizeLocationInput = (value: unknown) => {
+function normalizeLocationInput(value: unknown) {
   if (value === null || value === undefined || value === "" || value === "null") {
     return undefined;
   }
@@ -59,16 +62,16 @@ const normalizeLocationInput = (value: unknown) => {
 
   // Unknown object shape; ignore instead of failing request.
   return undefined;
-};
+}
 
-const nullableNumber = (value: unknown) => {
+function nullableNumber(value: unknown) {
   if (value === null || value === undefined || value === "" || value === "null") {
     return undefined;
   }
   return value;
-};
+}
 
-const parseDurationMinutes = (value: unknown) => {
+function parseDurationMinutes(value: unknown) {
   if (value === null || value === undefined || value === "" || value === "null") {
     return undefined;
   }
@@ -79,7 +82,8 @@ const parseDurationMinutes = (value: unknown) => {
 
   if (typeof value === "string") {
     const normalized = value.trim();
-    if (!normalized) return undefined;
+    if (!normalized)
+      return undefined;
 
     const exactNumber = Number(normalized);
     if (Number.isFinite(exactNumber)) {
@@ -93,12 +97,13 @@ const parseDurationMinutes = (value: unknown) => {
   }
 
   return value;
-};
+}
 
 const locationSchema = z
   .preprocess(normalizeLocationInput, z.any().optional())
   .transform((value) => {
-    if (!value || typeof value !== "object") return undefined;
+    if (!value || typeof value !== "object")
+      return undefined;
 
     const obj = value as any;
     if (Array.isArray(obj.coordinates) && obj.coordinates.length === 2) {
@@ -178,7 +183,8 @@ export const createEventSchema = z.object({
             message: "ticketPrice must be 0 for free events",
           });
         }
-      } else if (!data.ticketPrice || data.ticketPrice <= 0) {
+      }
+      else if (!data.ticketPrice || data.ticketPrice <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["ticketPrice"],
@@ -262,7 +268,7 @@ export const updateEventSchema = z.object({
         });
       }
     })
-    .refine((data) => Object.keys(data).length > 0, {
+    .refine(data => Object.keys(data).length > 0, {
       message: "At least one field must be provided",
     }),
 });

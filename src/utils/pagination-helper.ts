@@ -1,13 +1,15 @@
 // file: src/utils/pagination-helper.ts
 
+import type { PaginationQueryParams } from "@/core/http/pagination";
 import type { PaginatedResponse } from "@/ts/pagination.types";
 import type { PaginationMeta } from "@/utils/response.utils";
+
 import {
   buildMongoFilters,
   buildPaginationMeta,
   buildSort,
+
   parsePaginationParams,
-  type PaginationQueryParams,
 } from "@/core/http/pagination";
 
 export class PaginationHelper {
@@ -101,7 +103,7 @@ export class PaginationHelper {
 
     if (parsed.query && searchFields.length) {
       const regex = new RegExp(parsed.query, "i");
-      filters.$or = searchFields.map((field) => ({ [field]: { $regex: regex } }));
+      filters.$or = searchFields.map(field => ({ [field]: { $regex: regex } }));
     }
 
     return filters;

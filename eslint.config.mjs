@@ -13,7 +13,6 @@ export default antfu(
   },
   {
     rules: {
-      "@typescript-eslint/stylistic": "error",
       "ts/no-redeclare": "off",
       "node/file-extension-in-import": ["error", "always"],
       "ts/consistent-type-definitions": ["error", "type"],

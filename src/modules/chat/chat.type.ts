@@ -1,4 +1,5 @@
 import type { UserResponse } from "@/modules/user/user.type";
+
 import type { ChatMessageType, ChatThreadType } from "./chat.interface";
 
 export type ChatThreadSummary = {

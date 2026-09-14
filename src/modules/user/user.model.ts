@@ -1,5 +1,9 @@
 // file: src/modules/user/user.model.ts
 
+import type { Query } from "mongoose";
+
+import mongoose, { model, Schema } from "mongoose";
+
 import {
   ACCOUNT_STATUS,
   GENDERS,
@@ -7,7 +11,7 @@ import {
   USER_STATUS,
 } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Query, Schema } from "mongoose";
+
 import type { IUser } from "./user.interface";
 
 const pointSchema = new Schema(
@@ -22,7 +26,7 @@ const pointSchema = new Schema(
       default: undefined,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const locationSchema = new Schema(
@@ -36,7 +40,7 @@ const locationSchema = new Schema(
       default: undefined,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const userSchema = BaseSchemaUtil.createSchema<IUser>({
@@ -256,6 +260,26 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         default: false,
         index: true,
       },
+      stripeDetailsSubmitted: {
+        type: Boolean,
+        default: false,
+        index: true,
+      },
+      stripeChargesEnabled: {
+        type: Boolean,
+        default: false,
+        index: true,
+      },
+      stripePayoutsEnabled: {
+        type: Boolean,
+        default: false,
+        index: true,
+      },
+      stripeDisabledReason: {
+        type: String,
+        trim: true,
+        default: null,
+      },
       notificationPreferences: {
         activityJoined: {
           type: Boolean,
@@ -333,7 +357,7 @@ const userSchema = BaseSchemaUtil.createSchema<IUser>({
         type: Boolean,
         default: false,
       },
-    }
+    },
   ),
 });
 
@@ -357,8 +381,6 @@ userSchema.pre(/^find/, function (this: Query<any, IUser>) {
 
 userSchema.set("toJSON", { virtuals: true });
 userSchema.set("toObject", { virtuals: true });
-
-import mongoose from "mongoose";
 
 const refreshTokenBlacklistSchema = new mongoose.Schema(
   {
@@ -387,12 +409,12 @@ const refreshTokenBlacklistSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const RefreshTokenBlacklist = mongoose.model(
   "RefreshTokenBlacklist",
-  refreshTokenBlacklistSchema
+  refreshTokenBlacklistSchema,
 );
 
 export const User = model<IUser>("User", userSchema);

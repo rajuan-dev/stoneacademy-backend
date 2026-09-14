@@ -1,13 +1,16 @@
+import type { CommunityLocation } from "@/modules/community/community.type";
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import { env } from "@/env";
 import { CommunityService } from "@/modules/community/community.service";
-import type { CommunityLocation } from "@/modules/community/community.type";
 import { Media } from "@/modules/media/media.model";
-import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+import { s3Service } from "@/services/s3.service";
 import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
+
 import type {
   CommunityCreatorServiceInput,
   CreateCommunityPostBody,
@@ -42,7 +45,7 @@ export class CommunityCreatorService {
     const link = input.body.link?.trim() || undefined;
     const orderedMediaIds = [
       ...existingMediaIds,
-      ...uploadedMedia.map((item) => item.id),
+      ...uploadedMedia.map(item => item.id),
     ];
 
     if (
@@ -69,7 +72,8 @@ export class CommunityCreatorService {
         activityIds,
         link,
       });
-    } catch (error) {
+    }
+    catch (error) {
       await this.cleanupUploadedMedia(uploadedMedia);
       throw error;
     }
@@ -87,7 +91,7 @@ export class CommunityCreatorService {
       .lean();
 
     const mediaById = new Map(
-      mediaDocs.map((media) => [media._id.toString(), media]),
+      mediaDocs.map(media => [media._id.toString(), media]),
     );
 
     return mediaIds.map((mediaId) => {
@@ -111,12 +115,12 @@ export class CommunityCreatorService {
     }
 
     for (const file of files) {
-      if (!ALLOWED_PREFIXES.some((prefix) => file.mimetype.startsWith(prefix))) {
+      if (!ALLOWED_PREFIXES.some(prefix => file.mimetype.startsWith(prefix))) {
         throw new BadRequestException("Only image and video uploads are supported");
       }
     }
 
-    const uploadsInput: StorageUploadInput[] = files.map((file) => ({
+    const uploadsInput: StorageUploadInput[] = files.map(file => ({
       buffer: file.buffer,
       mimeType: file.mimetype,
       originalName: file.originalname,
@@ -143,9 +147,10 @@ export class CommunityCreatorService {
         id: doc._id.toString(),
         s3Key: uploads[index].key,
       })) satisfies ProcessedUploadedCommunityMedia[];
-    } catch (error) {
+    }
+    catch (error) {
       await Promise.allSettled(
-        uploads.map((upload) => s3Service.deleteFile(upload.key)),
+        uploads.map(upload => s3Service.deleteFile(upload.key)),
       );
       throw error;
     }
@@ -187,8 +192,8 @@ export class CommunityCreatorService {
     }
 
     await Promise.allSettled([
-      Media.deleteMany({ _id: { $in: media.map((item) => item.id) } }).exec(),
-      ...media.map((item) => s3Service.deleteFile(item.s3Key)),
+      Media.deleteMany({ _id: { $in: media.map(item => item.id) } }).exec(),
+      ...media.map(item => s3Service.deleteFile(item.s3Key)),
     ]);
   }
 
@@ -197,6 +202,6 @@ export class CommunityCreatorService {
       ...(primary ?? []),
       ...(Array.isArray(legacy) ? legacy : legacy ? [legacy] : []),
     ];
-    return [...new Set(values.map((id) => id.trim()).filter(Boolean))];
+    return [...new Set(values.map(id => id.trim()).filter(Boolean))];
   }
 }

@@ -1,10 +1,13 @@
 // file: src/modules/category/category.service.ts
 
-import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
 import { PAGINATION } from "@/constants/app.constants";
-import { Category, type ICategory } from "./category.model";
+import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
+
+import type { ICategory } from "./category.model";
+
 import { Activity } from "../activity/activity.model";
 import { Event } from "../event/event.model";
+import { Category } from "./category.model";
 
 export class CategoryService {
   private static readonly ADMIN_ROW_ID_PAD = 2;

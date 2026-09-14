@@ -1,12 +1,15 @@
-import { URL } from "url";
-import { env } from "@/env";
+import type { Buffer } from "node:buffer";
+
 import {
   DeleteObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import path from "path";
+import path from "node:path";
+import { URL } from "node:url";
 import { v4 as uuidv4 } from "uuid";
+
+import { env } from "@/env";
 
 export type StorageUploadInput = {
   buffer: Buffer;
@@ -67,12 +70,13 @@ export class S3Service {
     files: StorageUploadInput[],
     options: { prefix: string },
   ): Promise<StorageUploadResult[]> {
-    const uploads = files.map((file) => this.uploadFile(file, options));
+    const uploads = files.map(file => this.uploadFile(file, options));
     return Promise.all(uploads);
   }
 
   async deleteFile(key: string): Promise<void> {
-    if (!key) return;
+    if (!key)
+      return;
     await this.client.send(
       new DeleteObjectCommand({
         Bucket: this.bucket,
@@ -107,7 +111,8 @@ export class S3Service {
         url.hostname = url.hostname.replace(matchedBucketPrefix, "");
       }
       return url.toString().replace(/\/+$/, "");
-    } catch {
+    }
+    catch {
       return endpoint;
     }
   }

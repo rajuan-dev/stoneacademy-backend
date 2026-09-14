@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface INotification {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type INotification = {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   type: string;
@@ -12,7 +15,7 @@ export interface INotification {
   readAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const notificationSchema = BaseSchemaUtil.createSchema<INotification>({
   userId: {

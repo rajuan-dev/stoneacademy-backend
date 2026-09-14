@@ -1,28 +1,32 @@
+import type { Request, Response } from "express";
+
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { BadRequestException } from "@/utils/app-error.utils";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
-import type { StorageUploadInput } from "@/services/s3.service";
+
 import {
+  adminEventIdSchema,
   blockUserSchema,
   creatorIdSchema,
+  dashboardAnalyticsSchema,
   earningTransactionIdSchema,
-  listEarningTransactionsSchema,
-  processEventCreatorPayoutSchema,
-  listUsersSchema,
-  listBlockedUsersSchema,
   listActivitiesSchema,
+  listBlockedUsersSchema,
+  listEarningTransactionsSchema,
   listEventsSchema,
   listPremiumCreatorsSchema,
-  dashboardAnalyticsSchema,
   listSubscriptionsSchema,
+  listUsersSchema,
+  processEventCreatorPayoutSchema,
   searchUsersSchema,
   unblockUserSchema,
-  updateAdminProfileSchema,
-  updateSubscriptionFeesSchema,
   updateActivityStatusSchema,
+  updateAdminProfileSchema,
   updateEventStatusSchema,
+  updateSubscriptionFeesSchema,
   updateUserRoleSchema,
   updateUserStatusSchema,
   userIdSchema,
@@ -218,6 +222,21 @@ export class AdminController {
       req.user?.userId as string,
     );
     ApiResponse.success(res, event, "Event status updated");
+  });
+
+  getEventRefundStatus = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(adminEventIdSchema, req);
+    const result = await this.service.getEventRefundStatus(validated.params.eventId);
+    ApiResponse.success(res, result, "Event refund status fetched");
+  });
+
+  retryFailedEventRefunds = asyncHandler(async (req: Request, res: Response) => {
+    const validated = await zParse(adminEventIdSchema, req);
+    const result = await this.service.retryFailedEventRefunds(
+      validated.params.eventId,
+      req.user?.userId as string,
+    );
+    ApiResponse.success(res, result, "Failed event refunds retried");
   });
 
   listSubscriptions = asyncHandler(async (req: Request, res: Response) => {

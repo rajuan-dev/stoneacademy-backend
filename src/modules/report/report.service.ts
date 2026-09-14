@@ -1,11 +1,12 @@
 import { PAGINATION, USER_STATUS } from "@/constants/app.constants";
-import { AdminAuditLog } from "@/modules/admin/admin-audit-log.model";
 import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
+import { AdminAuditLog } from "@/modules/admin/admin-audit-log.model";
 import { notificationService } from "@/modules/notification/notification.service";
 import {
   BadRequestException,
   NotFoundException,
 } from "@/utils/app-error.utils";
+
 import { Activity } from "../activity/activity.model";
 import { CommunityPost } from "../community/community-post.model";
 import { Event } from "../event/event.model";
@@ -128,7 +129,8 @@ export class ReportService {
     payload: { status: "under_review" | "resolved" | "rejected"; adminNote?: string },
   ) {
     const report = await Report.findById(reportId).exec();
-    if (!report) throw new NotFoundException("Report not found");
+    if (!report)
+      throw new NotFoundException("Report not found");
 
     report.status = payload.status;
     report.adminNote = payload.adminNote;
@@ -155,7 +157,8 @@ export class ReportService {
     payload: { action: "warn" | "disable_user" | "recover_user"; note?: string },
   ) {
     const report = await Report.findById(reportId).exec();
-    if (!report) throw new NotFoundException("Report not found");
+    if (!report)
+      throw new NotFoundException("Report not found");
     if (!report.reportedUserId) {
       throw new BadRequestException(
         "This report has no target user available for moderation action",
@@ -246,9 +249,12 @@ export class ReportService {
     const skip = (page - 1) * limit;
 
     const filter: Record<string, unknown> = {};
-    if (filterInput.reporterId) filter.reporterId = filterInput.reporterId;
-    if (filterInput.status) filter.status = filterInput.status;
-    if (filterInput.entityType) filter.entityType = filterInput.entityType;
+    if (filterInput.reporterId)
+      filter.reporterId = filterInput.reporterId;
+    if (filterInput.status)
+      filter.status = filterInput.status;
+    if (filterInput.entityType)
+      filter.entityType = filterInput.entityType;
 
     const [data, totalItems] = await Promise.all([
       Report.find(filter)
@@ -263,7 +269,7 @@ export class ReportService {
 
     return {
       data: await Promise.all(
-        data.map((report) => this.serializeReport(report as any)),
+        data.map(report => this.serializeReport(report as any)),
       ),
       pagination: {
         currentPage: page,
@@ -357,7 +363,8 @@ export class ReportService {
     profileImageUrl: string | null;
     status: string | null;
   } | null {
-    if (!userRef) return null;
+    if (!userRef)
+      return null;
 
     if (typeof userRef === "string") {
       return {
@@ -413,8 +420,8 @@ export class ReportService {
     const base = reportDoc.toObject();
     const reportFrom = this.normalizeUser(reportDoc.reporterId);
     const reportTo = this.normalizeUser(reportDoc.reportedUserId || null);
-    const entityId =
-      typeof reportDoc.entityId === "string"
+    const entityId
+      = typeof reportDoc.entityId === "string"
         ? reportDoc.entityId
         : reportDoc.entityId.toString();
     const entitySnapshot = await this.buildEntitySnapshot(
@@ -458,7 +465,8 @@ export class ReportService {
         .populate("hostId", "fullName email profileImageUrl")
         .lean();
 
-      if (!activity) return null;
+      if (!activity)
+        return null;
 
       return {
         kind: "activity",
@@ -482,7 +490,8 @@ export class ReportService {
         .populate("creatorId", "fullName email profileImageUrl")
         .lean();
 
-      if (!event) return null;
+      if (!event)
+        return null;
 
       return {
         kind: "event",
@@ -511,7 +520,8 @@ export class ReportService {
         .populate("activityId", "title type category")
         .lean();
 
-      if (!post) return null;
+      if (!post)
+        return null;
 
       const media = Array.isArray(post.media) ? post.media as any[] : [];
       const event = post.eventId as any;
@@ -521,7 +531,7 @@ export class ReportService {
         kind: "community_post",
         id: post._id.toString(),
         text: post.text || null,
-        media: media.map((item) => ({
+        media: media.map(item => ({
           id: item._id?.toString?.() || null,
           type: item.type || null,
           url: item.url || null,
@@ -560,7 +570,8 @@ export class ReportService {
       .populate("senderId", "fullName email profileImageUrl status")
       .lean();
 
-    if (!message) return null;
+    if (!message)
+      return null;
 
     return {
       kind: "message",
@@ -582,14 +593,16 @@ export class ReportService {
       update.blockedReason = reason ?? null;
       update.blockedAt = new Date();
       update.blockedBy = adminId as any;
-    } else if (status === USER_STATUS.ACTIVE) {
+    }
+    else if (status === USER_STATUS.ACTIVE) {
       update.blockedReason = null;
       update.blockedAt = null;
       update.blockedBy = null;
     }
 
     const user = await User.findByIdAndUpdate(userId, update, { new: true }).exec();
-    if (!user) throw new NotFoundException("User not found");
+    if (!user)
+      throw new NotFoundException("User not found");
 
     await AdminAuditLog.create({
       adminId,

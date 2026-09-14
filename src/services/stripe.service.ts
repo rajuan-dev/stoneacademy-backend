@@ -1,7 +1,10 @@
 // file: src/services/stripe.service.ts
 
-import { env } from "@/env";
+import type { Buffer } from "node:buffer";
+
 import Stripe from "stripe";
+
+import { env } from "@/env";
 
 export class StripeService {
   private stripe?: Stripe;
@@ -28,12 +31,22 @@ export class StripeService {
     return this.getClient().paymentIntents.create(params, options);
   }
 
+  async createEventPaymentIntent(
+    params: Stripe.PaymentIntentCreateParams,
+    idempotencyKey: string,
+  ) {
+    return this.getClient().paymentIntents.create(params, { idempotencyKey });
+  }
+
   async createCheckoutSession(params: Stripe.Checkout.SessionCreateParams) {
     return this.getClient().checkout.sessions.create(params);
   }
 
-  async retrievePaymentIntent(paymentIntentId: string) {
-    return this.getClient().paymentIntents.retrieve(paymentIntentId);
+  async retrievePaymentIntent(
+    paymentIntentId: string,
+    params?: Stripe.PaymentIntentRetrieveParams,
+  ) {
+    return this.getClient().paymentIntents.retrieve(paymentIntentId, params);
   }
 
   async createCustomer(params: Stripe.CustomerCreateParams) {
@@ -128,6 +141,32 @@ export class StripeService {
     params: Stripe.PayoutCreateParams,
   ) {
     return this.getClient().payouts.create(params, { stripeAccount: accountId });
+  }
+
+  async createCreatorTransfer(
+    params: Stripe.TransferCreateParams,
+    idempotencyKey: string,
+  ) {
+    return this.getClient().transfers.create(params, { idempotencyKey });
+  }
+
+  async reverseTransfer(
+    transferId: string,
+    params: Stripe.TransferCreateReversalParams,
+    idempotencyKey: string,
+  ) {
+    return this.getClient().transfers.createReversal(
+      transferId,
+      params,
+      { idempotencyKey },
+    );
+  }
+
+  async createEventCancellationRefund(
+    params: Stripe.RefundCreateParams,
+    idempotencyKey: string,
+  ) {
+    return this.getClient().refunds.create(params, { idempotencyKey });
   }
 
   async createConnectedAccountOnboardingLink(params: {

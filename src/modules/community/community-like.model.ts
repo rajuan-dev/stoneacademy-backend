@@ -1,13 +1,16 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface ICommunityLike {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type ICommunityLike = {
   _id: Types.ObjectId;
   postId: Types.ObjectId;
   userId: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const communityLikeSchema = BaseSchemaUtil.createSchema<ICommunityLike>({
   postId: {

@@ -9,7 +9,7 @@ export const createCategorySchema = z.object({
       categoryName: z.string().trim().min(1).max(120).optional(),
       isActive: z.boolean().optional(),
     })
-    .refine((data) => data.name !== undefined || data.categoryName !== undefined, {
+    .refine(data => data.name !== undefined || data.categoryName !== undefined, {
       message: "Category name is required",
       path: ["categoryName"],
     }),
@@ -26,12 +26,12 @@ export const updateCategorySchema = z.object({
       isActive: z.boolean().optional(),
     })
     .refine(
-      (data) =>
-        data.name !== undefined ||
-        data.categoryName !== undefined ||
-        data.isActive !== undefined,
+      data =>
+        data.name !== undefined
+        || data.categoryName !== undefined
+        || data.isActive !== undefined,
       {
-      message: "At least one field must be provided",
+        message: "At least one field must be provided",
       },
     ),
 });

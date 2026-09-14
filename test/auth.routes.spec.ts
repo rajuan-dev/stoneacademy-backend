@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
 import request from "supertest";
-import app from "../src/app";
+import { describe, expect, it, vi } from "vitest";
+
+import app from "../src/app.js";
 
 vi.mock("../src/modules/auth/auth.service", () => {
   class AuthService {
@@ -12,22 +13,27 @@ vi.mock("../src/modules/auth/auth.service", () => {
         expiresInMinutes: 10,
       },
     });
+
     login = vi.fn().mockResolvedValue({
       user: { _id: "u1", email: "test@example.com", fullName: "Test User" },
       tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
     });
+
     loginWithGoogle = vi.fn().mockResolvedValue({
       user: { _id: "u1", email: "test@example.com", fullName: "Test User" },
       tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
     });
+
     loginWithApple = vi.fn().mockResolvedValue({
       user: { _id: "u1", email: "apple@example.com", fullName: "Apple User" },
       tokens: { accessToken: "access", refreshToken: "refresh", expiresIn: "7d" },
     });
+
     sendOtp = vi.fn().mockResolvedValue({
       expiresAt: new Date().toISOString(),
       expiresInMinutes: 10,
     });
+
     verifyOtp = vi.fn().mockResolvedValue({ message: "OTP verified successfully" });
     requestPasswordReset = vi.fn().mockResolvedValue({ message: "OTP sent" });
     resetPassword = vi.fn().mockResolvedValue({ message: "Password reset" });

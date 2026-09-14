@@ -1,12 +1,13 @@
 // file: src/app.ts
 import type { Application } from "express";
 
-import cookieParser from "cookie-parser";
 import compression from "compression";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import swaggerUi from "swagger-ui-express";
 
 import { errorHandler } from "@/middlewares/error-handler.middleware";
 import { notFound } from "@/middlewares/not-found.middleware";
@@ -14,8 +15,6 @@ import { responseCache } from "@/middlewares/response-cache.middleware";
 import billingWebhookRouter from "@/modules/billing/billing-webhook.route.js";
 import stripeConnectWebhookRouter from "@/modules/host-stripe/stripe-connect-webhook.route.js";
 import rootRouter from "@/routes/index.route.js";
-
-import swaggerUi from "swagger-ui-express";
 
 import { swaggerSpec, swaggerUiOptions } from "./config/swagger.config.js";
 import { env } from "./env.js";

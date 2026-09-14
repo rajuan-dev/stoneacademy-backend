@@ -1,9 +1,11 @@
+import type { Request, Response } from "express";
+
 import { MESSAGES } from "@/constants/app.constants";
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
-import { ApiResponse } from "@/utils/response.utils";
 import { UnauthorizedException } from "@/utils/app-error.utils";
+import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
+
 import { createCommunityPostSchema } from "./community-creator.schema";
 import { CommunityCreatorService } from "./community-creator.service";
 

@@ -1,19 +1,21 @@
 // file: src/modules/admin-auth/admin-auth.controller.ts
 
+import type { Router } from "express";
+
 import { COOKIE_CONFIG } from "@/config/cookie.config";
 import upload from "@/config/multer.config";
-import { asyncHandler } from "@/middlewares/async-handler.middleware";
-import { adminAuthMiddleware } from "@/core/middleware/admin-auth.middleware";
 import { ApiResponse } from "@/core/http/api-response";
+import { adminAuthMiddleware } from "@/core/middleware/admin-auth.middleware";
+import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { zParse } from "@/utils/validators.utils";
-import type { Router } from "express";
-import { AdminAuthService } from "./admin-auth.service";
+
 import {
   adminChangePasswordSchema,
   adminLoginSchema,
   adminLogoutSchema,
   adminProfileUpdateSchema,
 } from "./admin-auth.schema";
+import { AdminAuthService } from "./admin-auth.service";
 
 export class AdminAuthController {
   private service: AdminAuthService;
@@ -49,9 +51,9 @@ export class AdminAuthController {
   logout = asyncHandler(async (req, res) => {
     const validated = await zParse(adminLogoutSchema, req);
     const adminId = req.user?.userId as string;
-    const refreshToken =
-      validated.body?.refreshToken
-      || (req.cookies?.[COOKIE_CONFIG.REFRESH_TOKEN.name] as string | undefined);
+    const refreshToken
+      = validated.body?.refreshToken
+        || (req.cookies?.[COOKIE_CONFIG.REFRESH_TOKEN.name] as string | undefined);
     const result = await this.service.logout(adminId, refreshToken);
     ApiResponse.success(res, result, "Admin logged out successfully");
   });

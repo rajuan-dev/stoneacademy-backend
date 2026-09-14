@@ -1,6 +1,8 @@
+import type { Request, Response } from "express";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { ApiResponse } from "@/utils/response.utils";
-import type { Request, Response } from "express";
+
 import { OnboardingService } from "./onboarding.service";
 
 export class OnboardingController {

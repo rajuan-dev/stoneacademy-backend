@@ -1,7 +1,8 @@
 // file: src/modules/user/user.service.ts (ENHANCED VERSION)
 
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import { EMAIL_ENABLED } from "@/config/email.config";
-import { env } from "@/env";
 import {
   ACCOUNT_STATUS,
   MESSAGES,
@@ -10,26 +11,27 @@ import {
   ROLES,
   USER_STATUS,
 } from "@/constants/app.constants";
+import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
+import { ActivityParticipant } from "@/modules/activity/activity-participant.model";
+import { Activity } from "@/modules/activity/activity.model";
+import { CommunityLike } from "@/modules/community/community-like.model";
+import { CommunityPost } from "@/modules/community/community-post.model";
+import { EventParticipant } from "@/modules/event/event-participant.model";
+import { Event } from "@/modules/event/event.model";
 import { Media } from "@/modules/media/media.model";
+import { Review } from "@/modules/review/review.model";
 import { EmailService } from "@/services/email.service";
-import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+import { s3Service } from "@/services/s3.service";
 import {
   BadRequestException,
   ConflictException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import { generateRandomPassword, hashPassword } from "@/utils/password.utils";
 import { normalizeGeography } from "@/utils/geography.utils";
+import { generateRandomPassword, hashPassword } from "@/utils/password.utils";
+
 import type { IUser } from "./user.interface";
-import { UserRepository } from "./user.repository";
-import { Activity } from "@/modules/activity/activity.model";
-import { ActivityParticipant } from "@/modules/activity/activity-participant.model";
-import { CommunityLike } from "@/modules/community/community-like.model";
-import { CommunityPost } from "@/modules/community/community-post.model";
-import { Event } from "@/modules/event/event.model";
-import { EventParticipant } from "@/modules/event/event-participant.model";
-import { Review } from "@/modules/review/review.model";
 import type {
   CleanerCreatePayload,
   CleanerCreationResult,
@@ -38,6 +40,8 @@ import type {
   UserCreatePayload,
   UserResponse,
 } from "./user.type";
+
+import { UserRepository } from "./user.repository";
 
 export class UserService {
   private userRepository: UserRepository;
@@ -69,7 +73,7 @@ export class UserService {
       coverPhoto: user.coverPhoto
         ? user.coverPhoto.toString()
         : null,
-      gallery: (user.gallery || []).map((id) => id.toString()),
+      gallery: (user.gallery || []).map(id => id.toString()),
       role: user.role,
       accountStatus: user.accountStatus,
       status: user.status,
@@ -80,7 +84,7 @@ export class UserService {
       emailVerifiedAt: user.emailVerifiedAt ?? null,
       creatorStatus: user.creatorStatus,
       rating: user.rating,
-      blockedUsers: (user.blockedUsers || []).map((id) => id.toString()),
+      blockedUsers: (user.blockedUsers || []).map(id => id.toString()),
       lastLoginAt: user.lastLoginAt,
       profileImage: user.profileImageUrl || undefined,
       coverImage: user.coverImageUrl || null,
@@ -89,6 +93,10 @@ export class UserService {
       stripeAccountId: user.stripeAccountId || null,
       stripeCustomerId: user.stripeCustomerId || null,
       stripeOnboardingCompleted: Boolean(user.stripeOnboardingCompleted),
+      stripeDetailsSubmitted: Boolean(user.stripeDetailsSubmitted),
+      stripeChargesEnabled: Boolean(user.stripeChargesEnabled),
+      stripePayoutsEnabled: Boolean(user.stripePayoutsEnabled),
+      stripeDisabledReason: user.stripeDisabledReason || null,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -109,7 +117,7 @@ export class UserService {
       coverPhoto: user.coverPhoto
         ? user.coverPhoto.toString()
         : null,
-      gallery: (user.gallery || []).map((id) => id.toString()),
+      gallery: (user.gallery || []).map(id => id.toString()),
       rating: user.rating,
     };
   }
@@ -202,7 +210,7 @@ export class UserService {
     });
 
     return {
-      data: (result.data || []).map((user) => this.toUserResponse(user as any)),
+      data: (result.data || []).map(user => this.toUserResponse(user as any)),
       pagination: {
         currentPage: result.currentPage,
         totalPages: result.pageCount,
@@ -233,14 +241,15 @@ export class UserService {
 
   async getUsersByIds(ids: string[]): Promise<UserResponse[]> {
     const uniqueIds = Array.from(new Set(ids.filter(Boolean))).map(String);
-    if (!uniqueIds.length) return [];
+    if (!uniqueIds.length)
+      return [];
 
     const users = await this.userRepository.find({
       _id: { $in: uniqueIds },
       isDeleted: { $ne: true },
     });
 
-    return users.map((user) => this.toUserResponse(user as any));
+    return users.map(user => this.toUserResponse(user as any));
   }
 
   async createUser(payload: UserCreatePayload): Promise<IUser> {
@@ -319,7 +328,7 @@ export class UserService {
   }
 
   async createCleaner(
-    payload: CleanerCreatePayload
+    payload: CleanerCreatePayload,
   ): Promise<CleanerCreationResult> {
     const email = payload.email.toLowerCase();
     const existing = await this.userRepository.findByEmail(email);
@@ -328,9 +337,9 @@ export class UserService {
     }
 
     if (
-      Number.isNaN(payload.cleanerPercentage) ||
-      payload.cleanerPercentage < 0 ||
-      payload.cleanerPercentage > 100
+      Number.isNaN(payload.cleanerPercentage)
+      || payload.cleanerPercentage < 0
+      || payload.cleanerPercentage > 100
     ) {
       throw new BadRequestException("Cleaner percentage must be 0-100");
     }
@@ -366,13 +375,14 @@ export class UserService {
         password: tempPassword,
       });
       emailSent = emailSendingEnabled;
-    } catch (error) {
+    }
+    catch (error) {
       emailSent = false;
-      emailWarning =
-        "Cleaner created, but sending login credentials via email failed.";
+      emailWarning
+        = "Cleaner created, but sending login credentials via email failed.";
       logger.warn(
         { email: cleaner.email, error },
-        "Failed to send cleaner credentials email"
+        "Failed to send cleaner credentials email",
       );
     }
 
@@ -386,7 +396,7 @@ export class UserService {
 
   async updateCleaner(
     cleanerId: string,
-    payload: Partial<CleanerCreatePayload> & { accountStatus?: string }
+    payload: Partial<CleanerCreatePayload> & { accountStatus?: string },
   ): Promise<UserResponse> {
     const cleaner = await this.userRepository.findOne({
       _id: cleanerId,
@@ -423,9 +433,9 @@ export class UserService {
 
     if (payload.cleanerPercentage !== undefined) {
       if (
-        Number.isNaN(payload.cleanerPercentage) ||
-        payload.cleanerPercentage < 0 ||
-        payload.cleanerPercentage > 100
+        Number.isNaN(payload.cleanerPercentage)
+        || payload.cleanerPercentage < 0
+        || payload.cleanerPercentage > 100
       ) {
         throw new BadRequestException("Cleaner percentage must be 0-100");
       }
@@ -505,7 +515,8 @@ export class UserService {
 
   async invalidateAllRefreshTokensForUser(userId: string) {
     const user = await this.userRepository.findById(userId);
-    if (!user) return;
+    if (!user)
+      return;
     user.refreshTokenInvalidBefore = new Date();
     await user.save();
   }
@@ -517,7 +528,7 @@ export class UserService {
   async notifyPasswordChange(
     email: string,
     fullName: string,
-    changedAt: Date
+    changedAt: Date,
   ): Promise<void> {
     try {
       await this.emailService.sendPasswordChangeNotification({
@@ -525,7 +536,8 @@ export class UserService {
         userName: fullName,
         changedAt,
       });
-    } catch (error) {
+    }
+    catch (error) {
       logger.warn({ email, error }, "Password change notification failed");
     }
   }
@@ -559,7 +571,7 @@ export class UserService {
           coordinates: [number, number];
         };
       };
-    }
+    },
   ): Promise<UserResponse> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
@@ -626,7 +638,8 @@ export class UserService {
             coordinates: payload.location.coordinates.coordinates,
           },
         };
-      } else {
+      }
+      else {
         user.location = payload.location as any;
       }
     }
@@ -656,8 +669,8 @@ export class UserService {
     const limit = query?.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
-    const [profilePhoto, activityMediaIds, eventMediaIds, reviewRows, totalReviews] =
-      await Promise.all([
+    const [profilePhoto, activityMediaIds, eventMediaIds, reviewRows, totalReviews]
+      = await Promise.all([
         user.profilePhoto ? Media.findById(user.profilePhoto).lean() : Promise.resolve(null),
         Activity.distinct("media", { hostId: userId }),
         Event.distinct("media", { creatorId: userId }),
@@ -671,7 +684,7 @@ export class UserService {
       ]);
 
     const mediaIdSet = new Set<string>();
-    (user.gallery || []).forEach((id) => mediaIdSet.add(id.toString()));
+    (user.gallery || []).forEach(id => mediaIdSet.add(id.toString()));
     (activityMediaIds || []).forEach((id: any) => mediaIdSet.add(id.toString()));
     (eventMediaIds || []).forEach((id: any) => mediaIdSet.add(id.toString()));
 
@@ -694,7 +707,7 @@ export class UserService {
           count: user.rating?.count || 0,
         },
       },
-      gallery: galleryItems.map((item) => ({
+      gallery: galleryItems.map(item => ({
         _id: item._id.toString(),
         url: item.url,
         type: item.type,
@@ -838,7 +851,7 @@ export class UserService {
     }
 
     const existing = user.blockedUsers || [];
-    if (!existing.map((id) => id.toString()).includes(targetId)) {
+    if (!existing.map(id => id.toString()).includes(targetId)) {
       existing.push(targetId as any);
       user.blockedUsers = existing as any;
     }
@@ -854,7 +867,7 @@ export class UserService {
     }
 
     user.blockedUsers = (user.blockedUsers || []).filter(
-      (id) => id.toString() !== targetId,
+      id => id.toString() !== targetId,
     ) as any;
 
     await user.save();
@@ -903,7 +916,7 @@ export class UserService {
       })),
     );
 
-    user.gallery = [...(user.gallery || []), ...mediaDocs.map((doc) => doc._id)];
+    user.gallery = [...(user.gallery || []), ...mediaDocs.map(doc => doc._id)];
     await user.save();
 
     return this.toUserResponse(user);
@@ -919,7 +932,7 @@ export class UserService {
     }
 
     user.gallery = (user.gallery || []).filter(
-      (id) => id.toString() !== mediaId,
+      id => id.toString() !== mediaId,
     ) as any;
 
     await user.save();
@@ -954,14 +967,6 @@ export class UserService {
         ? Event.distinct("media", { creatorId: userId })
         : Promise.resolve([]),
     ]);
-
-    const profileMediaIds = includeProfile
-      ? [
-          ...(user.gallery || []),
-          ...(user.profilePhoto ? [user.profilePhoto] : []),
-          ...(user.coverPhoto ? [user.coverPhoto] : []),
-        ]
-      : [];
 
     const sourceMap = new Map<string, Set<string>>();
     const addSource = (ids: Array<any>, label: string) => {
@@ -1020,7 +1025,7 @@ export class UserService {
     ]);
 
     return {
-      data: data.map((doc) => ({
+      data: data.map(doc => ({
         _id: doc._id.toString(),
         url: doc.url,
         type: doc.type,
@@ -1193,7 +1198,8 @@ export class UserService {
     const data = participants
       .map((item: any) => {
         const activity = item.activityId;
-        if (!activity?._id) return null;
+        if (!activity?._id)
+          return null;
 
         const host = activity.hostId as any;
         return {
@@ -1244,7 +1250,8 @@ export class UserService {
     const data = participants
       .map((item: any) => {
         const event = item.eventId;
-        if (!event?._id) return null;
+        if (!event?._id)
+          return null;
 
         const creator = event.creatorId as any;
         return {
@@ -1415,7 +1422,7 @@ export class UserService {
     ]);
 
     const allMediaIds = new Set<string>();
-    (user.gallery || []).forEach((id) => allMediaIds.add(id.toString()));
+    (user.gallery || []).forEach(id => allMediaIds.add(id.toString()));
     (activityMediaIds || []).forEach((id: any) => allMediaIds.add(id.toString()));
     (eventMediaIds || []).forEach((id: any) => allMediaIds.add(id.toString()));
 
@@ -1533,7 +1540,7 @@ export class UserService {
       },
       mediaPreview: {
         total: photosCount + videosCount,
-        items: mediaPreview.map((media) => this.formatMediaItem(media)),
+        items: mediaPreview.map(media => this.formatMediaItem(media)),
       },
     };
   }
@@ -1703,7 +1710,7 @@ export class UserService {
   private formatCommunityEventAttachments(events?: any[], fallback?: any) {
     const items = Array.isArray(events) && events.length ? events : fallback ? [fallback] : [];
     return items
-      .filter((event) => event && event._id)
+      .filter(event => event && event._id)
       .map((event) => {
         const creator = event.creatorId && event.creatorId._id ? event.creatorId : null;
         const firstMedia = Array.isArray(event.media) ? event.media[0] : null;
@@ -1730,7 +1737,7 @@ export class UserService {
       : fallback ? [fallback] : [];
 
     return items
-      .filter((activity) => activity && activity._id)
+      .filter(activity => activity && activity._id)
       .map((activity) => {
         const host = activity.hostId && activity.hostId._id ? activity.hostId : null;
         const firstMedia = Array.isArray(activity.media) ? activity.media[0] : null;
@@ -1752,7 +1759,8 @@ export class UserService {
   }
 
   private calculatePayablePrice(ticketPrice: number, discountPercentage: number) {
-    if (ticketPrice <= 0) return 0;
+    if (ticketPrice <= 0)
+      return 0;
     if (discountPercentage <= 0) {
       return Number(ticketPrice.toFixed(2));
     }
@@ -1761,7 +1769,8 @@ export class UserService {
   }
 
   private formatHostSummary(host?: any) {
-    if (!host) return null;
+    if (!host)
+      return null;
 
     return {
       _id: host._id?.toString?.() || null,
@@ -1773,7 +1782,8 @@ export class UserService {
   }
 
   private deriveUsername(email?: string | null) {
-    if (!email) return null;
+    if (!email)
+      return null;
     const [username] = String(email).split("@");
     return username || null;
   }
@@ -1784,7 +1794,7 @@ export class UserService {
     }
 
     const parts = [user.city, user.state, user.country]
-      .map((part) => String(part || "").trim())
+      .map(part => String(part || "").trim())
       .filter(Boolean);
 
     return parts.length ? parts.join(", ") : null;

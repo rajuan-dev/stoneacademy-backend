@@ -1,10 +1,13 @@
 // file: src/modules/activity/activity.model.ts
 
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { ACTIVITY_STATUS } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
 
-export interface IActivity {
+export type IActivity = {
   _id: Types.ObjectId;
   hostId: Types.ObjectId;
   title: string;
@@ -35,7 +38,7 @@ export interface IActivity {
   };
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const activitySchema = BaseSchemaUtil.createSchema<IActivity>({
   hostId: {

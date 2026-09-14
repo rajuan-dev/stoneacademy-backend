@@ -55,6 +55,10 @@ export type UserResponse = {
   stripeAccountId?: string | null;
   stripeCustomerId?: string | null;
   stripeOnboardingCompleted?: boolean;
+  stripeDetailsSubmitted?: boolean;
+  stripeChargesEnabled?: boolean;
+  stripePayoutsEnabled?: boolean;
+  stripeDisabledReason?: string | null;
 
   createdAt: Date;
   updatedAt: Date;

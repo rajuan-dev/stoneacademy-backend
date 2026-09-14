@@ -1,5 +1,6 @@
 import { PAGINATION } from "@/constants/app.constants";
 import { ConflictException, NotFoundException } from "@/utils/app-error.utils";
+
 import { CmsPage } from "./cms.model";
 
 const STATIC_CMS_SLUGS = {
@@ -58,8 +59,10 @@ export class CmsService {
     if (!page) {
       throw new NotFoundException("Page not found");
     }
-    if (payload.title !== undefined) page.title = payload.title;
-    if (payload.content !== undefined) page.content = payload.content;
+    if (payload.title !== undefined)
+      page.title = payload.title;
+    if (payload.content !== undefined)
+      page.content = payload.content;
     page.version = (page.version || 1) + 1;
     page.updatedBy = adminId as any;
     await page.save();

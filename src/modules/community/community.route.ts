@@ -1,7 +1,9 @@
-import { authMiddleware } from "@/middlewares/auth.middleware";
 import { Router } from "express";
-import { CommunityController } from "./community.controller";
+
+import { authMiddleware } from "@/middlewares/auth.middleware";
 import { communityUpload } from "@/modules/community-creator/community-creator-upload";
+
+import { CommunityController } from "./community.controller";
 
 const router = Router();
 const controller = new CommunityController();

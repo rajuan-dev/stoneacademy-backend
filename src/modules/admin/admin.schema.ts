@@ -1,5 +1,6 @@
-import { ACTIVITY_STATUS, ROLES, USER_STATUS } from "@/constants/app.constants";
 import { z } from "zod";
+
+import { ACTIVITY_STATUS, ROLES, USER_STATUS } from "@/constants/app.constants";
 
 export const listUsersSchema = z.object({
   query: z.object({
@@ -108,6 +109,12 @@ export const updateEventStatusSchema = z.object({
   }),
 });
 
+export const adminEventIdSchema = z.object({
+  params: z.object({
+    eventId: z.string().trim().min(1),
+  }),
+});
+
 export const listSubscriptionsSchema = z.object({
   query: z.object({
     page: z.coerce.number().min(1).optional(),
@@ -184,7 +191,7 @@ export const updateAdminProfileSchema = z.object({
       phoneNumber: z.string().trim().min(3).max(20).optional(),
     })
     .refine(
-      (data) =>
+      data =>
         data.fullName
         || data.email
         || data.phone

@@ -74,13 +74,15 @@ const envSchema = z.object({
 try {
   // eslint-disable-next-line node/no-process-env
   envSchema.parse(process.env);
-} catch (error) {
+}
+catch (error) {
   if (error instanceof z.ZodError) {
     console.error(
       "Missing environment variables:",
-      error.issues.flatMap((issue) => issue.path),
+      error.issues.flatMap(issue => issue.path),
     );
-  } else {
+  }
+  else {
     console.error(error);
   }
   process.exit(1);

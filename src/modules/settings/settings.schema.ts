@@ -21,7 +21,7 @@ export const updateSettingsProfileSchema = z.object({
       phoneNumber: z.string().trim().min(3).max(20).optional(),
     })
     .refine(
-      (data) =>
+      data =>
         data.fullName
         || data.email
         || data.phone

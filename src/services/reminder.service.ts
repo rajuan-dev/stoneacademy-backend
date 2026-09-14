@@ -1,11 +1,14 @@
-import cron, { type ScheduledTask } from "node-cron";
+import type { ScheduledTask } from "node-cron";
+
 import dayjs from "dayjs";
-import { env } from "@/env";
+import cron from "node-cron";
+
 import { ACTIVITY_STATUS, PARTICIPANT_STATUS } from "@/constants/app.constants";
-import { Activity } from "@/modules/activity/activity.model";
+import { env } from "@/env";
 import { ActivityParticipant } from "@/modules/activity/activity-participant.model";
-import { Event } from "@/modules/event/event.model";
+import { Activity } from "@/modules/activity/activity.model";
 import { EventParticipant } from "@/modules/event/event-participant.model";
+import { Event } from "@/modules/event/event.model";
 import { Notification } from "@/modules/notification/notification.model";
 
 const WINDOW_MINUTES = 5;
@@ -14,7 +17,8 @@ class ReminderService {
   private task?: ScheduledTask;
 
   start(): void {
-    if (this.task) return;
+    if (this.task)
+      return;
     this.task = cron.schedule("*/5 * * * *", () => {
       this.run().catch(() => {
         // swallow; logged in run
@@ -49,11 +53,12 @@ class ReminderService {
       for (const participant of participants) {
         const reminderKey = `activity:${activity._id}:${start.toISOString()}`;
         const exists = await Notification.findOne({
-          userId: participant.userId,
-          type: "activity_reminder",
+          "userId": participant.userId,
+          "type": "activity_reminder",
           "data.reminderKey": reminderKey,
         }).select("_id").exec();
-        if (exists) continue;
+        if (exists)
+          continue;
 
         await Notification.create({
           userId: participant.userId,
@@ -85,11 +90,12 @@ class ReminderService {
       for (const participant of participants) {
         const reminderKey = `event:${event._id}:${start.toISOString()}`;
         const exists = await Notification.findOne({
-          userId: participant.userId,
-          type: "event_reminder",
+          "userId": participant.userId,
+          "type": "event_reminder",
           "data.reminderKey": reminderKey,
         }).select("_id").exec();
-        if (exists) continue;
+        if (exists)
+          continue;
 
         await Notification.create({
           userId: participant.userId,

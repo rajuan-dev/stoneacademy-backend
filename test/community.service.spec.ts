@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { CommunityService } from "../src/modules/community/community.service";
 import { NotFoundException } from "../src/utils/app-error.utils";
 
 const {
   communityPostModel,
   communityCommentModel,
   transactionHelperMock,
-  eventServiceGetByIdMock,
 } = vi.hoisted(() => ({
   communityPostModel: {
     findById: vi.fn(),
@@ -20,7 +21,6 @@ const {
   transactionHelperMock: {
     withTransaction: vi.fn(),
   },
-  eventServiceGetByIdMock: vi.fn(),
 }));
 
 vi.mock("../src/modules/community/community-post.model", () => ({
@@ -58,8 +58,6 @@ vi.mock("../src/services/s3.service", () => ({
 vi.mock("../src/utils/transaction.utils", () => ({
   TransactionHelper: transactionHelperMock,
 }));
-
-import { CommunityService } from "../src/modules/community/community.service";
 
 describe("CommunityService counter consistency", () => {
   beforeEach(() => {

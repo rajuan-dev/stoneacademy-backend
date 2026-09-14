@@ -1,12 +1,15 @@
 // file: src/services/email.service.ts
 
+import type { Transporter } from "nodemailer";
+
+import axios from "axios";
+import nodemailer from "nodemailer";
+import * as postmark from "postmark";
+
 import { EMAIL_CONFIG, EMAIL_ENABLED } from "@/config/email.config";
 import { APP } from "@/constants/app.constants";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
-import axios from "axios";
-import nodemailer, { type Transporter } from "nodemailer";
-import * as postmark from "postmark";
 
 type BasicEmailPayload = {
   to: string;
@@ -84,9 +87,11 @@ export class EmailService {
         this.postmarkClient = new postmark.ServerClient(
           EMAIL_CONFIG.postmark.apiToken,
         );
-      } else if (this.provider === "resend") {
+      }
+      else if (this.provider === "resend") {
         this.resendApiKey = EMAIL_CONFIG.resend.apiToken;
-      } else if (this.provider === "smtp") {
+      }
+      else if (this.provider === "smtp") {
         this.transporter = nodemailer.createTransport({
           host: EMAIL_CONFIG.smtp.host,
           port: EMAIL_CONFIG.smtp.port,
@@ -272,8 +277,8 @@ export class EmailService {
   private wrapTemplate(content: string): string {
     const logoMarkup = this.logoUrl
       ? `<img src="${this.logoUrl}" alt="${this.safeText(
-          APP.NAME,
-        )}" style="max-width: 160px; height: auto; margin-bottom: 16px;" />`
+        APP.NAME,
+      )}" style="max-width: 160px; height: auto; margin-bottom: 16px;" />`
       : `<h2 style="margin: 0 0 16px;">${this.safeText(APP.NAME)}</h2>`;
 
     const brandColor = this.brandColor || "#111111";
@@ -296,7 +301,7 @@ export class EmailService {
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
-        '"': "&quot;",
+        "\"": "&quot;",
         "'": "&#39;",
       };
       return escapeMap[char] || char;
@@ -382,12 +387,13 @@ export class EmailService {
         },
         {
           headers: {
-            Authorization: `Bearer ${this.resendApiKey}`,
+            "Authorization": `Bearer ${this.resendApiKey}`,
             "Content-Type": "application/json",
           },
         },
       );
-    } catch (error) {
+    }
+    catch (error) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         const data = error.response?.data as
@@ -424,7 +430,8 @@ export class EmailService {
       try {
         await operation();
         return;
-      } catch (error) {
+      }
+      catch (error) {
         if (attempt >= attempts) {
           throw error;
         }
@@ -442,6 +449,6 @@ export class EmailService {
   }
 
   private async delay(ms: number): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, ms));
+    await new Promise(resolve => setTimeout(resolve, ms));
   }
 }

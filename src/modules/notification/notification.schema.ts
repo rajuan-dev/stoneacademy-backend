@@ -7,10 +7,14 @@ export const listNotificationsSchema = z.object({
     type: z.string().trim().max(100).optional(),
     isRead: z
       .preprocess((value) => {
-        if (value === undefined || value === null || value === "") return undefined;
-        if (typeof value === "boolean") return value;
-        if (value === "true") return true;
-        if (value === "false") return false;
+        if (value === undefined || value === null || value === "")
+          return undefined;
+        if (typeof value === "boolean")
+          return value;
+        if (value === "true")
+          return true;
+        if (value === "false")
+          return false;
         return value;
       }, z.boolean().optional()),
     entityType: z.string().trim().max(50).optional(),
@@ -44,7 +48,7 @@ export const updateNotificationPreferencesSchema = z.object({
       contentReported: z.boolean().optional(),
       system: z.boolean().optional(),
     })
-    .refine((data) => Object.keys(data).length > 0, {
+    .refine(data => Object.keys(data).length > 0, {
       message: "At least one preference must be provided",
     }),
 });

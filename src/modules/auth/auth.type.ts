@@ -1,8 +1,9 @@
 // file: src/modules/auth/auth.type.ts
 
 import type { ROLES } from "@/constants/app.constants";
-import type { UserResponse } from "../user/user.type";
+
 import type { OtpPurpose } from "../otp/otp.model";
+import type { UserResponse } from "../user/user.type";
 
 /**
  * Register Payload - common fields only

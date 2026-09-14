@@ -1,6 +1,9 @@
-import { BaseRepository } from "@/modules/base/base.repository";
 import { Types } from "mongoose";
+
+import { BaseRepository } from "@/modules/base/base.repository";
+
 import type { IChatMessage, IChatThread } from "./chat.interface";
+
 import { ChatMessage, ChatThread } from "./chat.model";
 
 export class ChatThreadRepository extends BaseRepository<IChatThread> {

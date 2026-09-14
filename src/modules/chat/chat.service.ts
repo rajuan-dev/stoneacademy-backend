@@ -1,23 +1,26 @@
+import { Types } from "mongoose";
+
 import { ROLES, USER_STATUS } from "@/constants/app.constants";
 import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import { Types } from "mongoose";
-import { Activity } from "../activity/activity.model";
-import { AdminAccount } from "../admin-account/admin-account.model";
-import { Event } from "../event/event.model";
-import { User } from "../user/user.model";
-import { UserService } from "../user/user.service";
+
 import type { IChatMessage, IChatThread } from "./chat.interface";
-import { ChatMessageRepository, ChatThreadRepository } from "./chat.repository";
 import type {
   ChatMessageResponse,
   ChatThreadMessagesResponse,
   ChatThreadSummary,
   SendThreadMessagePayload,
 } from "./chat.type";
+
+import { Activity } from "../activity/activity.model";
+import { AdminAccount } from "../admin-account/admin-account.model";
+import { Event } from "../event/event.model";
+import { User } from "../user/user.model";
+import { UserService } from "../user/user.service";
+import { ChatMessageRepository, ChatThreadRepository } from "./chat.repository";
 
 export class ChatService {
   private threadRepo: ChatThreadRepository;
@@ -113,7 +116,8 @@ export class ChatService {
       .select("_id")
       .exec();
 
-    if (!adminAccount) throw new NotFoundException("No admin available");
+    if (!adminAccount)
+      throw new NotFoundException("No admin available");
 
     return this.ensureDirectThread(requesterUserId, adminAccount._id.toString());
   }
@@ -123,7 +127,8 @@ export class ChatService {
     payload: SendThreadMessagePayload,
   ): Promise<{ thread: ChatThreadSummary; message: ChatMessageResponse }> {
     const thread = await this.threadRepo.findById(payload.threadId);
-    if (!thread) throw new NotFoundException("Thread not found");
+    if (!thread)
+      throw new NotFoundException("Thread not found");
 
     if (!thread.memberUserIds.map(String).includes(senderUserId)) {
       throw new ForbiddenException("You are not a member of this thread");
@@ -131,7 +136,7 @@ export class ChatService {
 
     this.validateMessagePayload(payload.type, payload.text, payload.imageUrl);
 
-    const peerId = thread.memberUserIds.map(String).find((id) => id !== senderUserId) || null;
+    const peerId = thread.memberUserIds.map(String).find(id => id !== senderUserId) || null;
     if (peerId) {
       const [sender, peer] = await Promise.all([
         User.findById(senderUserId).select("blockedUsers").exec(),
@@ -161,19 +166,20 @@ export class ChatService {
 
   async listThreadsForUser(userId: string): Promise<ChatThreadSummary[]> {
     const threads = await this.threadRepo.findThreadsForUser(userId);
-    return Promise.all(threads.map((thread) => this.toThreadSummary(thread, null, userId)));
+    return Promise.all(threads.map(thread => this.toThreadSummary(thread, null, userId)));
   }
 
   async listMessages(userId: string, threadId: string): Promise<ChatThreadMessagesResponse> {
     const thread = await this.threadRepo.findById(threadId);
-    if (!thread) throw new NotFoundException("Thread not found");
+    if (!thread)
+      throw new NotFoundException("Thread not found");
 
     if (!thread.memberUserIds.map(String).includes(userId)) {
       throw new ForbiddenException("You are not part of this conversation");
     }
 
     const messages = await this.messageRepo.findByThread(threadId);
-    const mapped = await Promise.all(messages.map((m) => this.toMessageResponse(m, userId)));
+    const mapped = await Promise.all(messages.map(m => this.toMessageResponse(m, userId)));
 
     return {
       threadId,
@@ -183,7 +189,8 @@ export class ChatService {
 
   async markThreadSeen(userId: string, threadId: string) {
     const thread = await this.threadRepo.findById(threadId);
-    if (!thread) throw new NotFoundException("Thread not found");
+    if (!thread)
+      throw new NotFoundException("Thread not found");
 
     if (!thread.memberUserIds.map(String).includes(userId)) {
       throw new ForbiddenException("You are not part of this conversation");
@@ -209,8 +216,8 @@ export class ChatService {
     otherUserId: string,
   ) {
     return (
-      (user.blockedUsers || []).some((id) => id.toString() === otherUserId)
-      || (other.blockedUsers || []).some((id) => id.toString() === userId)
+      (user.blockedUsers || []).some(id => id.toString() === otherUserId)
+      || (other.blockedUsers || []).some(id => id.toString() === userId)
     );
   }
 
@@ -229,22 +236,23 @@ export class ChatService {
     const allMessages = await this.messageRepo.findByThread(threadId);
     const unreadCount = allMessages.filter((m) => {
       const isOwn = m.senderUserId.toString() === viewerUserId;
-      const seen = (m.seenByUserIds || []).some((id) => id.toString() === viewerUserId);
+      const seen = (m.seenByUserIds || []).some(id => id.toString() === viewerUserId);
       return !isOwn && !seen;
     }).length;
 
     const hasUnseenLastMessage = Boolean(
       lastMessage
       && lastMessage.senderUserId.toString() !== viewerUserId
-      && !(lastMessage.seenByUserIds || []).some((id) => id.toString() === viewerUserId),
+      && !(lastMessage.seenByUserIds || []).some(id => id.toString() === viewerUserId),
     );
 
-    const peerId = thread.memberUserIds.map(String).find((id) => id !== viewerUserId) || null;
+    const peerId = thread.memberUserIds.map(String).find(id => id !== viewerUserId) || null;
     let directPeer = null;
     if (peerId) {
       try {
         directPeer = await this.userService.getProfile(peerId);
-      } catch {
+      }
+      catch {
         directPeer = await this.getAdminProfileFallback(peerId);
       }
     }
@@ -252,7 +260,7 @@ export class ChatService {
     return {
       _id: threadId,
       type: thread.type,
-      memberUserIds: thread.memberUserIds.map((m) => m.toString()),
+      memberUserIds: thread.memberUserIds.map(m => m.toString()),
       memberCount: thread.memberUserIds.length,
       directPeer,
       lastMessage: lastMessage ? await this.toMessageResponse(lastMessage, viewerUserId) : null,
@@ -272,11 +280,12 @@ export class ChatService {
     let sender = null;
     try {
       sender = await this.userService.getProfile(senderId);
-    } catch {
+    }
+    catch {
       sender = await this.getAdminProfileFallback(senderId);
     }
 
-    const seenByUserIds = (message.seenByUserIds || []).map((id) => id.toString());
+    const seenByUserIds = (message.seenByUserIds || []).map(id => id.toString());
 
     return {
       _id: (message._id as any).toString(),
@@ -315,7 +324,8 @@ export class ChatService {
       .select("_id email fullName role createdAt updatedAt profileImageUrl")
       .exec();
 
-    if (!admin) return null;
+    if (!admin)
+      return null;
 
     return {
       _id: admin._id.toString(),

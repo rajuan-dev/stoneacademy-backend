@@ -1,9 +1,10 @@
-import { BadRequestException } from "@/utils/app-error.utils";
+import type { Request, Response } from "express";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
+import { BadRequestException } from "@/utils/app-error.utils";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
-import { AdsService } from "./ads.service";
+
 import {
   adIdSchema,
   createAdSchema,
@@ -12,6 +13,7 @@ import {
   migrateShopProductsSchema,
   updateAdSchema,
 } from "./ads.schema";
+import { AdsService } from "./ads.service";
 
 export class AdsController {
   private static readonly MAX_CREATIVE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -67,7 +69,7 @@ export class AdsController {
     const validated = await zParse(updateAdSchema, req);
     const file = req.file;
     const hasBodyUpdates = Object.values(validated.body).some(
-      (value) => value !== undefined,
+      value => value !== undefined,
     );
     if (!hasBodyUpdates && !file) {
       throw new BadRequestException("Provide at least one field or an image");

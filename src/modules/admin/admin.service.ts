@@ -1,26 +1,36 @@
+import type { PipelineStage } from "mongoose";
+
+import { Types } from "mongoose";
+
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import {
   ACTIVITY_STATUS,
+  CREATOR_EARNING_STATUS,
   PAGINATION,
+  PAYMENT_ARCHITECTURE,
   PAYMENT_STATUS,
+  REFUND_STATUS,
   USER_STATUS,
 } from "@/constants/app.constants";
 import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
-import { PipelineStage, Types } from "mongoose";
-import { User } from "../user/user.model";
+
 import { Activity } from "../activity/activity.model";
-import { Event } from "../event/event.model";
-import { Report } from "../report/report.model";
-import { SupportTicket } from "../support/support-ticket.model";
-import { PaymentTransaction } from "../event/payment-transaction.model";
-import { AdminAuditLog } from "./admin-audit-log.model";
-import { Subscription } from "../subscription/subscription.model";
-import { SettingsService } from "../settings/settings.service";
-import { PayoutRequest } from "../billing/payout-request.model";
-import { UserService } from "../user/user.service";
-import { AdminAccountService } from "../admin-account/admin-account.service";
 import { AdminAccount } from "../admin-account/admin-account.model";
+import { AdminAccountService } from "../admin-account/admin-account.service";
+import { BillingService } from "../billing/billing.service";
+import { PayoutRequest } from "../billing/payout-request.model";
+import { EventParticipant } from "../event/event-participant.model";
+import { Event } from "../event/event.model";
+import { PaymentTransaction } from "../event/payment-transaction.model";
+import { Report } from "../report/report.model";
+import { SettingsService } from "../settings/settings.service";
 import { SubscriptionPayment } from "../subscription/subscription-payment.model";
-import type { StorageUploadInput } from "@/services/s3.service";
+import { Subscription } from "../subscription/subscription.model";
+import { SupportTicket } from "../support/support-ticket.model";
+import { User } from "../user/user.model";
+import { UserService } from "../user/user.service";
+import { AdminAuditLog } from "./admin-audit-log.model";
 
 type AggregatedUserRow = {
   _id: Types.ObjectId;
@@ -100,12 +110,14 @@ export class AdminService {
   private settingsService: SettingsService;
   private userService: UserService;
   private adminAccountService: AdminAccountService;
+  private billingService: BillingService;
   private cache = new Map<string, { expiresAt: number; value: unknown }>();
 
   constructor() {
     this.settingsService = new SettingsService();
     this.userService = new UserService();
     this.adminAccountService = new AdminAccountService();
+    this.billingService = new BillingService();
   }
 
   private async remember<T>(
@@ -125,7 +137,8 @@ export class AdminService {
   }
 
   private deriveUsername(email?: string | null): string | null {
-    if (!email) return null;
+    if (!email)
+      return null;
     const [username] = email.split("@");
     return username || null;
   }
@@ -340,6 +353,7 @@ export class AdminService {
       }),
     };
   }
+
   async getAdminProfile(adminId: string) {
     const admin = await this.adminAccountService.getById(adminId);
     if (!admin) {
@@ -363,10 +377,10 @@ export class AdminService {
 
     let adminProfile: any = null;
 
-    const hasUpdates =
-      payload.fullName !== undefined
-      || payload.email !== undefined
-      || normalizedPhone !== undefined;
+    const hasUpdates
+      = payload.fullName !== undefined
+        || payload.email !== undefined
+        || normalizedPhone !== undefined;
 
     if (hasUpdates) {
       adminProfile = await this.adminAccountService.updateProfile(adminId, {
@@ -603,11 +617,13 @@ export class AdminService {
       update.blockedReason = reason ?? null;
       update.blockedAt = new Date();
       update.blockedBy = adminId ? new Types.ObjectId(adminId) : null;
-    } else if (status === USER_STATUS.ACTIVE) {
+    }
+    else if (status === USER_STATUS.ACTIVE) {
       update.blockedReason = null;
       update.blockedAt = null;
       update.blockedBy = null;
-    } else if (reason !== undefined) {
+    }
+    else if (reason !== undefined) {
       update.blockedReason = reason;
     }
 
@@ -616,11 +632,12 @@ export class AdminService {
       update,
       { new: true },
     ).select("-passwordHash").exec();
-    if (!user) throw new NotFoundException("User not found");
+    if (!user)
+      throw new NotFoundException("User not found");
 
     if (adminId) {
-      const action =
-        status === USER_STATUS.BLOCKED
+      const action
+        = status === USER_STATUS.BLOCKED
           ? "user_blocked"
           : status === USER_STATUS.ACTIVE
             ? "user_unblocked"
@@ -647,7 +664,8 @@ export class AdminService {
       { role },
       { new: true },
     ).select("-passwordHash").exec();
-    if (!user) throw new NotFoundException("User not found");
+    if (!user)
+      throw new NotFoundException("User not found");
     return user;
   }
 
@@ -661,8 +679,8 @@ export class AdminService {
       throw new NotFoundException("User not found");
     }
 
-    const blockedBy =
-      typeof user.blockedBy === "object" && user.blockedBy !== null
+    const blockedBy
+      = typeof user.blockedBy === "object" && user.blockedBy !== null
         ? this.buildBlockedByPayload(user.blockedBy as any)
         : null;
 
@@ -719,7 +737,15 @@ export class AdminService {
         Report.countDocuments({ status: { $in: ["open", "under_review"] } }),
         SupportTicket.countDocuments({ status: { $in: ["open", "in_progress"] } }),
         PaymentTransaction.aggregate([
-          { $match: { status: { $in: this.successfulPaymentStatuses } } },
+          {
+            $match: {
+              $or: [
+                { paymentStatus: "succeeded" },
+                { status: { $in: this.successfulPaymentStatuses } },
+              ],
+              refundStatus: { $ne: "succeeded" },
+            },
+          },
           {
             $group: {
               _id: null,
@@ -730,7 +756,15 @@ export class AdminService {
           },
         ]),
         SubscriptionPayment.aggregate([
-          { $match: { status: { $in: this.successfulPaymentStatuses } } },
+          {
+            $match: {
+              $or: [
+                { paymentStatus: "succeeded" },
+                { status: { $in: this.successfulPaymentStatuses } },
+              ],
+              refundStatus: { $ne: "succeeded" },
+            },
+          },
           {
             $group: {
               _id: null,
@@ -771,121 +805,121 @@ export class AdminService {
   async dashboardAnalytics(query?: { year?: number }) {
     const selectedYear = query?.year ?? new Date().getFullYear();
     return this.remember(`dashboard:analytics:${selectedYear}`, 15000, async () => {
-    const startOfYear = new Date(selectedYear, 0, 1);
-    const startOfNextYear = new Date(selectedYear + 1, 0, 1);
-    const monthLabels = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+      const startOfYear = new Date(selectedYear, 0, 1);
+      const startOfNextYear = new Date(selectedYear + 1, 0, 1);
+      const monthLabels = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
 
-    const [userSeries, activitySeries, eventSeries, revenueSeries] =
-      await Promise.all([
-        User.aggregate([
-          {
-            $match: {
-              createdAt: { $gte: startOfYear, $lt: startOfNextYear },
-              isDeleted: false,
+      const [userSeries, activitySeries, eventSeries, revenueSeries]
+        = await Promise.all([
+          User.aggregate([
+            {
+              $match: {
+                createdAt: { $gte: startOfYear, $lt: startOfNextYear },
+                isDeleted: false,
+              },
             },
-          },
-          {
-            $group: {
-              _id: { month: { $month: "$createdAt" } },
-              count: { $sum: 1 },
+            {
+              $group: {
+                _id: { month: { $month: "$createdAt" } },
+                count: { $sum: 1 },
+              },
             },
-          },
-          { $sort: { "_id.month": 1 } },
-        ]),
-        Activity.aggregate([
-          { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
-          {
-            $group: {
-              _id: { month: { $month: "$createdAt" } },
-              count: { $sum: 1 },
+            { $sort: { "_id.month": 1 } },
+          ]),
+          Activity.aggregate([
+            { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
+            {
+              $group: {
+                _id: { month: { $month: "$createdAt" } },
+                count: { $sum: 1 },
+              },
             },
-          },
-          { $sort: { "_id.month": 1 } },
-        ]),
-        Event.aggregate([
-          { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
-          {
-            $group: {
-              _id: { month: { $month: "$createdAt" } },
-              count: { $sum: 1 },
+            { $sort: { "_id.month": 1 } },
+          ]),
+          Event.aggregate([
+            { $match: { createdAt: { $gte: startOfYear, $lt: startOfNextYear } } },
+            {
+              $group: {
+                _id: { month: { $month: "$createdAt" } },
+                count: { $sum: 1 },
+              },
             },
-          },
-          { $sort: { "_id.month": 1 } },
-        ]),
-        PaymentTransaction.aggregate([
-          {
-            $match: {
-              status: { $in: this.successfulPaymentStatuses },
-              createdAt: { $gte: startOfYear, $lt: startOfNextYear },
+            { $sort: { "_id.month": 1 } },
+          ]),
+          PaymentTransaction.aggregate([
+            {
+              $match: {
+                status: { $in: this.successfulPaymentStatuses },
+                createdAt: { $gte: startOfYear, $lt: startOfNextYear },
+              },
             },
-          },
-          {
-            $group: {
-              _id: { month: { $month: "$createdAt" } },
-              gross: { $sum: "$grossAmount" },
+            {
+              $group: {
+                _id: { month: { $month: "$createdAt" } },
+                gross: { $sum: "$grossAmount" },
+              },
             },
-          },
-          { $sort: { "_id.month": 1 } },
-        ]),
-      ]);
+            { $sort: { "_id.month": 1 } },
+          ]),
+        ]);
 
-    const usersByMonth = new Map<number, number>(
-      userSeries.map((entry) => [Number(entry._id?.month), Number(entry.count) || 0]),
-    );
-    const activitiesByMonth = new Map<number, number>(
-      activitySeries.map((entry) => [
-        Number(entry._id?.month),
-        Number(entry.count) || 0,
-      ]),
-    );
-    const eventsByMonth = new Map<number, number>(
-      eventSeries.map((entry) => [Number(entry._id?.month), Number(entry.count) || 0]),
-    );
-    const revenueByMonth = new Map<number, number>(
-      revenueSeries.map((entry) => [
-        Number(entry._id?.month),
-        Number(entry.gross) || 0,
-      ]),
-    );
+      const usersByMonth = new Map<number, number>(
+        userSeries.map(entry => [Number(entry._id?.month), Number(entry.count) || 0]),
+      );
+      const activitiesByMonth = new Map<number, number>(
+        activitySeries.map(entry => [
+          Number(entry._id?.month),
+          Number(entry.count) || 0,
+        ]),
+      );
+      const eventsByMonth = new Map<number, number>(
+        eventSeries.map(entry => [Number(entry._id?.month), Number(entry.count) || 0]),
+      );
+      const revenueByMonth = new Map<number, number>(
+        revenueSeries.map(entry => [
+          Number(entry._id?.month),
+          Number(entry.gross) || 0,
+        ]),
+      );
 
-    const monthlyUsers = monthLabels.map((month, index) => ({
-      month,
-      users: usersByMonth.get(index + 1) || 0,
-    }));
+      const monthlyUsers = monthLabels.map((month, index) => ({
+        month,
+        users: usersByMonth.get(index + 1) || 0,
+      }));
 
-    return {
-      year: selectedYear,
-      monthlyUsers,
-      users: monthLabels.map((month, index) => ({
-        month,
-        count: usersByMonth.get(index + 1) || 0,
-      })),
-      activities: monthLabels.map((month, index) => ({
-        month,
-        count: activitiesByMonth.get(index + 1) || 0,
-      })),
-      events: monthLabels.map((month, index) => ({
-        month,
-        count: eventsByMonth.get(index + 1) || 0,
-      })),
-      revenue: monthLabels.map((month, index) => ({
-        month,
-        gross: revenueByMonth.get(index + 1) || 0,
-      })),
-    };
+      return {
+        year: selectedYear,
+        monthlyUsers,
+        users: monthLabels.map((month, index) => ({
+          month,
+          count: usersByMonth.get(index + 1) || 0,
+        })),
+        activities: monthLabels.map((month, index) => ({
+          month,
+          count: activitiesByMonth.get(index + 1) || 0,
+        })),
+        events: monthLabels.map((month, index) => ({
+          month,
+          count: eventsByMonth.get(index + 1) || 0,
+        })),
+        revenue: monthLabels.map((month, index) => ({
+          month,
+          gross: revenueByMonth.get(index + 1) || 0,
+        })),
+      };
     });
   }
 
@@ -1087,6 +1121,16 @@ export class AdminService {
     if (!event) {
       throw new NotFoundException("Event not found");
     }
+    if (status === ACTIVITY_STATUS.CANCELLED) {
+      await EventParticipant.updateMany(
+        { eventId: event._id, status: "joined" },
+        { status: "cancelled" },
+      ).exec();
+      await this.billingService.processEventCancellationRefunds(event._id.toString());
+    }
+    else if (status === ACTIVITY_STATUS.COMPLETED) {
+      await this.billingService.settleCompletedEvent(event._id.toString());
+    }
     if (adminId) {
       await AdminAuditLog.create({
         adminId,
@@ -1097,6 +1141,182 @@ export class AdminService {
       });
     }
     return event;
+  }
+
+  async getEventRefundStatus(eventId: string) {
+    if (!Types.ObjectId.isValid(eventId)) {
+      throw new NotFoundException("Event not found");
+    }
+
+    const event = await Event.findById(eventId)
+      .select("_id status title")
+      .lean();
+    if (!event) {
+      throw new NotFoundException("Event not found");
+    }
+    if (event.status !== ACTIVITY_STATUS.CANCELLED) {
+      throw new BadRequestException("Refund status is available only for cancelled events");
+    }
+
+    const transactions = await PaymentTransaction.find({
+      eventId: event._id,
+      paymentArchitecture: PAYMENT_ARCHITECTURE.PLATFORM_CHARGE_DELAYED_TRANSFER,
+      $or: [
+        { paymentStatus: "succeeded" },
+        { status: { $in: this.successfulPaymentStatuses } },
+      ],
+    })
+      .select("_id refundStatus refundedAmountMinor grossAmount grossAmountMinor stripeRefundId lastRefundError")
+      .lean();
+
+    const summary = transactions.reduce(
+      (acc, transaction: any) => {
+        const refundStatus = transaction.refundStatus || REFUND_STATUS.NONE;
+        if (refundStatus === REFUND_STATUS.PENDING) {
+          acc.refundPending += 1;
+        }
+        else if (refundStatus === REFUND_STATUS.SUCCEEDED) {
+          acc.refundSucceeded += 1;
+        }
+        else if (refundStatus === REFUND_STATUS.FAILED) {
+          acc.refundFailed += 1;
+          acc.failedTransactionIds.push(transaction._id.toString());
+        }
+        else {
+          acc.refundNone += 1;
+        }
+
+        acc.totalRefundedAmountMinor += Number(transaction.refundedAmountMinor || 0);
+        return acc;
+      },
+      {
+        refundPending: 0,
+        refundSucceeded: 0,
+        refundFailed: 0,
+        refundNone: 0,
+        totalRefundedAmountMinor: 0,
+        failedTransactionIds: [] as string[],
+      },
+    );
+
+    return {
+      eventId: event._id.toString(),
+      eventStatus: event.status,
+      totalSuccessfulPaidTickets: transactions.length,
+      refundPending: summary.refundPending,
+      refundSucceeded: summary.refundSucceeded,
+      refundFailed: summary.refundFailed,
+      refundNone: summary.refundNone,
+      totalRefundedAmountMinor: summary.totalRefundedAmountMinor,
+      totalRefundedAmount: Number((summary.totalRefundedAmountMinor / 100).toFixed(2)),
+      failedTransactionIds: summary.failedTransactionIds,
+    };
+  }
+
+  async retryFailedEventRefunds(eventId: string, adminId?: string) {
+    if (!Types.ObjectId.isValid(eventId)) {
+      throw new NotFoundException("Event not found");
+    }
+
+    const event = await Event.findById(eventId).select("_id status").exec();
+    if (!event) {
+      throw new NotFoundException("Event not found");
+    }
+    if (event.status !== ACTIVITY_STATUS.CANCELLED) {
+      throw new BadRequestException("Failed refunds can be retried only for cancelled events");
+    }
+
+    const failedTransactions = await PaymentTransaction.find({
+      eventId: event._id,
+      refundStatus: REFUND_STATUS.FAILED,
+      paymentArchitecture: PAYMENT_ARCHITECTURE.PLATFORM_CHARGE_DELAYED_TRANSFER,
+      $or: [
+        { paymentStatus: "succeeded" },
+        { status: { $in: this.successfulPaymentStatuses } },
+      ],
+    }).exec();
+
+    const results: Array<{
+      transactionId: string;
+      status: string;
+      skipped?: boolean;
+      error?: string;
+    }> = [];
+    let retried = 0;
+    let succeeded = 0;
+    let stillFailed = 0;
+    let skipped = 0;
+
+    for (const transaction of failedTransactions) {
+      const transactionId = transaction._id.toString();
+      const grossAmountMinor = transaction.grossAmountMinor
+        ?? Math.round(Number(transaction.grossAmount || 0) * 100);
+      const refundedAmountMinor = Number(transaction.refundedAmountMinor || 0);
+
+      if (grossAmountMinor > 0 && refundedAmountMinor >= grossAmountMinor) {
+        skipped += 1;
+        results.push({
+          transactionId,
+          status: "already_fully_refunded",
+          skipped: true,
+        });
+        continue;
+      }
+
+      retried += 1;
+      try {
+        const retriedTransaction
+          = await this.billingService.refundTransactionForEventCancellation(transactionId);
+        const refundStatus = retriedTransaction?.refundStatus || REFUND_STATUS.FAILED;
+        if (refundStatus === REFUND_STATUS.SUCCEEDED) {
+          succeeded += 1;
+        }
+        else {
+          stillFailed += 1;
+        }
+        results.push({ transactionId, status: refundStatus });
+      }
+      catch (error: any) {
+        stillFailed += 1;
+        const message = error?.message || "Refund retry failed";
+        await PaymentTransaction.findByIdAndUpdate(transaction._id, {
+          refundStatus: REFUND_STATUS.FAILED,
+          lastRefundError: message,
+          creatorEarningStatus: CREATOR_EARNING_STATUS.CANCELLED,
+        }).exec();
+        results.push({
+          transactionId,
+          status: REFUND_STATUS.FAILED,
+          error: message,
+        });
+      }
+    }
+
+    if (adminId) {
+      await AdminAuditLog.create({
+        adminId,
+        action: "event_failed_refunds_retried",
+        entityType: "event",
+        entityId: event._id,
+        meta: {
+          totalFailed: failedTransactions.length,
+          retried,
+          succeeded,
+          stillFailed,
+          skipped,
+        },
+      });
+    }
+
+    return {
+      eventId: event._id.toString(),
+      totalFailed: failedTransactions.length,
+      retried,
+      succeeded,
+      stillFailed,
+      skipped,
+      results,
+    };
   }
 
   async listSubscriptions(query: {
@@ -1111,8 +1331,10 @@ export class AdminService {
     const skip = (page - 1) * limit;
 
     const filter: Record<string, any> = {};
-    if (query.status) filter.status = query.status;
-    if (query.plan) filter.plan = query.plan;
+    if (query.status)
+      filter.status = query.status;
+    if (query.plan)
+      filter.plan = query.plan;
     const searchRegex = query.search ? new RegExp(query.search, "i") : null;
 
     const pipeline: Record<string, any>[] = [
@@ -1331,7 +1553,15 @@ export class AdminService {
         },
       ]),
       PaymentTransaction.aggregate([
-        { $match: { status: { $in: this.successfulPaymentStatuses } } },
+        {
+          $match: {
+            $or: [
+              { paymentStatus: "succeeded" },
+              { status: { $in: this.successfulPaymentStatuses } },
+            ],
+            refundStatus: { $ne: "succeeded" },
+          },
+        },
         {
           $lookup: {
             from: "events",
@@ -1398,7 +1628,7 @@ export class AdminService {
     });
 
     const filtered = query.paymentStatus && query.paymentStatus !== "all"
-      ? merged.filter((item) => item.paymentStatus === query.paymentStatus)
+      ? merged.filter(item => item.paymentStatus === query.paymentStatus)
       : merged;
 
     filtered.sort((a, b) => b.totalEarnings - a.totalEarnings);
@@ -1492,7 +1722,15 @@ export class AdminService {
 
     const [earningStats, payoutStats] = await Promise.all([
       PaymentTransaction.aggregate([
-        { $match: { status: { $in: this.successfulPaymentStatuses } } },
+        {
+          $match: {
+            $or: [
+              { paymentStatus: "succeeded" },
+              { status: { $in: this.successfulPaymentStatuses } },
+            ],
+            refundStatus: { $ne: "succeeded" },
+          },
+        },
         {
           $lookup: {
             from: "events",
@@ -1551,9 +1789,9 @@ export class AdminService {
       };
     });
 
-    const filtered =
-      query.paymentStatus && query.paymentStatus !== "all"
-        ? merged.filter((item) => item.paymentStatus === query.paymentStatus)
+    const filtered
+      = query.paymentStatus && query.paymentStatus !== "all"
+        ? merged.filter(item => item.paymentStatus === query.paymentStatus)
         : merged;
 
     filtered.sort((a, b) => b.totalEarnings - a.totalEarnings);
@@ -1585,7 +1823,8 @@ export class AdminService {
     const creator = await User.findById(creatorId)
       .select("fullName email role creatorStatus profileImageUrl status")
       .exec();
-    if (!creator) throw new NotFoundException("Creator not found");
+    if (!creator)
+      throw new NotFoundException("Creator not found");
 
     const [latestSubscription, eventRows, totalEvents, paymentSummary, payoutSummary] = await Promise.all([
       Subscription.findOne({ userId: creatorId }).sort({ createdAt: -1 }).exec(),
@@ -1596,7 +1835,15 @@ export class AdminService {
         .exec(),
       Event.countDocuments({ creatorId }),
       PaymentTransaction.aggregate([
-        { $match: { status: { $in: this.successfulPaymentStatuses } } },
+        {
+          $match: {
+            $or: [
+              { paymentStatus: "succeeded" },
+              { status: { $in: this.successfulPaymentStatuses } },
+            ],
+            refundStatus: { $ne: "succeeded" },
+          },
+        },
         {
           $lookup: {
             from: "events",
@@ -1685,11 +1932,20 @@ export class AdminService {
     }
 
     const creator = await User.findById(creatorId).select("_id").exec();
-    if (!creator) throw new NotFoundException("Creator not found");
+    if (!creator)
+      throw new NotFoundException("Creator not found");
 
     const [paymentSummary, payoutSummary] = await Promise.all([
       PaymentTransaction.aggregate([
-        { $match: { status: { $in: this.successfulPaymentStatuses } } },
+        {
+          $match: {
+            $or: [
+              { paymentStatus: "succeeded" },
+              { status: { $in: this.successfulPaymentStatuses } },
+            ],
+            refundStatus: { $ne: "succeeded" },
+          },
+        },
         {
           $lookup: {
             from: "events",
@@ -1746,8 +2002,11 @@ export class AdminService {
       creatorId: creator._id,
       amount: Number(amount.toFixed(2)),
       currency: payload.currency || "USD",
-      status: "paid",
-      note: payload.note || "Processed by admin",
+      status: "requested",
+      provider: "manual_review",
+      note:
+        payload.note
+        || "Legacy admin payout route preserved; event-ticket payouts must be settled through Stripe transfer after event completion.",
       reviewedBy: adminId as any,
       reviewedAt: new Date(),
     });
@@ -1771,8 +2030,10 @@ export class AdminService {
       currency: payout.currency,
       status: payout.status,
       pendingAmountBefore: pendingAmount,
-      pendingAmountAfter: Number((pendingAmount - payout.amount).toFixed(2)),
+      pendingAmountAfter: pendingAmount,
       processedAt: payout.reviewedAt,
+      message:
+        "Payout was recorded for manual review only. No Stripe money movement was performed by this legacy endpoint.",
     };
   }
 
@@ -1786,13 +2047,27 @@ export class AdminService {
     const skip = (page - 1) * limit;
 
     const status = query.status || "succeeded";
-    const eventStatusFilter =
-      status === "succeeded"
+    const eventStatusFilter
+      = status === "succeeded"
         ? { $in: this.successfulPaymentStatuses }
         : status;
+    const eventPaymentFilter = status === "succeeded"
+      ? {
+          $or: [
+            { paymentStatus: "succeeded" },
+            { status: eventStatusFilter },
+          ],
+          refundStatus: { $ne: "succeeded" },
+        }
+      : {
+          $or: [
+            { paymentStatus: status },
+            { status: eventStatusFilter },
+          ],
+        };
 
     const [eventRows, subscriptionRows] = await Promise.all([
-      PaymentTransaction.find({ status: eventStatusFilter })
+      PaymentTransaction.find(eventPaymentFilter)
         .sort({ createdAt: -1 })
         .populate("payerId", "fullName email profileImageUrl")
         .populate("eventId", "title")
@@ -1901,7 +2176,8 @@ export class AdminService {
     const subscriptionRow = await SubscriptionPayment.findById(transactionId)
       .populate("userId", "fullName email profileImageUrl")
       .exec();
-    if (!subscriptionRow) throw new NotFoundException("Earning transaction not found");
+    if (!subscriptionRow)
+      throw new NotFoundException("Earning transaction not found");
 
     const payer: any = subscriptionRow.userId || null;
     return {

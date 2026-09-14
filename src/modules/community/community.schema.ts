@@ -1,53 +1,60 @@
-import { PAGINATION } from "@/constants/app.constants";
 import { Types } from "mongoose";
 import { z } from "zod";
+
+import { PAGINATION } from "@/constants/app.constants";
 
 const objectIdSchema = z
   .string()
   .trim()
   .min(1)
-  .refine((value) => Types.ObjectId.isValid(value), {
+  .refine(value => Types.ObjectId.isValid(value), {
     message: "Invalid ObjectId",
   });
 
-const parseObject = (value: unknown) => {
-  if (typeof value !== "string") return value;
+function parseObject(value: unknown) {
+  if (typeof value !== "string")
+    return value;
   try {
     return JSON.parse(value);
-  } catch {
+  }
+  catch {
     return value;
   }
-};
+}
 
-const parseStringArray = (value: unknown) => {
+function parseStringArray(value: unknown) {
   if (value === undefined || value === null || value === "" || value === "null") {
     return undefined;
   }
   const parsed = parseObject(value);
-  if (Array.isArray(parsed)) return parsed;
-  if (typeof parsed === "string") return [parsed];
+  if (Array.isArray(parsed))
+    return parsed;
+  if (typeof parsed === "string")
+    return [parsed];
   return parsed;
-};
+}
 
-const parseObjectIdArray = (value: unknown) => {
+function parseObjectIdArray(value: unknown) {
   const parsed = parseStringArray(value);
-  if (parsed === undefined) return undefined;
+  if (parsed === undefined)
+    return undefined;
   return Array.isArray(parsed) ? parsed : [parsed];
-};
+}
 
 const nullableObjectIdSchema = z.preprocess(
-  (value) => (value === "" || value === "null" ? null : value),
+  value => (value === "" || value === "null" ? null : value),
   objectIdSchema.nullable().optional(),
 );
 
 const optionalObjectIdSchema = z.preprocess(
-  (value) => (value === "" || value === "null" || value === null ? undefined : value),
+  value => (value === "" || value === "null" || value === null ? undefined : value),
   objectIdSchema.optional(),
 );
 
 const nullableObjectIdArraySchema = z.preprocess(
   (value) => {
-    if (value === "" || value === "null" || value === null) return null;
+    if (value === "" || value === "null" || value === null)
+      return null;
     return parseObjectIdArray(value);
   },
   z.array(objectIdSchema).nullable().optional(),
@@ -148,7 +155,7 @@ export const updateCommunityPostSchema = z.object({
       activityIds: nullableObjectIdArraySchema,
       link: z.string().trim().url().nullable().optional(),
     })
-    .refine((data) => Object.keys(data).length > 0, {
+    .refine(data => Object.keys(data).length > 0, {
       message: "At least one field must be provided",
     })
     .superRefine((data, ctx) => {

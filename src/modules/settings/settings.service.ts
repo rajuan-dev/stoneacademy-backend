@@ -1,7 +1,8 @@
 import { env } from "@/env";
-import { AuthService } from "@/modules/auth/auth.service";
 import { AdminAccountService } from "@/modules/admin-account/admin-account.service";
+import { AuthService } from "@/modules/auth/auth.service";
 import { NotFoundException } from "@/utils/app-error.utils";
+
 import { Settings } from "./settings.model";
 
 const PLATFORM_SETTINGS_KEY = "platform";

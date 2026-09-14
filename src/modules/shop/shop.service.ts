@@ -1,6 +1,9 @@
-import { PAGINATION, ORDER_STATUS } from "@/constants/app.constants";
+import type { StorageUploadInput } from "@/services/s3.service";
+
+import { ORDER_STATUS, PAGINATION } from "@/constants/app.constants";
+import { s3Service } from "@/services/s3.service";
 import { BadRequestException, NotFoundException } from "@/utils/app-error.utils";
-import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+
 import { Cart } from "./cart.model";
 import { Order } from "./order.model";
 import { Product } from "./product.model";
@@ -30,7 +33,8 @@ export class ShopService {
     }
     if (query.active !== undefined) {
       filter.isActive = query.active;
-    } else if (defaultActive) {
+    }
+    else if (defaultActive) {
       filter.isActive = true;
     }
     if (query.category) {
@@ -113,15 +117,24 @@ export class ShopService {
       throw new NotFoundException("Product not found");
     }
 
-    if (payload.name !== undefined) product.name = payload.name;
-    if (payload.category !== undefined) product.category = payload.category;
-    if (payload.description !== undefined) product.description = payload.description;
-    if (payload.price !== undefined) product.price = payload.price;
-    if (payload.currency !== undefined) product.currency = payload.currency;
-    if (payload.ctaUrl !== undefined) product.ctaUrl = payload.ctaUrl;
-    if (payload.imageUrl !== undefined) product.imageUrl = payload.imageUrl;
-    if (payload.stock !== undefined) product.stock = payload.stock;
-    if (payload.isActive !== undefined) product.isActive = payload.isActive;
+    if (payload.name !== undefined)
+      product.name = payload.name;
+    if (payload.category !== undefined)
+      product.category = payload.category;
+    if (payload.description !== undefined)
+      product.description = payload.description;
+    if (payload.price !== undefined)
+      product.price = payload.price;
+    if (payload.currency !== undefined)
+      product.currency = payload.currency;
+    if (payload.ctaUrl !== undefined)
+      product.ctaUrl = payload.ctaUrl;
+    if (payload.imageUrl !== undefined)
+      product.imageUrl = payload.imageUrl;
+    if (payload.stock !== undefined)
+      product.stock = payload.stock;
+    if (payload.isActive !== undefined)
+      product.isActive = payload.isActive;
     if (image) {
       const upload = await this.uploadProductImage(
         image,
@@ -179,14 +192,15 @@ export class ShopService {
     }
 
     const cart = await this.getCart(userId);
-    const existing = cart.items.find((item) => item.productId.toString() === productId);
+    const existing = cart.items.find(item => item.productId.toString() === productId);
     if (existing) {
       const newQty = existing.quantity + quantity;
       if (product.stock < newQty) {
         throw new BadRequestException("Insufficient stock");
       }
       existing.quantity = newQty;
-    } else {
+    }
+    else {
       cart.items.push({
         productId: product._id,
         quantity,
@@ -200,7 +214,7 @@ export class ShopService {
 
   async updateCartItem(userId: string, productId: string, quantity: number) {
     const cart = await this.getCart(userId);
-    const item = cart.items.find((i) => i.productId.toString() === productId);
+    const item = cart.items.find(i => i.productId.toString() === productId);
     if (!item) {
       throw new NotFoundException("Cart item not found");
     }
@@ -219,7 +233,7 @@ export class ShopService {
 
   async removeCartItem(userId: string, productId: string) {
     const cart = await this.getCart(userId);
-    cart.items = cart.items.filter((i) => i.productId.toString() !== productId);
+    cart.items = cart.items.filter(i => i.productId.toString() !== productId);
     await cart.save();
     return cart;
   }
@@ -231,10 +245,10 @@ export class ShopService {
     }
 
     const products = await Product.find({
-      _id: { $in: cart.items.map((i) => i.productId) },
+      _id: { $in: cart.items.map(i => i.productId) },
     }).exec();
 
-    const productMap = new Map(products.map((p) => [p._id.toString(), p]));
+    const productMap = new Map(products.map(p => [p._id.toString(), p]));
 
     let totalAmount = 0;
     const orderItems = cart.items.map((item) => {
@@ -287,9 +301,9 @@ export class ShopService {
   }) {
     const result = await this.listProducts(query, { defaultActive: false });
     const rows = result.data.map((product, index) => {
-      const rowNumber =
-        result.pagination.totalItems -
-        ((result.pagination.currentPage - 1) * result.pagination.itemsPerPage + index);
+      const rowNumber
+        = result.pagination.totalItems
+          - ((result.pagination.currentPage - 1) * result.pagination.itemsPerPage + index);
       return {
         id: product._id,
         rowId: String(Math.max(rowNumber, 0)).padStart(
@@ -336,9 +350,11 @@ export class ShopService {
   }
 
   private toRowDescription(description?: string) {
-    if (!description) return "";
+    if (!description)
+      return "";
     const trimmed = description.trim();
-    if (!trimmed) return "";
+    if (!trimmed)
+      return "";
     const firstLine = trimmed.split(/\r?\n/)[0];
     return firstLine.length > 120 ? `${firstLine.slice(0, 117)}...` : firstLine;
   }

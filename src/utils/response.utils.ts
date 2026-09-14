@@ -1,7 +1,8 @@
 // file: src/utils/response.utils.ts
 
-import { HTTPSTATUS } from "@/config/http.config";
 import type { Response } from "express";
+
+import { HTTPSTATUS } from "@/config/http.config";
 
 export type PaginationMeta = {
   page: number;

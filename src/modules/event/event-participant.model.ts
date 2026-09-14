@@ -1,8 +1,11 @@
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { PARTICIPANT_STATUS } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
 
-export interface IEventParticipant {
+export type IEventParticipant = {
   _id: Types.ObjectId;
   eventId: Types.ObjectId;
   userId: Types.ObjectId;
@@ -11,7 +14,7 @@ export interface IEventParticipant {
   paymentTransactionId?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const eventParticipantSchema = BaseSchemaUtil.createSchema<IEventParticipant>({
   eventId: {

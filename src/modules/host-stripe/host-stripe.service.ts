@@ -4,6 +4,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from "@/utils/app-error.utils";
+
 import { User } from "../user/user.model";
 
 export class HostStripeService {
@@ -41,6 +42,10 @@ export class HostStripeService {
       stripeAccountId: host.stripeAccountId || null,
       stripeCustomerId: host.stripeCustomerId || null,
       stripeOnboardingCompleted: Boolean(host.stripeOnboardingCompleted),
+      stripeDetailsSubmitted: Boolean(host.stripeDetailsSubmitted),
+      stripeChargesEnabled: Boolean(host.stripeChargesEnabled),
+      stripePayoutsEnabled: Boolean(host.stripePayoutsEnabled),
+      stripeDisabledReason: host.stripeDisabledReason || null,
       hasStripeAccount: Boolean(host.stripeAccountId),
       createdAt: host.createdAt,
       updatedAt: host.updatedAt,
@@ -77,6 +82,10 @@ export class HostStripeService {
 
     host.stripeAccountId = account.id;
     host.stripeOnboardingCompleted = Boolean(account.charges_enabled);
+    host.stripeChargesEnabled = Boolean(account.charges_enabled);
+    host.stripePayoutsEnabled = Boolean(account.payouts_enabled);
+    host.stripeDetailsSubmitted = Boolean(account.details_submitted);
+    host.stripeDisabledReason = account.requirements?.disabled_reason || null;
     await host.save();
 
     return {
@@ -108,11 +117,15 @@ export class HostStripeService {
       });
       host.stripeAccountId = account.id;
       host.stripeOnboardingCompleted = Boolean(account.charges_enabled);
+      host.stripeChargesEnabled = Boolean(account.charges_enabled);
+      host.stripePayoutsEnabled = Boolean(account.payouts_enabled);
+      host.stripeDetailsSubmitted = Boolean(account.details_submitted);
+      host.stripeDisabledReason = account.requirements?.disabled_reason || null;
       await host.save();
     }
 
-    const refreshUrl =
-      payload?.refreshUrl || env.STRIPE_CONNECT_ONBOARDING_REFRESH_URL;
+    const refreshUrl
+      = payload?.refreshUrl || env.STRIPE_CONNECT_ONBOARDING_REFRESH_URL;
     const returnUrl = payload?.returnUrl || env.STRIPE_CONNECT_ONBOARDING_RETURN_URL;
 
     if (!refreshUrl || !returnUrl) {
@@ -177,14 +190,19 @@ export class HostStripeService {
   async syncOnboardingStatusFromStripeAccountUpdated(params: {
     stripeAccountId: string;
     chargesEnabled: boolean;
+    payoutsEnabled?: boolean;
+    detailsSubmitted?: boolean;
+    disabledReason?: string | null;
   }) {
-    if (!params.chargesEnabled) {
-      return null;
-    }
-
     return User.findOneAndUpdate(
       { stripeAccountId: params.stripeAccountId },
-      { stripeOnboardingCompleted: true },
+      {
+        stripeOnboardingCompleted: Boolean(params.chargesEnabled),
+        stripeChargesEnabled: Boolean(params.chargesEnabled),
+        stripePayoutsEnabled: Boolean(params.payoutsEnabled),
+        stripeDetailsSubmitted: Boolean(params.detailsSubmitted),
+        stripeDisabledReason: params.disabledReason || null,
+      },
       { new: true },
     ).exec();
   }
@@ -208,15 +226,22 @@ export class HostStripeService {
       });
 
     const chargesEnabled = Boolean(account.charges_enabled);
+    const payoutsEnabled = Boolean(account.payouts_enabled);
+    const detailsSubmitted = Boolean(account.details_submitted);
     host.stripeOnboardingCompleted = chargesEnabled;
+    host.stripeChargesEnabled = chargesEnabled;
+    host.stripePayoutsEnabled = payoutsEnabled;
+    host.stripeDetailsSubmitted = detailsSubmitted;
+    host.stripeDisabledReason = account.requirements?.disabled_reason || null;
     await host.save();
 
     return {
       stripeAccountId: host.stripeAccountId,
       stripeOnboardingCompleted: host.stripeOnboardingCompleted,
       chargesEnabled,
-      detailsSubmitted: Boolean(account.details_submitted),
-      payoutsEnabled: Boolean(account.payouts_enabled),
+      detailsSubmitted,
+      payoutsEnabled,
+      disabledReason: host.stripeDisabledReason,
     };
   }
 

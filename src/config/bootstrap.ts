@@ -11,7 +11,8 @@ export async function bootstrapApplication(): Promise<void> {
     reminderService.start();
 
     logger.info("Application bootstrapped successfully");
-  } catch (error) {
+  }
+  catch (error) {
     logger.error(error, "Bootstrap failed");
     throw error;
   }

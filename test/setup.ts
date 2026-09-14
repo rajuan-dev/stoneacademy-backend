@@ -1,9 +1,9 @@
 import { vi } from "vitest";
 
-process.env.NODE_ENV = "test";
-process.env.BASE_URL = "/api/v1";
-process.env.JWT_SECRET = "test-jwt-secret";
-process.env.JWT_REFRESH_SECRET = "test-jwt-refresh-secret";
+vi.stubEnv("NODE_ENV", "test");
+vi.stubEnv("BASE_URL", "/api/v1");
+vi.stubEnv("JWT_SECRET", "test-jwt-secret");
+vi.stubEnv("JWT_REFRESH_SECRET", "test-jwt-refresh-secret");
 
 vi.mock("../src/services/s3.service", () => {
   return {

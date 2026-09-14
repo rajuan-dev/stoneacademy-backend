@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IAdminAuditLog {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IAdminAuditLog = {
   _id: Types.ObjectId;
   adminId: Types.ObjectId;
   action: string;
@@ -10,7 +13,7 @@ export interface IAdminAuditLog {
   meta?: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const adminAuditLogSchema = BaseSchemaUtil.createSchema<IAdminAuditLog>({
   adminId: {

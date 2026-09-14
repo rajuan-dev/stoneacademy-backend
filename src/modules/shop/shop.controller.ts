@@ -1,7 +1,10 @@
+import type { Request, Response } from "express";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
+import { BadRequestException } from "@/utils/app-error.utils";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import type { Request, Response } from "express";
+
 import {
   addCartItemSchema,
   cartItemIdSchema,
@@ -13,7 +16,6 @@ import {
   updateProductStatusSchema,
 } from "./shop.schema";
 import { ShopService } from "./shop.service";
-import { BadRequestException } from "@/utils/app-error.utils";
 
 export class ShopController {
   private static readonly MAX_CREATIVE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -100,7 +102,7 @@ export class ShopController {
     const validated = await zParse(updateProductSchema, req);
     const file = req.file;
     const hasBodyUpdates = Object.values(validated.body).some(
-      (value) => value !== undefined,
+      value => value !== undefined,
     );
     if (!hasBodyUpdates && !file) {
       throw new BadRequestException("Provide at least one field or an image");

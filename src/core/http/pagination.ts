@@ -71,7 +71,8 @@ function parseFilters(filters?: string | Record<string, unknown>): Record<string
       if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
         return parsed as Record<string, unknown>;
       }
-    } catch {
+    }
+    catch {
       return {};
     }
   }
@@ -120,4 +121,3 @@ export function buildMongoFilters(
     ...extra,
   };
 }
-

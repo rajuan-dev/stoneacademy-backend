@@ -1,11 +1,12 @@
-import {
+import type { Document, Types } from "mongoose";
+
+import type {
   ACCOUNT_STATUS,
   ROLES,
   USER_STATUS,
 } from "@/constants/app.constants";
-import type { Document, Types } from "mongoose";
 
-export interface IAdminAccount extends Document {
+export type IAdminAccount = {
   _id: Types.ObjectId;
   email: string;
   passwordHash: string;
@@ -22,4 +23,4 @@ export interface IAdminAccount extends Document {
   lastLoginAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
-}
+} & Document;

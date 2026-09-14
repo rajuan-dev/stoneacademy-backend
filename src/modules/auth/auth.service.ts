@@ -1,16 +1,23 @@
 // file: src/modules/auth/auth.service.ts
 
+import type { DecodedIdToken } from "firebase-admin/auth";
+
+import { OAuth2Client } from "google-auth-library";
+import { randomUUID } from "node:crypto";
+
+import { getFirebaseAdmin } from "@/config/firebase-admin.config";
 import {
-  AUTH,
   ACCOUNT_STATUS,
+  AUTH,
   MESSAGES,
   OTP_PURPOSES,
   ROLES,
   USER_STATUS,
 } from "@/constants/app.constants";
-import { getFirebaseAdmin } from "@/config/firebase-admin.config";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
+import { AdminAccountService } from "@/modules/admin-account/admin-account.service";
+import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
 import { EmailService } from "@/services/email.service";
 import {
   BadRequestException,
@@ -18,16 +25,10 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@/utils/app-error.utils";
+import { normalizeGeographyValue } from "@/utils/geography.utils";
 import { comparePassword, hashPassword } from "@/utils/password.utils";
-import { OAuth2Client } from "google-auth-library";
-import type { DecodedIdToken } from "firebase-admin/auth";
-import { randomUUID } from "node:crypto";
-import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
-import { otpService } from "../otp/otp.service";
+
 import type { IUser } from "../user/user.interface";
-import { UserService } from "../user/user.service";
-import { AdminAccountService } from "@/modules/admin-account/admin-account.service";
-import type { UserResponse } from "../user/user.type";
 import type {
   AuthServiceResponse,
   LoginPayload,
@@ -35,9 +36,12 @@ import type {
   SendOtpPayload,
   VerifyOtpPayload,
 } from "./auth.type";
-import { PendingRegistration } from "./pending-registration.model";
+
+import { otpService } from "../otp/otp.service";
+import { UserService } from "../user/user.service";
 import { AuthUtil } from "./auth.utils";
-import { normalizeGeographyValue } from "@/utils/geography.utils";
+import { PendingRegistration } from "./pending-registration.model";
+
 type TokenSubject = {
   id: string;
   email: string;
@@ -187,7 +191,8 @@ export class AuthService {
         user.profileImageUrl = googlePayload.picture;
         await user.save();
       }
-    } else {
+    }
+    else {
       if (user.status === USER_STATUS.BLOCKED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
       }
@@ -232,7 +237,8 @@ export class AuthService {
     let decodedToken: DecodedIdToken;
     try {
       decodedToken = await getFirebaseAdmin().auth().verifyIdToken(payload.idToken);
-    } catch (error) {
+    }
+    catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -270,7 +276,8 @@ export class AuthService {
         accountStatus: ACCOUNT_STATUS.ACTIVE,
         emailVerifiedAt: new Date(),
       });
-    } else {
+    }
+    else {
       if (user.status === USER_STATUS.BLOCKED) {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
       }
@@ -417,7 +424,8 @@ export class AuthService {
         otp.code,
         otp.expiresInMinutes,
       );
-    } else {
+    }
+    else {
       await this.sendEmailVerificationOrThrow({
         to: payload.email,
         userName: user?.fullName || pendingRegistration?.fullName || "there",
@@ -447,7 +455,8 @@ export class AuthService {
         user.emailVerifiedAt = new Date();
         user.status = USER_STATUS.ACTIVE;
         await user.save();
-      } else {
+      }
+      else {
         const pending = await PendingRegistration.findOne({
           email: payload.email.toLowerCase(),
           expiresAt: { $gt: new Date() },
@@ -539,7 +548,8 @@ export class AuthService {
         purpose: OTP_PURPOSES.RESET_PASSWORD,
         code,
       });
-    } catch (error) {
+    }
+    catch (error) {
       const alreadyVerified = await otpService.hasVerifiedOtpSession({
         email,
         purpose: OTP_PURPOSES.RESET_PASSWORD,
@@ -640,9 +650,9 @@ export class AuthService {
       }
 
       if (
-        user.refreshTokenInvalidBefore &&
-        payload.iat &&
-        payload.iat * 1000 < user.refreshTokenInvalidBefore.getTime()
+        user.refreshTokenInvalidBefore
+        && payload.iat
+        && payload.iat * 1000 < user.refreshTokenInvalidBefore.getTime()
       ) {
         throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
       }
@@ -674,7 +684,8 @@ export class AuthService {
       });
 
       return { accessToken };
-    } catch (error) {
+    }
+    catch {
       throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
     }
   }
@@ -726,8 +737,8 @@ export class AuthService {
   private getGoogleClientIds(): string[] {
     return [env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_IDS]
       .filter(Boolean)
-      .flatMap((value) => String(value).split(","))
-      .map((value) => value.trim())
+      .flatMap(value => String(value).split(","))
+      .map(value => value.trim())
       .filter(Boolean);
   }
 
@@ -760,7 +771,7 @@ export class AuthService {
   ): Promise<{ message: string }> {
     try {
       logger.info(
-        { userId, token: token.substring(0, 20) + "..." },
+        { userId, token: `${token.substring(0, 20)}...` },
         "User logged out",
       );
 
@@ -785,7 +796,8 @@ export class AuthService {
           expiresAt,
           "logout",
         );
-      } else {
+      }
+      else {
         await this.userService.addRefreshTokenToBlacklist(
           userId,
           token,
@@ -795,7 +807,8 @@ export class AuthService {
       }
 
       return { message: "Logged out successfully" };
-    } catch (error) {
+    }
+    catch (error) {
       logger.error({ error, userId }, "Logout failed");
       throw new BadRequestException("Logout failed");
     }
@@ -881,7 +894,8 @@ export class AuthService {
   ): Promise<{ message: string }> {
     if (subjectType === "admin") {
       await this.adminAccountService.invalidateAllRefreshTokens(userId);
-    } else {
+    }
+    else {
       await this.userService.invalidateAllRefreshTokensForUser(userId);
     }
     return { message: "All sessions logged out successfully" };
@@ -896,7 +910,8 @@ export class AuthService {
   }): Promise<void> {
     try {
       await this.emailService.sendEmailVerification(payload);
-    } catch (error) {
+    }
+    catch (error) {
       this.throwEmailDeliveryError(error, payload.to);
     }
   }
@@ -914,7 +929,8 @@ export class AuthService {
         code,
         expiresInMinutes,
       );
-    } catch (error) {
+    }
+    catch (error) {
       this.throwEmailDeliveryError(error, to);
     }
   }

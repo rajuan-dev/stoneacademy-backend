@@ -1,9 +1,11 @@
 // file: src/modules/auth/auth.route.ts
 
+import { Router } from "express";
+
 import { ROLES } from "@/constants/app.constants";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { authLimiter } from "@/middlewares/rate-limit.middleware";
-import { Router } from "express";
+
 import { AuthController } from "./auth.controller";
 
 const router = Router();
@@ -238,7 +240,7 @@ router.post("/token/refresh", authController.refreshToken);
 router.put(
   "/change-password",
   authMiddleware.verifyToken,
-  authController.changePassword
+  authController.changePassword,
 );
 router.put(
   "/admin/change-password",

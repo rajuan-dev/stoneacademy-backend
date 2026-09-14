@@ -1,19 +1,20 @@
 // file: src/middlewares/auth.middleware.ts
 
+import type { NextFunction, Request, Response } from "express";
+
 import { MESSAGES, USER_STATUS } from "@/constants/app.constants";
 import { ErrorCodeEnum } from "@/enums/error-code.enum";
-
 import { logger } from "@/middlewares/pino-logger";
 import { AuthUtil } from "@/modules/auth/auth.utils";
 import {
   ForbiddenException,
   UnauthorizedException,
 } from "@/utils/app-error.utils";
-import type { NextFunction, Request, Response } from "express";
 
 /**
  * Extended Express Request with user info
  */
+/* eslint-disable ts/consistent-type-definitions, ts/no-namespace */
 declare global {
   namespace Express {
     interface Request {
@@ -33,6 +34,7 @@ declare global {
     }
   }
 }
+/* eslint-enable ts/consistent-type-definitions, ts/no-namespace */
 
 export class AuthMiddleware {
   static verifyToken = (req: Request, res: Response, next: NextFunction) => {
@@ -43,11 +45,11 @@ export class AuthMiddleware {
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         logger.warn(
           { requestId, path: req.path },
-          "Missing or invalid Authorization header"
+          "Missing or invalid Authorization header",
         );
         throw new UnauthorizedException(
           MESSAGES.AUTH.INVALID_CREDENTIALS,
-          ErrorCodeEnum.AUTH_TOKEN_NOT_FOUND
+          ErrorCodeEnum.AUTH_TOKEN_NOT_FOUND,
         );
       }
 
@@ -76,10 +78,11 @@ export class AuthMiddleware {
       }
 
       next();
-    } catch (error) {
+    }
+    catch (error) {
       logger.warn(
         { requestId: req.id, error: (error as any).message },
-        "Token verification failed"
+        "Token verification failed",
       );
       next(error);
     }
@@ -91,23 +94,24 @@ export class AuthMiddleware {
         if (!req.user) {
           throw new UnauthorizedException(
             MESSAGES.AUTH.UNAUTHORIZED_ACCESS,
-            ErrorCodeEnum.AUTH_UNAUTHORIZED_ACCESS
+            ErrorCodeEnum.AUTH_UNAUTHORIZED_ACCESS,
           );
         }
 
         if (!allowedRoles.includes(req.user.role)) {
           logger.warn(
             { userId: req.user.userId, role: req.user.role, requestId: req.id },
-            "User role not authorized"
+            "User role not authorized",
           );
           throw new ForbiddenException(
             `Only ${allowedRoles.join(", ")} can access this resource`,
-            ErrorCodeEnum.ACCESS_UNAUTHORIZED
+            ErrorCodeEnum.ACCESS_UNAUTHORIZED,
           );
         }
 
         next();
-      } catch (error) {
+      }
+      catch (error) {
         next(error);
       }
     };
@@ -138,10 +142,11 @@ export class AuthMiddleware {
       }
 
       next();
-    } catch (error) {
+    }
+    catch (error) {
       logger.debug(
         { error: (error as any).message },
-        "Optional token verification skipped"
+        "Optional token verification skipped",
       );
       next();
     }
@@ -150,7 +155,7 @@ export class AuthMiddleware {
   static checkTokenExpiration = (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       if (!req.user || !req.user.exp) {
@@ -163,13 +168,14 @@ export class AuthMiddleware {
       if (expiresIn < 300 && expiresIn > 0) {
         logger.warn(
           { userId: req.user.userId, expiresIn },
-          "Token expiring soon"
+          "Token expiring soon",
         );
         res.setHeader("X-Token-Expires-In", expiresIn);
       }
 
       next();
-    } catch (error) {
+    }
+    catch (error) {
       next(error);
     }
   };
@@ -177,20 +183,21 @@ export class AuthMiddleware {
   static verifyEmailVerified = (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       if (!req.user?.emailVerified) {
         if (!req.user?.emailVerifiedAt) {
-        throw new ForbiddenException(
-          "Please verify your email address before accessing this resource.",
-          ErrorCodeEnum.ACCESS_UNAUTHORIZED
-        );
+          throw new ForbiddenException(
+            "Please verify your email address before accessing this resource.",
+            ErrorCodeEnum.ACCESS_UNAUTHORIZED,
+          );
         }
       }
 
       next();
-    } catch (error) {
+    }
+    catch (error) {
       next(error);
     }
   };

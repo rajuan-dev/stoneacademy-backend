@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IAd {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IAd = {
   _id: Types.ObjectId;
   name: string;
   category?: string;
@@ -16,7 +19,7 @@ export interface IAd {
   status: "active" | "expired";
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const adSchema = BaseSchemaUtil.createSchema<IAd>({
   name: {

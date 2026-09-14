@@ -1,16 +1,18 @@
+import { Types } from "mongoose";
+
 import { PAGINATION, PARTICIPANT_STATUS } from "@/constants/app.constants";
 import { notificationService } from "@/modules/notification/notification.service";
 import {
   BadRequestException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import { Activity } from "../activity/activity.model";
+
 import { ActivityParticipant } from "../activity/activity-participant.model";
-import { Event } from "../event/event.model";
+import { Activity } from "../activity/activity.model";
 import { EventParticipant } from "../event/event-participant.model";
+import { Event } from "../event/event.model";
 import { User } from "../user/user.model";
 import { Review } from "./review.model";
-import { Types } from "mongoose";
 
 export class ReviewService {
   async create(
@@ -70,9 +72,12 @@ export class ReviewService {
     const skip = (page - 1) * limit;
 
     const filter: Record<string, any> = {};
-    if (query.targetUserId) filter.targetUserId = query.targetUserId;
-    if (query.targetType) filter.targetType = query.targetType;
-    if (query.targetId) filter.targetId = query.targetId;
+    if (query.targetUserId)
+      filter.targetUserId = query.targetUserId;
+    if (query.targetType)
+      filter.targetType = query.targetType;
+    if (query.targetId)
+      filter.targetId = query.targetId;
 
     const [data, totalItems] = await Promise.all([
       Review.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
@@ -99,7 +104,8 @@ export class ReviewService {
   ) {
     if (targetType === "activity") {
       const activity = await Activity.findById(targetId).exec();
-      if (!activity) throw new NotFoundException("Activity not found");
+      if (!activity)
+        throw new NotFoundException("Activity not found");
 
       const participant = await ActivityParticipant.findOne({
         activityId: targetId,
@@ -114,7 +120,8 @@ export class ReviewService {
     }
 
     const event = await Event.findById(targetId).exec();
-    if (!event) throw new NotFoundException("Event not found");
+    if (!event)
+      throw new NotFoundException("Event not found");
 
     const participant = await EventParticipant.findOne({
       eventId: targetId,

@@ -36,7 +36,7 @@ export const sendMessageSchema = z.object({
       text: z.string().trim().max(4000).optional(),
       mediaIds: z.array(z.string().trim().min(1)).optional(),
     })
-    .refine((data) => (data.text && data.text.length > 0) || (data.mediaIds && data.mediaIds.length > 0), {
+    .refine(data => (data.text && data.text.length > 0) || (data.mediaIds && data.mediaIds.length > 0), {
       message: "Message must contain text or media",
     }),
 });

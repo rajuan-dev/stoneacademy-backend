@@ -13,7 +13,7 @@ const SENSITIVE_KEYS = new Set([
 
 function sanitize(value: unknown): unknown {
   if (Array.isArray(value)) {
-    return value.map((item) => sanitize(item));
+    return value.map(item => sanitize(item));
   }
 
   if (value && typeof value === "object") {
@@ -22,7 +22,8 @@ function sanitize(value: unknown): unknown {
     Object.entries(obj).forEach(([key, val]) => {
       if (SENSITIVE_KEYS.has(key)) {
         result[key] = "***redacted***";
-      } else {
+      }
+      else {
         result[key] = sanitize(val);
       }
     });
@@ -42,10 +43,11 @@ function normalizeFiles(req: Request) {
     | Record<string, Express.Multer.File[]>
     | undefined;
 
-  if (!files) return undefined;
+  if (!files)
+    return undefined;
 
   if (Array.isArray(files)) {
-    return files.map((file) => ({
+    return files.map(file => ({
       field: file.fieldname,
       name: file.originalname,
       mimeType: file.mimetype,
@@ -55,7 +57,7 @@ function normalizeFiles(req: Request) {
 
   const mapped: Record<string, unknown> = {};
   Object.entries(files).forEach(([field, items]) => {
-    mapped[field] = items.map((file) => ({
+    mapped[field] = items.map(file => ({
       name: file.originalname,
       mimeType: file.mimetype,
       size: file.size,
@@ -67,7 +69,8 @@ function normalizeFiles(req: Request) {
 export function requestBodyLogger(req: Request, res: Response, next: NextFunction) {
   res.on("finish", () => {
     const methodHasBody = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method);
-    if (!methodHasBody) return;
+    if (!methodHasBody)
+      return;
 
     const body = sanitize(req.body ?? {});
     const files = normalizeFiles(req);

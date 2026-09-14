@@ -1,29 +1,34 @@
 // file: src/modules/activity/activity.service.ts
 
+import type { FilterQuery } from "mongoose";
+
+import jwt from "jsonwebtoken";
+
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import { ACTIVITY_STATUS, PARTICIPANT_STATUS } from "@/constants/app.constants";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
 import { Media } from "@/modules/media/media.model";
 import { notificationService } from "@/modules/notification/notification.service";
-import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+import { s3Service } from "@/services/s3.service";
 import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import jwt from "jsonwebtoken";
-import type { FilterQuery } from "mongoose";
-import { Activity } from "./activity.model";
-import { ActivityParticipant } from "./activity-participant.model";
-import { QrToken } from "./qr-token.model";
-import { User } from "../user/user.model";
-import { ChatService } from "../chat/chat.service";
-import { SubscriptionService } from "../subscription/subscription.service";
 import {
   buildGeographyFilter,
   getUserGeography,
   normalizeGeography,
 } from "@/utils/geography.utils";
+
+import { ChatService } from "../chat/chat.service";
+import { SubscriptionService } from "../subscription/subscription.service";
+import { User } from "../user/user.model";
+import { ActivityParticipant } from "./activity-participant.model";
+import { Activity } from "./activity.model";
+import { QrToken } from "./qr-token.model";
 
 type ListQuery = {
   q?: string;
@@ -95,8 +100,8 @@ export class ActivityService {
     const hasGeo = query.lat !== undefined && query.lng !== undefined;
     let countFilter: FilterQuery<any> = { ...filter };
     if (hasGeo) {
-      const maxDistance =
-        query.radiusMiles !== undefined
+      const maxDistance
+        = query.radiusMiles !== undefined
           ? query.radiusMiles * MILES_TO_METERS
           : undefined;
 
@@ -127,10 +132,12 @@ export class ActivityService {
 
     let sort: Record<string, any> | undefined = { createdAt: -1 };
     if (query.sort === "popular") {
-      sort = { "stats.joinedCount": -1, startAt: 1 };
-    } else if (query.sort === "time") {
+      sort = { "stats.joinedCount": -1, "startAt": 1 };
+    }
+    else if (query.sort === "time") {
       sort = { startAt: 1 };
-    } else if (hasGeo) {
+    }
+    else if (hasGeo) {
       sort = undefined;
     }
 
@@ -160,8 +167,8 @@ export class ActivityService {
 
     const joinedUserIdsByActivity = new Map<string, string[]>();
     for (const participant of participants as Array<{
-      activityId: { toString(): string };
-      userId: { toString(): string };
+      activityId: { toString: () => string };
+      userId: { toString: () => string };
     }>) {
       const activityId = participant.activityId.toString();
       const existing = joinedUserIdsByActivity.get(activityId) || [];
@@ -412,7 +419,7 @@ export class ActivityService {
             rating: host.rating || { avg: 0, count: 0 },
           }
         : null,
-      gallery: mediaList.map((media) => ({
+      gallery: mediaList.map(media => ({
         id: media._id?.toString?.() || null,
         url: media.url || null,
         type: media.type || null,
@@ -557,13 +564,14 @@ export class ActivityService {
       );
       activity.distance = normalizedDistance as any;
       activity.distanceType = normalizedDistanceType as any;
-      activity.distanceMiles =
-        normalizedDistanceType === "miles" && normalizedDistance !== undefined
+      activity.distanceMiles
+        = normalizedDistanceType === "miles" && normalizedDistance !== undefined
           ? normalizedDistance
           : undefined;
       changedFields.push("distance");
       changedFields.push("distanceType");
-    } else if (payload.distanceType !== undefined) {
+    }
+    else if (payload.distanceType !== undefined) {
       activity.distanceType = this.normalizeDistanceType(payload.distanceType) as any;
       changedFields.push("distanceType");
     }
@@ -679,18 +687,18 @@ export class ActivityService {
     });
 
     if (
-      activity.participantLimit &&
-      joinedCount >= activity.participantLimit
+      activity.participantLimit
+      && joinedCount >= activity.participantLimit
     ) {
       throw new BadRequestException("Activity is full");
     }
 
-    const participant =
-      existing ||
-      new ActivityParticipant({
-        activityId: activity._id,
-        userId,
-      });
+    const participant
+      = existing
+        || new ActivityParticipant({
+          activityId: activity._id,
+          userId,
+        });
 
     participant.status = PARTICIPANT_STATUS.JOINED;
     participant.joinedAt = new Date();
@@ -863,23 +871,25 @@ export class ActivityService {
         env.JWT_SECRET,
         { expiresIn: "30d" },
       );
-    } catch (error) {
+    }
+    catch (error) {
       logger.warn({ error }, "Failed to generate QR payload");
       throw error;
     }
   }
 
   private async isBlocked(userId: string, otherUserId: string) {
-    if (userId === otherUserId) return false;
+    if (userId === otherUserId)
+      return false;
     const [user, other] = await Promise.all([
       User.findById(userId).select("blockedUsers").exec(),
       User.findById(otherUserId).select("blockedUsers").exec(),
     ]);
     const userBlocksOther = user?.blockedUsers?.some(
-      (id) => id.toString() === otherUserId,
+      id => id.toString() === otherUserId,
     );
     const otherBlocksUser = other?.blockedUsers?.some(
-      (id) => id.toString() === userId,
+      id => id.toString() === userId,
     );
     return Boolean(userBlocksOther || otherBlocksUser);
   }
@@ -888,9 +898,10 @@ export class ActivityService {
     ownerId: string,
     mediaFiles?: Express.Multer.File[],
   ): Promise<string[]> {
-    if (!mediaFiles?.length) return [];
+    if (!mediaFiles?.length)
+      return [];
 
-    const uploadsInput: StorageUploadInput[] = mediaFiles.map((file) => ({
+    const uploadsInput: StorageUploadInput[] = mediaFiles.map(file => ({
       buffer: file.buffer,
       mimeType: file.mimetype,
       originalName: file.originalname,
@@ -914,7 +925,7 @@ export class ActivityService {
       })),
     );
 
-    return mediaDocs.map((doc) => doc._id.toString());
+    return mediaDocs.map(doc => doc._id.toString());
   }
 
   private async notifyParticipants(
@@ -937,10 +948,11 @@ export class ActivityService {
       .map((participant: any) => participant.userId?.toString?.() || null)
       .filter(Boolean) as string[];
 
-    if (userIds.length === 0) return;
+    if (userIds.length === 0)
+      return;
 
     await notificationService.createMany(
-      userIds.map((participantUserId) => ({
+      userIds.map(participantUserId => ({
         userId: participantUserId,
         type,
         title,
@@ -964,7 +976,8 @@ export class ActivityService {
 
   private normalizeDistance(distance?: number, legacyDistanceMiles?: number) {
     const raw = distance ?? legacyDistanceMiles;
-    if (raw === undefined || raw === null) return undefined;
+    if (raw === undefined || raw === null)
+      return undefined;
     return Math.max(0, Math.trunc(raw));
   }
 
@@ -972,19 +985,23 @@ export class ActivityService {
     distanceType?: "km" | "miles",
     legacyDistanceMiles?: number,
   ) {
-    if (distanceType) return distanceType;
-    if (legacyDistanceMiles !== undefined) return "miles";
+    if (distanceType)
+      return distanceType;
+    if (legacyDistanceMiles !== undefined)
+      return "miles";
     return undefined;
   }
 
   private normalizeDuration(duration?: string) {
-    if (duration === undefined) return undefined;
+    if (duration === undefined)
+      return undefined;
     const normalized = String(duration).trim();
     return normalized.length ? normalized : undefined;
   }
 
   private normalizeCategoryInput(category?: string) {
-    if (category === undefined) return undefined;
+    if (category === undefined)
+      return undefined;
     const normalized = String(category).trim();
     return normalized.length ? normalized : undefined;
   }
@@ -1026,14 +1043,13 @@ export class ActivityService {
     const toRad = (deg: number) => (deg * Math.PI) / 180;
     const dLat = toRad(toLat - fromLat);
     const dLng = toRad(toLng - fromLng);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2)
-      + Math.cos(toRad(fromLat))
-      * Math.cos(toRad(toLat))
-      * Math.sin(dLng / 2)
-      * Math.sin(dLng / 2);
+    const a
+      = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+        + Math.cos(toRad(fromLat))
+        * Math.cos(toRad(toLat))
+        * Math.sin(dLng / 2)
+        * Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Number((EARTH_RADIUS_MILES * c).toFixed(2));
   }
 }
-

@@ -1,3 +1,5 @@
+import type { Types } from "mongoose";
+
 import { PAGINATION, ROLES, USER_STATUS } from "@/constants/app.constants";
 import { notificationService } from "@/modules/notification/notification.service";
 import {
@@ -5,7 +7,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import type { Types } from "mongoose";
+
 import { User } from "../user/user.model";
 import { Conversation } from "./conversation.model";
 import { Message } from "./message.model";
@@ -131,8 +133,8 @@ export class MessageService {
 
     if (conversation.type === "direct") {
       const otherId = conversation.participantIds
-        .map((id) => id.toString())
-        .find((id) => id !== userId);
+        .map(id => id.toString())
+        .find(id => id !== userId);
       if (otherId) {
         const blocked = await this.isBlocked(userId, otherId);
         if (blocked) {
@@ -165,11 +167,11 @@ export class MessageService {
     await conversation.save();
 
     const recipientIds = conversation.participantIds
-      .map((id) => id.toString())
-      .filter((participantId) => participantId !== userId);
+      .map(id => id.toString())
+      .filter(participantId => participantId !== userId);
 
     await Promise.all(
-      recipientIds.map((recipientId) =>
+      recipientIds.map(recipientId =>
         notificationService.create({
           userId: recipientId,
           type: "new_message",
@@ -226,7 +228,7 @@ export class MessageService {
     }
 
     const isParticipant = conversation.participantIds.some(
-      (participantId) => participantId.toString() === userId,
+      participantId => participantId.toString() === userId,
     );
 
     if (!isParticipant) {
@@ -268,16 +270,17 @@ export class MessageService {
   }
 
   private async isBlocked(userId: string, otherUserId: string) {
-    if (userId === otherUserId) return false;
+    if (userId === otherUserId)
+      return false;
     const [user, other] = await Promise.all([
       User.findById(userId).select("blockedUsers").exec(),
       User.findById(otherUserId).select("blockedUsers").exec(),
     ]);
     const userBlocksOther = user?.blockedUsers?.some(
-      (id) => id.toString() === otherUserId,
+      id => id.toString() === otherUserId,
     );
     const otherBlocksUser = other?.blockedUsers?.some(
-      (id) => id.toString() === userId,
+      id => id.toString() === userId,
     );
     return Boolean(userBlocksOther || otherBlocksUser);
   }

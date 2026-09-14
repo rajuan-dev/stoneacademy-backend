@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IEventQrToken {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IEventQrToken = {
   _id: Types.ObjectId;
   kind: "event";
   participantId: Types.ObjectId;
@@ -10,7 +13,7 @@ export interface IEventQrToken {
   revokedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const eventQrTokenSchema = BaseSchemaUtil.createSchema<IEventQrToken>({
   kind: {

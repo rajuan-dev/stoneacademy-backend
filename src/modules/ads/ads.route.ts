@@ -1,7 +1,9 @@
+import { Router } from "express";
+
 import upload from "@/config/multer.config";
 import { ROLES } from "@/constants/app.constants";
 import { authMiddleware } from "@/middlewares/auth.middleware";
-import { Router } from "express";
+
 import { AdsController } from "./ads.controller";
 
 const router = Router();

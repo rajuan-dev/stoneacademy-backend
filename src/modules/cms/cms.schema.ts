@@ -30,7 +30,7 @@ export const updateCmsPageSchema = z.object({
       title: z.string().trim().min(1).max(200).optional(),
       content: z.string().trim().min(1).max(20000).optional(),
     })
-    .refine((data) => Object.keys(data).length > 0, {
+    .refine(data => Object.keys(data).length > 0, {
       message: "At least one field must be provided",
     }),
 });

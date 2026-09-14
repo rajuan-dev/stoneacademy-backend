@@ -1,8 +1,11 @@
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { ACTIVITY_STATUS } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
 
-export interface IEvent {
+export type IEvent = {
   _id: Types.ObjectId;
   creatorId: Types.ObjectId;
   title: string;
@@ -34,7 +37,7 @@ export interface IEvent {
   };
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const eventSchema = BaseSchemaUtil.createSchema<IEvent>({
   creatorId: {

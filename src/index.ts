@@ -4,7 +4,8 @@ import { connectDB } from "@/config/database.config";
 import { env } from "@/env";
 import { logger } from "@/middlewares/pino-logger";
 import { realtimeService } from "@/services/realtime.service";
-import { bootstrapApplication } from "./config/bootstrap";
+
+import { bootstrapApplication } from "./config/bootstrap.js";
 
 const port = env.PORT;
 
@@ -30,9 +31,10 @@ async function startServer() {
   server.on("error", (err) => {
     if ("code" in err && err.code === "EADDRINUSE") {
       console.error(
-        `Port ${env.PORT} is already in use. Please choose another port or stop the process using it.`
+        `Port ${env.PORT} is already in use. Please choose another port or stop the process using it.`,
       );
-    } else {
+    }
+    else {
       console.error("Failed to start server:", err);
     }
 

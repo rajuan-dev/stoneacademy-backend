@@ -1,10 +1,13 @@
 // file: src/modules/activity/activity-participant.model.ts
 
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { PARTICIPANT_STATUS } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
 
-export interface IActivityParticipant {
+export type IActivityParticipant = {
   _id: Types.ObjectId;
   activityId: Types.ObjectId;
   userId: Types.ObjectId;
@@ -13,10 +16,10 @@ export interface IActivityParticipant {
   qrTokenId?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
-const activityParticipantSchema =
-  BaseSchemaUtil.createSchema<IActivityParticipant>({
+const activityParticipantSchema
+  = BaseSchemaUtil.createSchema<IActivityParticipant>({
     activityId: {
       type: Schema.Types.ObjectId,
       ref: "Activity",

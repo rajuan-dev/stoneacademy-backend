@@ -1,9 +1,11 @@
+import { Router } from "express";
+
 import { asyncHandler } from "@/middlewares/async-handler.middleware";
 import { authMiddleware } from "@/middlewares/auth.middleware";
+import { realtimeService } from "@/services/realtime.service";
 import { ApiResponse } from "@/utils/response.utils";
 import { zParse } from "@/utils/validators.utils";
-import { Router } from "express";
-import { realtimeService } from "@/services/realtime.service";
+
 import {
   createHostThreadSchema,
   listThreadsSchema,

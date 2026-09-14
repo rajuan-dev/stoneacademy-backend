@@ -1,12 +1,13 @@
 // file: src/core/middleware/admin-auth.middleware.ts
 
-import { MESSAGES, ROLES } from "@/constants/app.constants";
 import type { NextFunction, Request, Response } from "express";
+
+import { MESSAGES, ROLES } from "@/constants/app.constants";
+import { authMiddleware } from "@/middlewares/auth.middleware";
 import {
   ForbiddenException,
   UnauthorizedException,
 } from "@/utils/app-error.utils";
-import { authMiddleware } from "@/middlewares/auth.middleware";
 
 type Role = (typeof ROLES)[keyof typeof ROLES];
 
@@ -66,4 +67,3 @@ export const adminAuthMiddleware = {
   verifyAdmin,
   requireRoles: adminRequireRoles,
 };
-

@@ -1,3 +1,9 @@
+import type { FilterQuery } from "mongoose";
+
+import { randomBytes } from "node:crypto";
+
+import type { StorageUploadInput } from "@/services/s3.service";
+
 import {
   ACTIVITY_STATUS,
   PARTICIPANT_STATUS,
@@ -6,25 +12,25 @@ import {
 import { env } from "@/env";
 import { Media } from "@/modules/media/media.model";
 import { notificationService } from "@/modules/notification/notification.service";
-import { s3Service, type StorageUploadInput } from "@/services/s3.service";
+import { s3Service } from "@/services/s3.service";
 import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
-import type { FilterQuery } from "mongoose";
-import { randomBytes } from "node:crypto";
-import { User } from "../user/user.model";
-import { Event } from "./event.model";
-import { EventParticipant } from "./event-participant.model";
-import { PaymentTransaction } from "./payment-transaction.model";
-import { EventQrToken } from "./event-qr-token.model";
-import { ChatService } from "../chat/chat.service";
 import {
   buildGeographyFilter,
   getUserGeography,
   normalizeGeography,
 } from "@/utils/geography.utils";
+
+import { BillingService } from "../billing/billing.service";
+import { ChatService } from "../chat/chat.service";
+import { User } from "../user/user.model";
+import { EventParticipant } from "./event-participant.model";
+import { EventQrToken } from "./event-qr-token.model";
+import { Event } from "./event.model";
+import { PaymentTransaction } from "./payment-transaction.model";
 
 type ListQuery = {
   q?: string;
@@ -50,9 +56,11 @@ const EARTH_RADIUS_MILES = 3958.8;
 
 export class EventService {
   private chatService: ChatService;
+  private billingService: BillingService;
 
   constructor() {
     this.chatService = new ChatService();
+    this.billingService = new BillingService();
   }
 
   async list(query: ListQuery) {
@@ -93,15 +101,16 @@ export class EventService {
 
     if (query.paid === "free") {
       filter.priceType = "free";
-    } else if (query.paid === "paid") {
+    }
+    else if (query.paid === "paid") {
       filter.priceType = "paid";
     }
 
     const hasGeo = query.lat !== undefined && query.lng !== undefined;
     let countFilter: FilterQuery<any> = { ...filter };
     if (hasGeo) {
-      const maxDistance =
-        query.radiusMiles !== undefined
+      const maxDistance
+        = query.radiusMiles !== undefined
           ? query.radiusMiles * MILES_TO_METERS
           : undefined;
 
@@ -127,17 +136,20 @@ export class EventService {
             },
           },
         };
-      } else {
+      }
+      else {
         countFilter = { ...countFilter };
       }
     }
 
     let sort: Record<string, any> | undefined = { createdAt: -1 };
     if (query.sort === "popular") {
-      sort = { "stats.joinedCount": -1, startAt: 1 };
-    } else if (query.sort === "time") {
+      sort = { "stats.joinedCount": -1, "startAt": 1 };
+    }
+    else if (query.sort === "time") {
       sort = { startAt: 1 };
-    } else if (hasGeo) {
+    }
+    else if (hasGeo) {
       sort = undefined;
     }
 
@@ -167,8 +179,8 @@ export class EventService {
 
     const joinedUserIdsByEvent = new Map<string, string[]>();
     for (const participant of participants as Array<{
-      eventId: { toString(): string };
-      userId: { toString(): string };
+      eventId: { toString: () => string };
+      userId: { toString: () => string };
     }>) {
       const eventId = participant.eventId.toString();
       const existing = joinedUserIdsByEvent.get(eventId) || [];
@@ -280,15 +292,15 @@ export class EventService {
     const geography = normalizeGeography(payload);
 
     const normalizedPriceType = payload.priceType || "free";
-    const normalizedTicketPrice =
-      normalizedPriceType === "free"
+    const normalizedTicketPrice
+      = normalizedPriceType === "free"
         ? 0
         : this.roundMoney(payload.ticketPrice || 0);
     const normalizedDiscount = this.roundMoney(payload.discountPercentage || 0);
     const durationMinutes = payload.durationMinutes || 60;
-    const computedEndAt =
-      payload.endAt
-      ?? new Date(startAt.getTime() + durationMinutes * 60 * 1000);
+    const computedEndAt
+      = payload.endAt
+        ?? new Date(startAt.getTime() + durationMinutes * 60 * 1000);
 
     if (normalizedPriceType === "paid" && normalizedTicketPrice <= 0) {
       throw new BadRequestException("Paid event ticket price must be greater than 0");
@@ -439,7 +451,7 @@ export class EventService {
             rating: creator.rating || { avg: 0, count: 0 },
           }
         : null,
-      gallery: mediaList.map((media) => ({
+      gallery: mediaList.map(media => ({
         id: media._id?.toString?.() || null,
         url: media.url || null,
         type: media.type || null,
@@ -510,17 +522,20 @@ export class EventService {
       PaymentTransaction.findOne({
         eventId: event._id,
         payerId: userId,
-        status: { $in: [PAYMENT_STATUS.SUCCEEDED, "succeeded"] },
+        $or: [
+          { paymentStatus: "succeeded" },
+          { status: { $in: [PAYMENT_STATUS.SUCCEEDED, "succeeded"] } },
+        ],
       })
         .sort({ createdAt: -1 })
-        .select("_id providerReference status createdAt")
+        .select("_id providerReference stripePaymentIntentId status paymentStatus createdAt")
         .lean(),
       PaymentTransaction.findOne({
         eventId: event._id,
         payerId: userId,
       })
         .sort({ createdAt: -1 })
-        .select("_id providerReference status createdAt")
+        .select("_id providerReference stripePaymentIntentId status paymentStatus createdAt")
         .lean(),
     ]);
 
@@ -532,9 +547,11 @@ export class EventService {
       paymentVerified: payableTicketPrice > 0 ? Boolean(latestSucceededPayment) : true,
       paymentStatus: latestSucceededPayment
         ? PAYMENT_STATUS.SUCCEEDED
-        : (latestPayment?.status || null),
+        : (latestPayment?.paymentStatus || latestPayment?.status || null),
       providerReference:
         latestSucceededPayment?.providerReference
+        || latestSucceededPayment?.stripePaymentIntentId
+        || latestPayment?.stripePaymentIntentId
         || latestPayment?.providerReference
         || null,
     };
@@ -648,17 +665,22 @@ export class EventService {
       }
     }
     if (payload.status !== undefined) {
+      if (payload.status === ACTIVITY_STATUS.COMPLETED) {
+        throw new BadRequestException(
+          "Only an authorized admin completion flow can complete an event.",
+        );
+      }
       event.status = payload.status as any;
       changedFields.push("status");
     }
 
     const nextPriceType = payload.priceType ?? event.priceType ?? "free";
-    const nextTicketPrice =
-      payload.ticketPrice !== undefined
+    const nextTicketPrice
+      = payload.ticketPrice !== undefined
         ? this.roundMoney(payload.ticketPrice)
         : event.ticketPrice;
-    const nextDiscount =
-      payload.discountPercentage !== undefined
+    const nextDiscount
+      = payload.discountPercentage !== undefined
         ? this.roundMoney(payload.discountPercentage)
         : event.discountPercentage || 0;
 
@@ -673,9 +695,12 @@ export class EventService {
     event.priceType = nextPriceType;
     event.ticketPrice = nextPriceType === "free" ? 0 : nextTicketPrice;
     event.discountPercentage = nextPriceType === "free" ? 0 : nextDiscount;
-    if (payload.priceType !== undefined) changedFields.push("priceType");
-    if (payload.ticketPrice !== undefined) changedFields.push("ticketPrice");
-    if (payload.discountPercentage !== undefined) changedFields.push("discountPercentage");
+    if (payload.priceType !== undefined)
+      changedFields.push("priceType");
+    if (payload.ticketPrice !== undefined)
+      changedFields.push("ticketPrice");
+    if (payload.discountPercentage !== undefined)
+      changedFields.push("discountPercentage");
 
     if (payload.durationMinutes !== undefined) {
       event.durationMinutes = payload.durationMinutes;
@@ -725,6 +750,8 @@ export class EventService {
       { eventId: event._id, status: PARTICIPANT_STATUS.JOINED },
       { status: PARTICIPANT_STATUS.CANCELLED },
     ).exec();
+
+    await this.billingService.processEventCancellationRefunds(event._id.toString());
 
     await this.notifyParticipants(
       event._id.toString(),
@@ -800,8 +827,18 @@ export class EventService {
       const transaction = await PaymentTransaction.findOne({
         eventId: event._id,
         payerId: userId,
-        providerReference: payload.providerReference,
-        status: { $in: [PAYMENT_STATUS.SUCCEEDED, "succeeded"] },
+        $or: [
+          { providerReference: payload.providerReference },
+          { stripePaymentIntentId: payload.providerReference },
+        ],
+        $and: [
+          {
+            $or: [
+              { paymentStatus: "succeeded" },
+              { status: { $in: [PAYMENT_STATUS.SUCCEEDED, "succeeded"] } },
+            ],
+          },
+        ],
       })
         .sort({ createdAt: -1 })
         .exec();
@@ -815,12 +852,12 @@ export class EventService {
       paymentTransactionId = transaction._id.toString();
     }
 
-    const participant =
-      existing ||
-      new EventParticipant({
-        eventId: event._id,
-        userId,
-      });
+    const participant
+      = existing
+        || new EventParticipant({
+          eventId: event._id,
+          userId,
+        });
 
     participant.status = PARTICIPANT_STATUS.JOINED;
     participant.joinedAt = new Date();
@@ -884,6 +921,18 @@ export class EventService {
       throw new BadRequestException("Not a participant");
     }
 
+    const event = await Event.findById(eventId)
+      .select("creatorId title priceType ticketPrice")
+      .lean();
+    const hasPaidTicket = Boolean(participant.paymentTransactionId)
+      || event?.priceType === "paid"
+      || Number(event?.ticketPrice || 0) > 0;
+    if (hasPaidTicket) {
+      throw new BadRequestException(
+        "Paid event tickets are non-refundable and cannot be cancelled by attendee.",
+      );
+    }
+
     participant.status = PARTICIPANT_STATUS.LEFT;
     await participant.save();
 
@@ -895,7 +944,6 @@ export class EventService {
       "stats.joinedCount": updatedCount,
     }).exec();
 
-    const event = await Event.findById(eventId).select("creatorId title").lean();
     const creatorId = event?.creatorId?.toString() || null;
     if (creatorId && creatorId !== userId) {
       const actor = await this.getActorSummary(userId);
@@ -956,7 +1004,8 @@ export class EventService {
   }
 
   private normalizeCategoryInput(category?: string) {
-    if (category === undefined) return undefined;
+    if (category === undefined)
+      return undefined;
     const normalized = String(category).trim();
     return normalized.length ? normalized : undefined;
   }
@@ -969,8 +1018,10 @@ export class EventService {
     ticketPrice: number,
     discountPercentage: number,
   ): number {
-    if (ticketPrice <= 0) return 0;
-    if (discountPercentage <= 0) return this.roundMoney(ticketPrice);
+    if (ticketPrice <= 0)
+      return 0;
+    if (discountPercentage <= 0)
+      return this.roundMoney(ticketPrice);
 
     const discounted = ticketPrice - (ticketPrice * discountPercentage) / 100;
     return this.roundMoney(Math.max(0, discounted));
@@ -989,27 +1040,28 @@ export class EventService {
     const toRad = (deg: number) => (deg * Math.PI) / 180;
     const dLat = toRad(toLat - fromLat);
     const dLng = toRad(toLng - fromLng);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2)
-      + Math.cos(toRad(fromLat))
-      * Math.cos(toRad(toLat))
-      * Math.sin(dLng / 2)
-      * Math.sin(dLng / 2);
+    const a
+      = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+        + Math.cos(toRad(fromLat))
+        * Math.cos(toRad(toLat))
+        * Math.sin(dLng / 2)
+        * Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Number((EARTH_RADIUS_MILES * c).toFixed(2));
   }
 
   private async isBlocked(userId: string, otherUserId: string) {
-    if (userId === otherUserId) return false;
+    if (userId === otherUserId)
+      return false;
     const [user, other] = await Promise.all([
       User.findById(userId).select("blockedUsers").exec(),
       User.findById(otherUserId).select("blockedUsers").exec(),
     ]);
     const userBlocksOther = user?.blockedUsers?.some(
-      (id) => id.toString() === otherUserId,
+      id => id.toString() === otherUserId,
     );
     const otherBlocksUser = other?.blockedUsers?.some(
-      (id) => id.toString() === userId,
+      id => id.toString() === userId,
     );
     return Boolean(userBlocksOther || otherBlocksUser);
   }
@@ -1018,9 +1070,10 @@ export class EventService {
     ownerId: string,
     mediaFiles?: Express.Multer.File[],
   ): Promise<string[]> {
-    if (!mediaFiles?.length) return [];
+    if (!mediaFiles?.length)
+      return [];
 
-    const uploadsInput: StorageUploadInput[] = mediaFiles.map((file) => ({
+    const uploadsInput: StorageUploadInput[] = mediaFiles.map(file => ({
       buffer: file.buffer,
       mimeType: file.mimetype,
       originalName: file.originalname,
@@ -1044,7 +1097,7 @@ export class EventService {
       })),
     );
 
-    return mediaDocs.map((doc) => doc._id.toString());
+    return mediaDocs.map(doc => doc._id.toString());
   }
 
   private async notifyParticipants(
@@ -1067,10 +1120,11 @@ export class EventService {
       .map((participant: any) => participant.userId?.toString?.() || null)
       .filter(Boolean) as string[];
 
-    if (userIds.length === 0) return;
+    if (userIds.length === 0)
+      return;
 
     await notificationService.createMany(
-      userIds.map((participantUserId) => ({
+      userIds.map(participantUserId => ({
         userId: participantUserId,
         type,
         title,

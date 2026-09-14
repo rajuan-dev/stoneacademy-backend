@@ -1,6 +1,8 @@
-import { BadRequestException } from "@/utils/app-error.utils";
-import multer from "multer";
 import type { NextFunction, Request, Response } from "express";
+
+import multer from "multer";
+
+import { BadRequestException } from "@/utils/app-error.utils";
 
 const COMMUNITY_MAX_FILES = 10;
 const COMMUNITY_FILE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -27,7 +29,7 @@ const communityUploader = multer({
 
 const rawCommunityUpload = communityUploader.any();
 
-export const communityUpload = (req: Request, res: Response, next: NextFunction) => {
+export function communityUpload(req: Request, res: Response, next: NextFunction) {
   rawCommunityUpload(req, res, (error) => {
     if (!error) {
       next();
@@ -48,4 +50,4 @@ export const communityUpload = (req: Request, res: Response, next: NextFunction)
 
     next(error);
   });
-};
+}

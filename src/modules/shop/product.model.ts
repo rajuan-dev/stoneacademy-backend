@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IProduct {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IProduct = {
   _id: Types.ObjectId;
   name: string;
   category?: string;
@@ -18,7 +21,7 @@ export interface IProduct {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const productSchema = BaseSchemaUtil.createSchema<IProduct>({
   name: {

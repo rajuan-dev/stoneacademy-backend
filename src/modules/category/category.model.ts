@@ -1,14 +1,15 @@
 // file: src/modules/category/category.model.ts
 
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
 import { model } from "mongoose";
 
-export interface ICategory {
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type ICategory = {
   name: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const categorySchema = BaseSchemaUtil.createSchema<ICategory>({
   name: {

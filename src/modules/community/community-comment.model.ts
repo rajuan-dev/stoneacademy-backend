@@ -1,7 +1,10 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface ICommunityComment {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type ICommunityComment = {
   _id: Types.ObjectId;
   postId: Types.ObjectId;
   authorId: Types.ObjectId;
@@ -12,7 +15,7 @@ export interface ICommunityComment {
   replyCount: number;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const communityCommentSchema = BaseSchemaUtil.createSchema<ICommunityComment>({
   postId: {

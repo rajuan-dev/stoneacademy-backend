@@ -1,5 +1,6 @@
 import { User } from "@/modules/user/user.model";
 import { NotFoundException } from "@/utils/app-error.utils";
+
 import { ONBOARDING_SLIDES } from "./onboarding.constants";
 
 export class OnboardingService {

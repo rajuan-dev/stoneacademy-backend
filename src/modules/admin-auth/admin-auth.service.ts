@@ -1,8 +1,9 @@
 // file: src/modules/admin-auth/admin-auth.service.ts
 
 import type { StorageUploadInput } from "@/services/s3.service";
-import { AuthService } from "@/modules/auth/auth.service";
+
 import { AdminAccountService } from "@/modules/admin-account/admin-account.service";
+import { AuthService } from "@/modules/auth/auth.service";
 import { BadRequestException } from "@/utils/app-error.utils";
 
 type AdminLoginPayload = {
@@ -62,7 +63,7 @@ export class AdminAuthService {
     };
 
     const hasPayload = Object.values(normalizedPayload).some(
-      (value) => value !== undefined && value !== null,
+      value => value !== undefined && value !== null,
     );
 
     if (!hasPayload && !photo) {

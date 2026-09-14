@@ -1,9 +1,12 @@
 // file: src/modules/activity/qr-token.model.ts
 
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface IQrToken {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type IQrToken = {
   _id: Types.ObjectId;
   kind: "activity";
   participantId: Types.ObjectId;
@@ -12,7 +15,7 @@ export interface IQrToken {
   revokedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const qrTokenSchema = BaseSchemaUtil.createSchema<IQrToken>({
   kind: {

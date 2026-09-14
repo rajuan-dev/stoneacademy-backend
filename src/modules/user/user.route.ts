@@ -1,9 +1,11 @@
 // file: src/modules/user/user.route.ts
 
+import { Router } from "express";
+
 import upload from "@/config/multer.config";
 import { ROLES } from "@/constants/app.constants";
 import { authMiddleware } from "@/middlewares/auth.middleware";
-import { Router } from "express";
+
 import { UserController } from "./user.controller";
 
 const router = Router();

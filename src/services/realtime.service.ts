@@ -1,13 +1,17 @@
 // file: src/services/realtime.service.ts
 
-import { logger } from "@/middlewares/pino-logger";
-import { env } from "@/env";
-import { AuthUtil } from "@/modules/auth/auth.utils";
-import type { JWTPayload } from "@/modules/user/user.type";
-import { Conversation } from "@/modules/message/conversation.model";
-import { ChatThread } from "@/modules/chat/chat.model";
 import type { Server as HttpServer } from "node:http";
-import { Server, type Socket } from "socket.io";
+import type { Socket } from "socket.io";
+
+import { Server } from "socket.io";
+
+import type { JWTPayload } from "@/modules/user/user.type";
+
+import { env } from "@/env";
+import { logger } from "@/middlewares/pino-logger";
+import { AuthUtil } from "@/modules/auth/auth.utils";
+import { ChatThread } from "@/modules/chat/chat.model";
+import { Conversation } from "@/modules/message/conversation.model";
 
 type AuthenticatedSocket = Socket & {
   data: {
@@ -81,7 +85,8 @@ class RealtimeService {
         socket.data.email = payload.email;
         socket.join(this.userRoom(payload.userId));
         return next();
-      } catch (error) {
+      }
+      catch (error) {
         logger.warn({ error }, "WebSocket authentication failed");
         return next(new Error("Unauthorized"));
       }
@@ -90,7 +95,7 @@ class RealtimeService {
     this.io.on("connection", (socket) => {
       logger.info(
         { userId: socket.data.userId, socketId: socket.id },
-        "WebSocket connected"
+        "WebSocket connected",
       );
 
       socket.emit("presence:status", {
@@ -101,50 +106,60 @@ class RealtimeService {
 
       socket.on("chat:conversation:join", async (conversationId: string) => {
         try {
-          if (!socket.data.userId || !conversationId) return;
+          if (!socket.data.userId || !conversationId)
+            return;
           const isParticipant = await this.isParticipant(
             conversationId,
             socket.data.userId,
           );
-          if (!isParticipant) return;
+          if (!isParticipant)
+            return;
 
           socket.join(this.conversationRoom(conversationId));
-        } catch (error) {
+        }
+        catch (error) {
           logger.warn({ error, conversationId }, "Failed to join chat conversation room");
         }
       });
 
       socket.on("chat:thread:join", async (threadId: string) => {
         try {
-          if (!socket.data.userId || !threadId) return;
+          if (!socket.data.userId || !threadId)
+            return;
           const isParticipant = await this.isThreadParticipant(
             threadId,
             socket.data.userId,
           );
-          if (!isParticipant) return;
+          if (!isParticipant)
+            return;
 
           socket.join(this.threadRoom(threadId));
-        } catch (error) {
+        }
+        catch (error) {
           logger.warn({ error, threadId }, "Failed to join chat thread room");
         }
       });
 
       socket.on("chat:typing", async (payload: TypingEvent) => {
         try {
-          if (!socket.data.userId) return;
-          if (!payload?.conversationId) return;
+          if (!socket.data.userId)
+            return;
+          if (!payload?.conversationId)
+            return;
           const isParticipant = await this.isParticipant(
             payload.conversationId,
             socket.data.userId,
           );
-          if (!isParticipant) return;
+          if (!isParticipant)
+            return;
 
           socket.to(this.conversationRoom(payload.conversationId)).emit("chat:typing", {
             conversationId: payload.conversationId,
             userId: socket.data.userId,
             isTyping: Boolean(payload.isTyping),
           });
-        } catch (error) {
+        }
+        catch (error) {
           logger.warn({ error }, "Failed to emit typing event");
         }
       });
@@ -152,7 +167,7 @@ class RealtimeService {
       socket.on("disconnect", (reason) => {
         logger.debug(
           { userId: socket.data.userId, socketId: socket.id, reason },
-          "WebSocket disconnected"
+          "WebSocket disconnected",
         );
 
         if (socket.data.userId) {
@@ -232,13 +247,13 @@ class RealtimeService {
   }
 
   private extractToken(socket: AuthenticatedSocket): string | undefined {
-    const headerToken =
-      (socket.handshake.headers.authorization as string | undefined)?.replace(
+    const headerToken
+      = (socket.handshake.headers.authorization as string | undefined)?.replace(
         /^Bearer\s+/i,
-        ""
+        "",
       );
-    const authToken =
-      typeof socket.handshake.auth?.token === "string"
+    const authToken
+      = typeof socket.handshake.auth?.token === "string"
         ? socket.handshake.auth.token
         : undefined;
     const queryToken = socket.handshake.query?.token;
@@ -256,10 +271,11 @@ class RealtimeService {
   }
 
   private parseAllowedOrigins(value?: string): string[] {
-    if (!value) return [];
+    if (!value)
+      return [];
     return value
       .split(",")
-      .map((origin) => origin.trim())
+      .map(origin => origin.trim())
       .filter(Boolean);
   }
 

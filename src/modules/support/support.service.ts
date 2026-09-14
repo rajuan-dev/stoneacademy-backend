@@ -1,10 +1,11 @@
 import { PAGINATION } from "@/constants/app.constants";
-import { notificationService } from "@/modules/notification/notification.service";
 import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
+import { notificationService } from "@/modules/notification/notification.service";
 import {
   ForbiddenException,
   NotFoundException,
 } from "@/utils/app-error.utils";
+
 import { SupportTicket } from "./support-ticket.model";
 
 export class SupportService {
@@ -50,7 +51,8 @@ export class SupportService {
 
   async getOneForUser(userId: string, id: string) {
     const ticket = await SupportTicket.findById(id).exec();
-    if (!ticket) throw new NotFoundException("Support ticket not found");
+    if (!ticket)
+      throw new NotFoundException("Support ticket not found");
     if (ticket.userId.toString() !== userId) {
       throw new ForbiddenException("Not allowed to access this ticket");
     }
@@ -81,7 +83,8 @@ export class SupportService {
 
   async addReplyAsAdmin(adminId: string, id: string, message: string) {
     const ticket = await SupportTicket.findById(id).exec();
-    if (!ticket) throw new NotFoundException("Support ticket not found");
+    if (!ticket)
+      throw new NotFoundException("Support ticket not found");
 
     ticket.messages.push({
       senderId: adminId as any,
@@ -107,7 +110,8 @@ export class SupportService {
 
   async updateStatus(id: string, status: "open" | "in_progress" | "resolved" | "closed") {
     const ticket = await SupportTicket.findById(id).exec();
-    if (!ticket) throw new NotFoundException("Support ticket not found");
+    if (!ticket)
+      throw new NotFoundException("Support ticket not found");
     ticket.status = status;
     await ticket.save();
     return ticket;
@@ -124,8 +128,10 @@ export class SupportService {
     const skip = (page - 1) * limit;
 
     const filter: Record<string, any> = {};
-    if (input.userId) filter.userId = input.userId;
-    if (input.status) filter.status = input.status;
+    if (input.userId)
+      filter.userId = input.userId;
+    if (input.status)
+      filter.status = input.status;
 
     const [data, totalItems] = await Promise.all([
       SupportTicket.find(filter)

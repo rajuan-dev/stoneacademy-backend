@@ -1,20 +1,23 @@
-import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface ICartItem {
+import { model, Schema } from "mongoose";
+
+import { BaseSchemaUtil } from "@/utils/base-schema.utils";
+
+export type ICartItem = {
   productId: Types.ObjectId;
   quantity: number;
   unitPrice: number;
   currency: string;
-}
+};
 
-export interface ICart {
+export type ICart = {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   items: ICartItem[];
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const cartItemSchema = new Schema<ICartItem>(
   {

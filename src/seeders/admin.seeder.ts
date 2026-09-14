@@ -69,7 +69,8 @@ export class AdminSeeder {
         },
         "IMPORTANT: Change admin password after first login.",
       );
-    } catch (error) {
+    }
+    catch (error) {
       logger.error(error, "Error running admin seeder");
       throw error;
     }
@@ -95,7 +96,8 @@ export class AdminSeeder {
       }
 
       logger.warn("Admin password reset to default. Change it immediately!");
-    } catch (error) {
+    }
+    catch (error) {
       logger.error(error, "Error resetting admin password");
       throw error;
     }

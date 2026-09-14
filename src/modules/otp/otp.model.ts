@@ -1,13 +1,16 @@
 // file: src/modules/otp/otp.model.ts
 
+import type { Types } from "mongoose";
+
+import { model, Schema } from "mongoose";
+
 import { OTP_PURPOSES } from "@/constants/app.constants";
 import { BaseSchemaUtil } from "@/utils/base-schema.utils";
-import { model, Schema, type Types } from "mongoose";
 
-export type OtpPurpose =
-  (typeof OTP_PURPOSES)[keyof typeof OTP_PURPOSES];
+export type OtpPurpose
+  = (typeof OTP_PURPOSES)[keyof typeof OTP_PURPOSES];
 
-export interface IOtpCode {
+export type IOtpCode = {
   _id: Types.ObjectId;
   email: string;
   purpose: OtpPurpose;
@@ -22,7 +25,7 @@ export interface IOtpCode {
   };
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 const otpCodeSchema = BaseSchemaUtil.createSchema<IOtpCode>({
   email: {
