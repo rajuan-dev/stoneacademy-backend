@@ -138,8 +138,10 @@ export class CommunityCreatorService {
           s3Bucket: env.AWS_S3_BUCKET,
           s3Key: upload.key,
           url: upload.url,
-          mimeType: uploadsInput[index].mimeType,
-          sizeBytes: uploadsInput[index].buffer.length,
+          mimeType: upload.mimeType,
+          sizeBytes: upload.sizeBytes,
+          width: upload.width,
+          height: upload.height,
         })),
       );
 

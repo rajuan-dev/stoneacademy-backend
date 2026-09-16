@@ -1,6 +1,6 @@
 // file: src/modules/user/user.service.ts (ENHANCED VERSION)
 
-import type { StorageUploadInput } from "@/services/s3.service";
+import type { StorageUploadInput, StorageUploadResult } from "@/services/s3.service";
 
 import { EMAIL_ENABLED } from "@/config/email.config";
 import {
@@ -911,8 +911,10 @@ export class UserService {
         s3Bucket: env.AWS_S3_BUCKET,
         s3Key: upload.key,
         url: upload.url,
-        mimeType: files[index].mimeType,
-        sizeBytes: files[index].buffer.length,
+        mimeType: upload.mimeType,
+        sizeBytes: upload.sizeBytes,
+        width: upload.width,
+        height: upload.height,
       })),
     );
 
@@ -1560,7 +1562,7 @@ export class UserService {
   private async createMediaDocument(
     ownerId: string,
     file: StorageUploadInput,
-    upload: { key: string; url: string },
+    upload: StorageUploadResult,
   ) {
     return Media.create({
       ownerId,
@@ -1568,8 +1570,10 @@ export class UserService {
       s3Bucket: env.AWS_S3_BUCKET,
       s3Key: upload.key,
       url: upload.url,
-      mimeType: file.mimeType,
-      sizeBytes: file.buffer.length,
+      mimeType: upload.mimeType,
+      sizeBytes: upload.sizeBytes,
+      width: upload.width,
+      height: upload.height,
     });
   }
 
