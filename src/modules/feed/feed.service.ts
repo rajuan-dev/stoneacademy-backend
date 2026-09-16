@@ -39,6 +39,7 @@ export class FeedService {
     const page = query.page ?? PAGINATION.DEFAULT_PAGE;
     const limit = query.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
+    const fetchLimit = page * limit * 2;
     const viewerGeography = await getUserGeography(query.userId);
     const geographyFilter = buildGeographyFilter({
       country: query.country ?? viewerGeography.country,
@@ -67,7 +68,7 @@ export class FeedService {
       = (!query.kind || query.kind === "all" || query.kind === "ad")
         && (!query.paid || query.paid === "all");
 
-    const [activityResult, eventResult, ads] = await Promise.all([
+    const [activityResult, eventResult, ads, totalAds] = await Promise.all([
       includeActivities
         ? this.activityService.list({
             q: query.q,
@@ -80,10 +81,10 @@ export class FeedService {
             radiusMiles: sharedRadiusMiles,
             sort: sharedSort,
             page: 1,
-            limit: limit * 2,
+            limit: fetchLimit,
             viewerUserId: query.userId,
           })
-        : Promise.resolve({ data: [] as any[] }),
+        : Promise.resolve({ data: [] as any[], pagination: { totalItems: 0 } }),
       includeEvents
         ? this.eventService.list({
             q: query.q,
@@ -97,13 +98,14 @@ export class FeedService {
             paid: query.paid === "all" ? undefined : query.paid,
             sort: sharedSort,
             page: 1,
-            limit: limit * 2,
+            limit: fetchLimit,
             viewerUserId: query.userId,
           })
-        : Promise.resolve({ data: [] as any[] }),
+        : Promise.resolve({ data: [] as any[], pagination: { totalItems: 0 } }),
       includeAds
-        ? Ad.find(adFilter).sort({ createdAt: -1 }).limit(limit * 2).exec()
+        ? Ad.find(adFilter).sort({ createdAt: -1 }).limit(fetchLimit).exec()
         : Promise.resolve([]),
+      includeAds ? Ad.countDocuments(adFilter) : Promise.resolve(0),
     ]);
 
     const adItems = ads.map((item: any) => ({
@@ -129,7 +131,10 @@ export class FeedService {
 
     const merged = this.injectAdsIntoFeed(filteredContentItems, adItems);
     const data = merged.slice(skip, skip + limit);
-    const totalItems = merged.length;
+    const totalContentItems
+      = (activityResult.pagination?.totalItems ?? activityResult.data.length)
+        + (eventResult.pagination?.totalItems ?? eventResult.data.length);
+    const totalItems = totalContentItems + totalAds;
 
     return {
       data,
@@ -384,4 +389,5 @@ export class FeedService {
       return item.kind === "event" && item.priceType === "free";
     });
   }
+
 }

@@ -81,6 +81,7 @@ export class CommunityService {
     const page = input.page ?? PAGINATION.DEFAULT_PAGE;
     const limit = input.limit ?? PAGINATION.DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
+    const fetchLimit = page * limit * 2;
     const filter: FilterQuery<ICommunityPost> = { isDeleted: false };
     const viewerGeography = await getUserGeography(input.currentUserId);
     const adFilter: FilterQuery<any> = {
@@ -98,10 +99,10 @@ export class CommunityService {
     const [posts, totalPosts, ads] = await Promise.all([
       this.populatePostQuery(CommunityPost.find(filter))
         .sort({ createdAt: -1 })
-        .limit(limit * 2)
+        .limit(fetchLimit)
         .exec() as Promise<CommunityPostDocument[]>,
       CommunityPost.countDocuments(filter),
-      Ad.find(adFilter).sort({ createdAt: -1 }).limit(limit * 2).exec(),
+      Ad.find(adFilter).sort({ createdAt: -1 }).limit(fetchLimit).exec(),
     ]);
 
     const postIds = posts.map(post => post._id);
@@ -688,8 +689,10 @@ export class CommunityService {
           s3Bucket: env.AWS_S3_BUCKET,
           s3Key: upload.key,
           url: upload.url,
-          mimeType: uploadsInput[index].mimeType,
-          sizeBytes: uploadsInput[index].buffer.length,
+          mimeType: upload.mimeType,
+          sizeBytes: upload.sizeBytes,
+          width: upload.width,
+          height: upload.height,
         })),
       );
 
