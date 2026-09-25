@@ -1,0 +1,252 @@
+[
+  {
+    "_id": {
+      "$oid": "6a15e0f4bb0473149748ffbe"
+    },
+    "activityId": {
+      "$oid": "6a15e041bb0473149748ff9f"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-05-26T18:05:40.982Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a15e0f4bb0473149748ffbf"
+    },
+    "createdAt": {
+      "$date": "2026-05-26T18:05:41.009Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:05:41.009Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f694bb047314974901e6"
+    },
+    "activityId": {
+      "$oid": "6a15e1d5bb0473149748ffe0"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-05-26T19:37:56.662Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a15f694bb047314974901e7"
+    },
+    "createdAt": {
+      "$date": "2026-05-26T19:37:56.687Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:37:56.687Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a25a866d66854885c6b61ff"
+    },
+    "activityId": {
+      "$oid": "6a15e041bb0473149748ff9f"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "status": "left",
+    "joinedAt": {
+      "$date": "2026-06-07T17:20:38.708Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a25a866d66854885c6b6200"
+    },
+    "createdAt": {
+      "$date": "2026-06-07T17:20:38.745Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:45:00.090Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a32ed827c0c56fc208af201"
+    },
+    "activityId": {
+      "$oid": "6a15e1d5bb0473149748ffe0"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-06-17T18:54:58.886Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a32ed827c0c56fc208af202"
+    },
+    "createdAt": {
+      "$date": "2026-06-17T18:54:58.929Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-17T18:54:58.929Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c2a6054b0bd80d012b713"
+    },
+    "activityId": {
+      "$oid": "6a39aac0f3b2b1bd47cd7a8a"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-06-24T19:05:04.661Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a3c2a6054b0bd80d012b714"
+    },
+    "createdAt": {
+      "$date": "2026-06-24T19:05:04.693Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T19:05:04.693Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c336e54b0bd80d012b76f"
+    },
+    "activityId": {
+      "$oid": "6a39aac0f3b2b1bd47cd7a8a"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "status": "left",
+    "joinedAt": {
+      "$date": "2026-06-25T21:20:38.873Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a3c336e54b0bd80d012b770"
+    },
+    "createdAt": {
+      "$date": "2026-06-24T19:43:42.436Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T21:21:42.888Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c449c54b0bd80d012b807"
+    },
+    "activityId": {
+      "$oid": "6a3c167b54b0bd80d012b638"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-07-06T21:08:56.388Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a3c449c54b0bd80d012b808"
+    },
+    "createdAt": {
+      "$date": "2026-06-24T20:57:00.982Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T21:08:56.388Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c45f654b0bd80d012b887"
+    },
+    "activityId": {
+      "$oid": "6a15e1d5bb0473149748ffe0"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-06-25T00:00:13.035Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a3c45f654b0bd80d012b888"
+    },
+    "createdAt": {
+      "$date": "2026-06-24T21:02:46.315Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:13.035Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4ac58c22ab874b91db14fe"
+    },
+    "activityId": {
+      "$oid": "6a4ac57c22ab874b91db14e5"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-07-07T01:39:33.338Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a4ac58c22ab874b91db14ff"
+    },
+    "createdAt": {
+      "$date": "2026-07-05T20:58:52.115Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:39:33.338Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5827425a30919ec3d29094"
+    },
+    "activityId": {
+      "$oid": "6a57fb51d04483c1b6588aee"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-07-16T00:35:14.026Z"
+    },
+    "qrTokenId": {
+      "$oid": "6a5827425a30919ec3d29095"
+    },
+    "createdAt": {
+      "$date": "2026-07-16T00:35:14.359Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T00:35:14.359Z"
+    },
+    "__v": 0
+  }
+]

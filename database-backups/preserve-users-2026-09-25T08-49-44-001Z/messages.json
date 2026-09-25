@@ -1,0 +1,355 @@
+[
+  {
+    "_id": {
+      "$oid": "6a10d972bb0473149748f3ea"
+    },
+    "threadId": {
+      "$oid": "6a10d963bb0473149748f3db"
+    },
+    "senderUserId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "type": "text",
+    "text": "New issue",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a10b9c0bb0473149748f23e"
+      },
+      {
+        "$oid": "69e6440b4f6e90932471e6ef"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-05-22T22:32:18.041Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T22:34:04.671Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10d9fdbb0473149748f42e"
+    },
+    "threadId": {
+      "$oid": "6a10d963bb0473149748f3db"
+    },
+    "senderUserId": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "type": "text",
+    "text": "issue solved",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "69e6440b4f6e90932471e6ef"
+      },
+      {
+        "$oid": "6a10b9c0bb0473149748f23e"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-05-22T22:34:37.496Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T22:34:49.798Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f6a4bb04731497490207"
+    },
+    "threadId": {
+      "$oid": "6a15f69dbb047314974901f5"
+    },
+    "senderUserId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "text",
+    "text": "New msg",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15f611bb047314974901ab"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-05-26T19:38:12.574Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:38:12.574Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f995bb0473149749030d"
+    },
+    "threadId": {
+      "$oid": "6a15f982bb047314974902fe"
+    },
+    "senderUserId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "text",
+    "text": "New support",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15f611bb047314974901ab"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-05-26T19:50:45.721Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:50:45.721Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6fc5f5b96c0518ce8392"
+    },
+    "threadId": {
+      "$oid": "6a3c6fbaf5b96c0518ce8386"
+    },
+    "senderUserId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "text",
+    "text": "Test",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-06-25T00:01:09.810Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:01:09.810Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d943d22ab874b91dae57c"
+    },
+    "threadId": {
+      "$oid": "6a3c6fbaf5b96c0518ce8386"
+    },
+    "senderUserId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "text",
+    "text": "Hello",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-06-25T20:49:01.039Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:49:01.039Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d947822ab874b91dae5ab"
+    },
+    "threadId": {
+      "$oid": "6a3c6fbaf5b96c0518ce8386"
+    },
+    "senderUserId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "text",
+    "text": "Is this Shavon",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-06-25T20:50:00.304Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:50:00.304Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d958222ab874b91dae638"
+    },
+    "threadId": {
+      "$oid": "6a3d957622ab874b91dae61f"
+    },
+    "senderUserId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "text",
+    "text": "Hello",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-06-25T20:54:26.475Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:54:26.475Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d969422ab874b91dae69f"
+    },
+    "threadId": {
+      "$oid": "6a3d957622ab874b91dae61f"
+    },
+    "senderUserId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "text",
+    "text": "hi",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-06-25T20:59:00.475Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:59:00.475Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3dc77422ab874b91dae86b"
+    },
+    "threadId": {
+      "$oid": "6a3d957622ab874b91dae61f"
+    },
+    "senderUserId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "text",
+    "text": "Sulphur itiff",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-06-26T00:27:32.806Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-26T00:27:32.806Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a617dd63291b666e003461e"
+    },
+    "threadId": {
+      "$oid": "6a617dc63291b666e003460e"
+    },
+    "senderUserId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "text",
+    "text": "Hello can I walking with you",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      },
+      {
+        "$oid": "6a56aa578993f78888d74855"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-07-23T02:35:02.336Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-06T05:13:43.315Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9cf68b938a2801e94476da"
+    },
+    "threadId": {
+      "$oid": "6a617dc63291b666e003460e"
+    },
+    "senderUserId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "text",
+    "text": "test",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a56aa578993f78888d74855"
+      },
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-09-06T05:13:47.131Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T11:35:10.846Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9f82f98ca236ab68e2e36d"
+    },
+    "threadId": {
+      "$oid": "6a617dc63291b666e003460e"
+    },
+    "senderUserId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "text",
+    "text": "kisafe6992@ezimb.com",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6a56aa578993f78888d74855"
+      },
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-09-08T03:37:29.312Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T11:35:10.846Z"
+    },
+    "__v": 0
+  }
+]

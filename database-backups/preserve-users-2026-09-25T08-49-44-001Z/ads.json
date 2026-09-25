@@ -1,0 +1,47 @@
+[
+  {
+    "_id": {
+      "$oid": "6a581514a65ca039a6f95a93"
+    },
+    "name": "Country Sponsored Ad",
+    "imageUrl": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/ads/bangladesh/82ff7112-9041-4eb7-afac-5d3abaef7207.jpg",
+    "linkUrl": "https://example.com/",
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "status": "active",
+    "order": 1,
+    "createdAt": {
+      "$date": "2026-07-15T23:17:40.036Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T00:21:28.385Z"
+    },
+    "__v": 0,
+    "category": "test 1",
+    "description": "test 1",
+    "price": 0.04
+  },
+  {
+    "_id": {
+      "$oid": "6a597307b83d2e115ef458ef"
+    },
+    "name": "New Product",
+    "category": "Fitness Tracker",
+    "description": "New Description",
+    "price": 100,
+    "imageUrl": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/shop/products/fitness-tracker/34a92fbd-4e6f-4d66-9cf4-218793e086bd.jpeg",
+    "linkUrl": "https://www.alibaba.com/product-detail/China-Saudi-Arabia-Top-10-Sales_1601300834142.html?spm=a2700.product_home_fy25.just_for_you.2.8b9667afiTXZjY",
+    "sourceProductId": {
+      "$oid": "6a10dd6cbb0473149748f643"
+    },
+    "country": "Bangladesh",
+    "status": "active",
+    "createdAt": {
+      "$date": "2026-05-22T22:49:16.343Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-17T00:10:47.146Z"
+    }
+  }
+]

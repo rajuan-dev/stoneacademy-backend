@@ -1,0 +1,191 @@
+[
+  {
+    "_id": {
+      "$oid": "6a3c66b574867b96dd6d89e8"
+    },
+    "reporterId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "reportedUserId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "entityType": "activity",
+    "entityId": {
+      "$oid": "6a15e1d5bb0473149748ffe0"
+    },
+    "reason": "inappropriate_content",
+    "details": "The activity details contain misleading or inappropriate instructions.",
+    "status": "open",
+    "createdAt": {
+      "$date": "2026-06-24T23:22:29.661Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:22:29.661Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c68e274867b96dd6d8a06"
+    },
+    "reporterId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "reportedUserId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "entityType": "activity",
+    "entityId": {
+      "$oid": "6a15e041bb0473149748ff9f"
+    },
+    "reason": "other",
+    "details": "Drtyrt",
+    "status": "open",
+    "createdAt": {
+      "$date": "2026-06-24T23:31:46.412Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:31:46.412Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c68fd74867b96dd6d8a1b"
+    },
+    "reporterId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "reportedUserId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "entityType": "event",
+    "entityId": {
+      "$oid": "6a15f78cbb04731497490245"
+    },
+    "reason": "other",
+    "details": "Tewt",
+    "status": "open",
+    "createdAt": {
+      "$date": "2026-06-24T23:32:13.685Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:32:13.685Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6f99f5b96c0518ce8362"
+    },
+    "reporterId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "reportedUserId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "entityType": "activity",
+    "entityId": {
+      "$oid": "6a15e1d5bb0473149748ffe0"
+    },
+    "reason": "inappropriate_content",
+    "details": "Test",
+    "status": "open",
+    "createdAt": {
+      "$date": "2026-06-25T00:00:25.274Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:25.274Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a40498a22ab874b91daf79a"
+    },
+    "reporterId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "reportedUserId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "entityType": "activity",
+    "entityId": {
+      "$oid": "6a10e226bb0473149748f68e"
+    },
+    "reason": "other",
+    "details": "Bbb",
+    "status": "open",
+    "createdAt": {
+      "$date": "2026-06-27T22:07:06.787Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-27T22:07:06.787Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a7863c7f237be0417d3ff72"
+    },
+    "reporterId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "reportedUserId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "entityType": "community_post",
+    "entityId": {
+      "$oid": "6a786240f237be0417d3ff4a"
+    },
+    "reason": "New issue",
+    "details": "Issue desc",
+    "status": "resolved",
+    "createdAt": {
+      "$date": "2026-08-09T11:25:59.279Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T17:55:56.243Z"
+    },
+    "__v": 0,
+    "adminNote": "Admin action: warn",
+    "resolvedAt": {
+      "$date": "2026-09-24T17:55:56.242Z"
+    },
+    "resolvedBy": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab5654e24f2dc521620f5a5"
+    },
+    "reporterId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "reportedUserId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "entityType": "community_post",
+    "entityId": {
+      "$oid": "6aa8c5b79db6a2359dadef7a"
+    },
+    "reason": "Omg he hit me",
+    "details": "He can’t is mean",
+    "status": "resolved",
+    "createdAt": {
+      "$date": "2026-09-24T18:00:46.891Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:07:56.574Z"
+    },
+    "__v": 0,
+    "adminNote": "Admin action: disable_user",
+    "resolvedAt": {
+      "$date": "2026-09-24T18:07:56.573Z"
+    },
+    "resolvedBy": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    }
+  }
+]

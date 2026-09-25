@@ -1,0 +1,26 @@
+[
+  {
+    "_id": {
+      "$oid": "69e8e39c46efa9ddaa9da540"
+    },
+    "key": "platform",
+    "value": {
+      "platformFeePercent": 10,
+      "cancellationPolicy": "Standard cancellation policy.",
+      "refundPolicy": "Refunds are handled according to the event policy.",
+      "reminderMinutes": 30,
+      "subscriptionMonthlyPrice": 11.99,
+      "subscriptionYearlyPrice": 99.99
+    },
+    "createdAt": {
+      "$date": "2026-04-22T15:05:00.179Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T19:03:11.835Z"
+    },
+    "__v": 0,
+    "updatedBy": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    }
+  }
+]

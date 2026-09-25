@@ -1,0 +1,102 @@
+[
+  {
+    "_id": {
+      "$oid": "69e92f8815f9b9047555a642"
+    },
+    "adminId": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "action": "event_creator_payout_processed",
+    "entityType": "creator",
+    "entityId": {
+      "$oid": "69e8d36546efa9ddaa9da4d6"
+    },
+    "meta": {
+      "payoutId": "69e92f8815f9b9047555a640",
+      "amount": 575.1,
+      "currency": "USD"
+    },
+    "createdAt": {
+      "$date": "2026-04-22T20:28:56.798Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T20:28:56.798Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5659024f2dc521620f5e8"
+    },
+    "adminId": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "action": "user_blocked",
+    "entityType": "user",
+    "entityId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "meta": {
+      "status": "blocked",
+      "reason": "Disabled by administrator through report action",
+      "source": "report_moderation"
+    },
+    "createdAt": {
+      "$date": "2026-09-24T18:01:52.924Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:01:52.924Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab565b024f2dc521620f60d"
+    },
+    "adminId": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "action": "user_unblocked",
+    "entityType": "user",
+    "entityId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "meta": {
+      "status": "active",
+      "reason": null,
+      "source": "report_moderation"
+    },
+    "createdAt": {
+      "$date": "2026-09-24T18:02:24.546Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:02:24.546Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab566fc24f2dc521620f70d"
+    },
+    "adminId": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "action": "user_blocked",
+    "entityType": "user",
+    "entityId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "meta": {
+      "status": "blocked",
+      "reason": "Disabled by administrator through report action",
+      "source": "report_moderation"
+    },
+    "createdAt": {
+      "$date": "2026-09-24T18:07:56.557Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:07:56.557Z"
+    },
+    "__v": 0
+  }
+]

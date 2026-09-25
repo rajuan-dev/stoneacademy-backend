@@ -1,0 +1,109 @@
+[
+  {
+    "_id": {
+      "$oid": "69e8e3a646efa9ddaa9da547"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "status": "pending",
+    "cancelAtPeriodEnd": false,
+    "plan": "monthly",
+    "startAt": {
+      "$date": "2026-04-22T15:05:05Z"
+    },
+    "endAt": {
+      "$date": "2026-05-22T15:05:05Z"
+    },
+    "currentPeriodStart": {
+      "$date": "2026-04-22T15:05:05Z"
+    },
+    "currentPeriodEnd": {
+      "$date": "2026-05-22T15:05:05Z"
+    },
+    "paymentProvider": "stripe",
+    "externalCustomerId": "cus_UNnwpCKMd3Bauh",
+    "externalSubscriptionId": "sub_1TP2KsEuf4ZHOjkvRMUU64vP",
+    "externalPriceId": "price_1TP2KrEuf4ZHOjkvH1QK31EU",
+    "latestInvoiceId": "in_1TP2KsEuf4ZHOjkvbZ2DYCzx",
+    "createdAt": {
+      "$date": "2026-04-22T15:05:10.246Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T15:05:10.246Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a25ab63d66854885c6b6223"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "status": "pending",
+    "cancelAtPeriodEnd": false,
+    "plan": "monthly",
+    "startAt": {
+      "$date": "2026-06-07T17:33:21Z"
+    },
+    "endAt": {
+      "$date": "2026-07-07T17:33:21Z"
+    },
+    "currentPeriodStart": {
+      "$date": "2026-06-07T17:33:21Z"
+    },
+    "currentPeriodEnd": {
+      "$date": "2026-07-07T17:33:21Z"
+    },
+    "paymentProvider": "stripe",
+    "externalCustomerId": "cus_Uf4j8Nt7fHvAcB",
+    "externalSubscriptionId": "sub_1TfkZZEuf4ZHOjkv8vSX7pZH",
+    "externalPriceId": "price_1TfkZZEuf4ZHOjkvgPlntLIz",
+    "latestInvoiceId": "in_1TfkZZEuf4ZHOjkvSRlv6IEt",
+    "createdAt": {
+      "$date": "2026-06-07T17:33:23.840Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-07T17:33:23.840Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a90848d938a2801e9445b6a"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "status": "expired",
+    "cancelAtPeriodEnd": false,
+    "plan": "monthly",
+    "startAt": {
+      "$date": "2026-08-27T18:40:11Z"
+    },
+    "endAt": {
+      "$date": "2026-09-27T18:40:11Z"
+    },
+    "currentPeriodStart": {
+      "$date": "2026-08-27T18:40:11Z"
+    },
+    "currentPeriodEnd": {
+      "$date": "2026-09-27T18:40:11Z"
+    },
+    "paymentProvider": "stripe",
+    "externalCustomerId": "cus_V9R5Q7ug0CcIRG",
+    "externalSubscriptionId": "sub_1U98DfEuf4ZHOjkvAPueoiN4",
+    "externalPriceId": "price_1U98DfEuf4ZHOjkvdkpY9Y6m",
+    "createdAt": {
+      "$date": "2026-08-27T18:40:13.300Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-28T17:40:51.842Z"
+    },
+    "__v": 0,
+    "cancelledAt": {
+      "$date": "2026-08-28T17:40:49Z"
+    }
+  }
+]

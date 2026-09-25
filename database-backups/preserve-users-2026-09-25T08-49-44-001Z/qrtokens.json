@@ -1,0 +1,200 @@
+[
+  {
+    "_id": {
+      "$oid": "6a15e0f4bb0473149748ffbf"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a15e0f4bb0473149748ffbe"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmExNWUwZjRiYjA0NzMxNDk3NDhmZmJlIiwiaWF0IjoxNzc5ODE4NzQwLCJleHAiOjE3ODI0MTA3NDB9.HgaspnDC4SbNasVaCs6ysDatRHAsuWV2bpJO4y3Ll_Y",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-05-26T18:05:40.983Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:05:40.983Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f694bb047314974901e7"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a15f694bb047314974901e6"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmExNWY2OTRiYjA0NzMxNDk3NDkwMWU2IiwiaWF0IjoxNzc5ODI0Mjc2LCJleHAiOjE3ODI0MTYyNzZ9.uWktKndMi25aFpBbMjcZFKgUPEsS8G9Cev9a-3jNEGU",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-05-26T19:37:56.663Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:37:56.663Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a25a866d66854885c6b6200"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a25a866d66854885c6b61ff"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmEyNWE4NjZkNjY4NTQ4ODVjNmI2MWZmIiwiaWF0IjoxNzgwODUyODM4LCJleHAiOjE3ODM0NDQ4Mzh9.pqi133OI30QPT46WkybV_OmP_1yhzuaGuNrAg9T0UFU",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-06-07T17:20:38.710Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-07T17:20:38.710Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a32ed827c0c56fc208af202"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a32ed827c0c56fc208af201"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmEzMmVkODI3YzBjNTZmYzIwOGFmMjAxIiwiaWF0IjoxNzgxNzIyNDk4LCJleHAiOjE3ODQzMTQ0OTh9.JYLuCtfmvVtVtUcDH3O5xO1JBOu_a97Me-y8bivd3ac",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-06-17T18:54:58.893Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-17T18:54:58.893Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c248354b0bd80d012b69f"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a3c248354b0bd80d012b69e"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmEzYzI0ODM1NGIwYmQ4MGQwMTJiNjllIiwiaWF0IjoxNzgyMzI2NDAzLCJleHAiOjE3ODQ5MTg0MDN9.858EMxj2Rfr0Hy7kHI-69v_8aHhuh7M2mgobOFMIEyA",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-06-24T18:40:03.161Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T18:40:03.161Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c2a6054b0bd80d012b714"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a3c2a6054b0bd80d012b713"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmEzYzJhNjA1NGIwYmQ4MGQwMTJiNzEzIiwiaWF0IjoxNzgyMzI3OTA0LCJleHAiOjE3ODQ5MTk5MDR9.jUE9hWsD_nRcNviQT-6k_FO4xXs-knwkVN2pUivaijw",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-06-24T19:05:04.665Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T19:05:04.665Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c336e54b0bd80d012b770"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a3c336e54b0bd80d012b76f"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmEzYzMzNmU1NGIwYmQ4MGQwMTJiNzZmIiwiaWF0IjoxNzgyMzMwMjIyLCJleHAiOjE3ODQ5MjIyMjJ9.Sflv7ojcHmKfPMZdfPmPvYPXHyRtAPJTZt2tF0LFBso",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-06-24T19:43:42.426Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T19:43:42.426Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c449c54b0bd80d012b808"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a3c449c54b0bd80d012b807"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmEzYzQ0OWM1NGIwYmQ4MGQwMTJiODA3IiwiaWF0IjoxNzgyMzM0NjIwLCJleHAiOjE3ODQ5MjY2MjB9.RiQvvIXBGryTl2_Ok0E6m4oGxJxDpjGpKwBTAJaXl1w",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-06-24T20:57:00.958Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T20:57:00.958Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c45f654b0bd80d012b888"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a3c45f654b0bd80d012b887"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmEzYzQ1ZjY1NGIwYmQ4MGQwMTJiODg3IiwiaWF0IjoxNzgyMzM0OTY2LCJleHAiOjE3ODQ5MjY5NjZ9.eJ7QASjnxmCXSgK4BUnhHAI1UGZLc-ZWS3BcoxO4Ftc",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-06-24T21:02:46.294Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T21:02:46.294Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4ac58c22ab874b91db14ff"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a4ac58c22ab874b91db14fe"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmE0YWM1OGMyMmFiODc0YjkxZGIxNGZlIiwiaWF0IjoxNzgzMjg1MTMyLCJleHAiOjE3ODU4NzcxMzJ9.v1_pR6M1wDXmAG1Du38lYu_BgIheFmF8j1eTob0Ve18",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-07-05T20:58:52.084Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-05T20:58:52.084Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5827425a30919ec3d29095"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6a5827425a30919ec3d29094"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmE1ODI3NDI1YTMwOTE5ZWMzZDI5MDk0IiwiaWF0IjoxNzg0MTYyMTE0LCJleHAiOjE3ODY3NTQxMTR9.mBVHCQmmIbl2TdisA2_yP_uxCpgSR82wPSPR7ZTkkiI",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-07-16T00:35:14.044Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T00:35:14.044Z"
+    },
+    "__v": 0
+  }
+]

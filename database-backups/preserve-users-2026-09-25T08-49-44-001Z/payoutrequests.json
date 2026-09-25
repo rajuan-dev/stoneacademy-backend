@@ -1,0 +1,30 @@
+[
+  {
+    "_id": {
+      "$oid": "69e92f8815f9b9047555a640"
+    },
+    "creatorId": {
+      "$oid": "69e8d36546efa9ddaa9da4d6"
+    },
+    "amount": 575.1,
+    "currency": "USD",
+    "status": "paid",
+    "payoutMethod": "admin_request",
+    "provider": null,
+    "providerPayoutId": null,
+    "note": "Processed by admin",
+    "reviewedBy": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "reviewedAt": {
+      "$date": "2026-04-22T20:28:56.479Z"
+    },
+    "createdAt": {
+      "$date": "2026-04-22T20:28:56.480Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T20:28:56.480Z"
+    },
+    "__v": 0
+  }
+]

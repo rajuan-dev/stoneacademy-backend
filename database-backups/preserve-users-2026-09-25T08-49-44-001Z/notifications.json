@@ -1,0 +1,3567 @@
+[
+  {
+    "_id": {
+      "$oid": "69e8f37215f9b9047555a4bc"
+    },
+    "userId": {
+      "$oid": "69e8d36546efa9ddaa9da4d6"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e8d3a146efa9ddaa9da4de",
+      "participantId": "69e8f36315f9b9047555a4b8"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-04-22T16:12:34.116Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T16:12:34.116Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69e946c4d48bec1a271d5359"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e68b3b4f6e90932471e7f0",
+      "participantId": "69e946c3d48bec1a271d5355"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-04-22T22:08:04.666Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T22:08:04.666Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69e95389b18bfdc887320d3d"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e64e464f6e90932471e77f",
+      "participantId": "69e95388b18bfdc887320d39"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-04-22T23:02:33.253Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T23:02:33.253Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10c84cbb0473149748f313"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e64e464f6e90932471e77f",
+      "participantId": "6a10c84cbb0473149748f30f"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-22T21:19:08.230Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T21:19:08.230Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10cb04bb0473149748f34d"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 4-star rating.",
+    "data": {
+      "reviewId": "6a10cb04bb0473149748f349",
+      "targetType": "event",
+      "targetId": "69e64e464f6e90932471e77f"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-22T21:30:44.858Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T21:30:44.858Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15e0f5bb0473149748ffc4"
+    },
+    "userId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a15e041bb0473149748ff9f",
+      "participantId": "6a15e0f4bb0473149748ffbe"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T18:05:41.042Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:05:41.042Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15e101bb0473149748ffd0"
+    },
+    "userId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 4-star rating.",
+    "data": {
+      "reviewId": "6a15e101bb0473149748ffcc",
+      "targetType": "activity",
+      "targetId": "6a15e041bb0473149748ff9f"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T18:05:53.146Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:05:53.146Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15e8acbb0473149749004a"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e64e464f6e90932471e77f",
+      "participantId": "6a15e8acbb04731497490046"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T18:38:36.152Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:38:36.152Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15e966bb0473149749008c"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e68b234f6e90932471e7ed",
+      "participantId": "6a15e966bb04731497490088"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T18:41:42.999Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:41:42.999Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f694bb047314974901ec"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a15f694bb047314974901e6"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T19:37:56.732Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:37:56.732Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f6c0bb04731497490220"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 2-star rating.",
+    "data": {
+      "reviewId": "6a15f6c0bb0473149749021c",
+      "targetType": "activity",
+      "targetId": "6a15e1d5bb0473149748ffe0"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T19:38:40.225Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:38:40.225Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f8a2bb047314974902df"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e64e464f6e90932471e77f",
+      "participantId": "6a15f8a2bb047314974902db"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T19:46:42.758Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:46:42.758Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a25a866d66854885c6b6205"
+    },
+    "userId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a15e041bb0473149748ff9f",
+      "participantId": "6a25a866d66854885c6b61ff"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-07T17:20:38.800Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-07T17:20:38.800Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a32ed827c0c56fc208af207"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a32ed827c0c56fc208af201"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-17T18:54:58.950Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-17T18:54:58.950Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3ac18a7c0c56fc208b026b"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 3-star rating.",
+    "data": {
+      "reviewId": "6a3ac1897c0c56fc208b0267",
+      "targetType": "activity",
+      "targetId": "6a15e1d5bb0473149748ffe0"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-23T17:25:30.004Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-23T17:25:30.004Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3ac4a97c0c56fc208b02c6"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "6a15f78cbb04731497490245",
+      "participantId": "6a3ac4a97c0c56fc208b02c2"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-23T17:38:49.215Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-23T17:38:49.215Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3ac4bb7c0c56fc208b02d4"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 3-star rating.",
+    "data": {
+      "reviewId": "6a3ac4bb7c0c56fc208b02d0",
+      "targetType": "event",
+      "targetId": "6a15f78cbb04731497490245"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-23T17:39:07.251Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-23T17:39:07.251Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c248354b0bd80d012b6a4"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c248354b0bd80d012b69e"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T18:40:03.235Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T18:40:03.235Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c2a6054b0bd80d012b719"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c2a6054b0bd80d012b713"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T19:05:04.711Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T19:05:04.711Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c2a7854b0bd80d012b727"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 4-star rating.",
+    "data": {
+      "reviewId": "6a3c2a7854b0bd80d012b723",
+      "targetType": "activity",
+      "targetId": "6a39aac0f3b2b1bd47cd7a8a"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T19:05:28.086Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T19:05:28.086Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c336e54b0bd80d012b775"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c336e54b0bd80d012b76f"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T19:43:42.455Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T19:43:42.455Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c438054b0bd80d012b7dc"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "6a15f78cbb04731497490245",
+      "participantId": "6a3c438054b0bd80d012b7d8"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T20:52:16.767Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T20:52:16.767Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c439154b0bd80d012b7e4"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 5-star rating.",
+    "data": {
+      "reviewId": "6a3c439154b0bd80d012b7e0",
+      "targetType": "event",
+      "targetId": "6a15f78cbb04731497490245"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T20:52:33.525Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T20:52:33.525Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c449d54b0bd80d012b80d"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T20:57:01.001Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T20:57:01.001Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c45f654b0bd80d012b88d"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T21:02:46.331Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T21:02:46.331Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c477154b0bd80d012b8f9"
+    },
+    "userId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "A user joined your event.",
+    "data": {
+      "eventId": "69e64e464f6e90932471e77f",
+      "participantId": "6a3c477154b0bd80d012b8f5"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T21:09:05.156Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T21:09:05.156Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c511754b0bd80d012b9b1"
+    },
+    "userId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 4-star rating.",
+    "data": {
+      "reviewId": "6a3c511654b0bd80d012b9ad",
+      "targetType": "activity",
+      "targetId": "6a15e041bb0473149748ff9f"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T21:50:15.026Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T21:50:15.026Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6c1274867b96dd6d8ac2"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c336e54b0bd80d012b76f"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:45:22.404Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:45:22.404Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6c2074867b96dd6d8ad4"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:45:36.488Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:45:36.488Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6c9d74867b96dd6d8b04"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "A user joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:47:41.996Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:47:41.996Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6dd2f5b96c0518ce8278"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:52:50.474Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:52:50.474Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6ddff5b96c0518ce828f"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:53:03.175Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:53:03.175Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6ea8f5b96c0518ce82cf"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:56:24.255Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:56:24.255Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6ed2f5b96c0518ce82e8"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:57:06.695Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:57:06.695Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6ed3f5b96c0518ce82eb"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"New Activity 10\".",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "hostId": "6a15d9f4bb0473149748ff39",
+      "joinedAt": {
+        "$date": "2026-06-24T23:57:04.932Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-06-25T20:37:00.354Z"
+    },
+    "createdAt": {
+      "$date": "2026-06-24T23:57:07.418Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:37:00.355Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6f82f5b96c0518ce8341"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T00:00:02.659Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:02.659Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6f8ef5b96c0518ce8355"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T00:00:14.571Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:14.571Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6f8ff5b96c0518ce8358"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"New Activity 10\".",
+    "data": {
+      "activityId": "6a15e1d5bb0473149748ffe0",
+      "participantId": "6a3c45f654b0bd80d012b887",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "hostId": "6a15d9f4bb0473149748ff39",
+      "joinedAt": {
+        "$date": "2026-06-25T00:00:13.035Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-06-25T20:37:00.354Z"
+    },
+    "createdAt": {
+      "$date": "2026-06-25T00:00:15.202Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:37:00.355Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6f9af5b96c0518ce8367"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "content_reported",
+    "title": "Content reported",
+    "body": "One of your activitys was reported and is under review.",
+    "data": {
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "reportId": "6a3c6f99f5b96c0518ce8362"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T00:00:26.369Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:26.369Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6fabf5b96c0518ce837b"
+    },
+    "userId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 4-star rating.",
+    "data": {
+      "reviewId": "6a3c6fa9f5b96c0518ce8371",
+      "targetType": "activity",
+      "targetId": "6a15e1d5bb0473149748ffe0"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T00:00:43.419Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:43.419Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d9ba122ab874b91dae771"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "entityType": "activity",
+      "entityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c336e54b0bd80d012b76f",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T21:20:33.085Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T21:20:33.085Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d9ba622ab874b91dae78a"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c336e54b0bd80d012b76f",
+      "entityType": "activity",
+      "entityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T21:20:38.894Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T21:20:38.894Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d9ba622ab874b91dae78d"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Test\".",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c336e54b0bd80d012b76f",
+      "entityType": "activity",
+      "entityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "hostId": "69e8e34f46efa9ddaa9da535",
+      "joinedAt": {
+        "$date": "2026-06-25T21:20:38.873Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-06-29T14:34:16.849Z"
+    },
+    "createdAt": {
+      "$date": "2026-06-25T21:20:38.903Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-29T14:34:16.849Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d9be622ab874b91dae796"
+    },
+    "userId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "entityType": "activity",
+      "entityId": "6a39aac0f3b2b1bd47cd7a8a",
+      "participantId": "6a3c336e54b0bd80d012b76f",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T21:21:42.911Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T21:21:42.911Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a40498a22ab874b91daf79f"
+    },
+    "userId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "type": "content_reported",
+    "title": "Content reported",
+    "body": "One of your activitys was reported and is under review.",
+    "data": {
+      "entityType": "activity",
+      "entityId": "6a10e226bb0473149748f68e",
+      "reportId": "6a40498a22ab874b91daf79a"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-27T22:07:06.848Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-27T22:07:06.848Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4ac58c22ab874b91db1506"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-05T20:58:52.156Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-05T20:58:52.156Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4ac58c22ab874b91db1509"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-05T20:58:52.082Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-05T20:58:52.188Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c009f016c7d1e5e9cc919"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T19:23:11.016Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T19:23:11.016Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c00b1016c7d1e5e9cc935"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T19:23:29.440Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T19:23:29.440Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c00b1016c7d1e5e9cc938"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-06T19:23:29.411Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T19:23:29.448Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c06dd016c7d1e5e9cc96e"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T19:49:49.802Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T19:49:49.802Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c06e9016c7d1e5e9cc982"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T19:50:01.575Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T19:50:01.575Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c06e9016c7d1e5e9cc985"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"New Activity 10\".",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "hostId": "6a15f611bb047314974901ab",
+      "joinedAt": {
+        "$date": "2026-07-06T19:50:01.522Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T19:50:01.591Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c07c1016c7d1e5e9cc99b"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T19:53:37.788Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T19:53:37.788Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c08b7016c7d1e5e9cc9ce"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T19:57:43.146Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T19:57:43.146Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c08b7016c7d1e5e9cc9d1"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-06T19:57:43.105Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T19:57:43.155Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c096a016c7d1e5e9cc9fc"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:00:42.770Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:00:42.770Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c0a58016c7d1e5e9cca36"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:04:40.885Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:04:40.885Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c0a58016c7d1e5e9cca39"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-06T20:04:40.833Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T20:04:40.895Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c0bfe016c7d1e5e9cca72"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:11:42.221Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:11:42.221Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c0d1a016c7d1e5e9ccaa4"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:16:26.506Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:16:26.506Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c0d1a016c7d1e5e9ccaa7"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"New Activity 10\".",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "hostId": "6a15f611bb047314974901ab",
+      "joinedAt": {
+        "$date": "2026-07-06T20:16:26.468Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T20:16:26.514Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c0d80016c7d1e5e9ccac1"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:18:08.075Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:18:08.075Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c1190016c7d1e5e9ccae9"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:35:28.616Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:35:28.616Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c11a7016c7d1e5e9ccaf9"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:35:51.182Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:35:51.182Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c11a7016c7d1e5e9ccafc"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-06T20:35:51.161Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T20:35:51.191Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c120c016c7d1e5e9ccb1b"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:37:32.778Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:37:32.778Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c12cb016c7d1e5e9ccb3f"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T20:40:43.228Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T20:40:43.228Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c12cb016c7d1e5e9ccb42"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-06T20:40:43.192Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T20:40:43.236Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c1968016c7d1e5e9ccbee"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-06T21:08:56.424Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T21:08:56.424Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c1968016c7d1e5e9ccbf1"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"New Activity 10\".",
+    "data": {
+      "activityId": "6a3c167b54b0bd80d012b638",
+      "participantId": "6a3c449c54b0bd80d012b807",
+      "entityType": "activity",
+      "entityId": "6a3c167b54b0bd80d012b638",
+      "hostId": "6a15f611bb047314974901ab",
+      "joinedAt": {
+        "$date": "2026-07-06T21:08:56.388Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-06T21:08:56.439Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4a7fcff670a4a47a51f1"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T00:38:23.248Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T00:38:23.248Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4aa3cff670a4a47a5212"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T00:38:59.639Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T00:38:59.639Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4aa3cff670a4a47a5215"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-07T00:38:59.588Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-07T00:38:59.648Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4afbcff670a4a47a5245"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T00:40:27.627Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T00:40:27.627Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4c53cff670a4a47a5275"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T00:46:11.404Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T00:46:11.404Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4c53cff670a4a47a5278"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-07T00:46:11.352Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-07T00:46:11.414Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4cd2cff670a4a47a528d"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T00:48:18.490Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T00:48:18.490Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c4ce5cff670a4a47a52a5"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T00:48:37.617Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T00:48:37.617Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c56eacff670a4a47a533a"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:31:22.571Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:31:22.571Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c570acff670a4a47a5357"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:31:54.172Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:31:54.172Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c570acff670a4a47a535a"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-07T01:31:54.151Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-07T01:31:54.181Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c5721cff670a4a47a5374"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:32:17.297Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:32:17.297Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c572acff670a4a47a5391"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:32:26.247Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:32:26.247Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c572acff670a4a47a5394"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-07T01:32:26.226Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-07T01:32:26.255Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c587fcff670a4a47a53cf"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:38:07.078Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:38:07.078Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c58becff670a4a47a53e7"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:39:10.436Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:39:10.436Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c58becff670a4a47a53ea"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-07T01:39:10.376Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-07T01:39:10.453Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c58c9cff670a4a47a53ff"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_left",
+    "title": "Participant left activity",
+    "body": "New user 20 left your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "leftUserId": "6a15ee3abb047314974900fe",
+      "leftUserName": "New user 20",
+      "leftUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:39:21.050Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:39:21.050Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c58d5cff670a4a47a5417"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 20 joined your activity.",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 20",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-07T01:39:33.362Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:39:33.362Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4c58d5cff670a4a47a541a"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walking Activity\".",
+    "data": {
+      "activityId": "6a4ac57c22ab874b91db14e5",
+      "participantId": "6a4ac58c22ab874b91db14fe",
+      "entityType": "activity",
+      "entityId": "6a4ac57c22ab874b91db14e5",
+      "hostId": "6a4020fd22ab874b91daecbb",
+      "joinedAt": {
+        "$date": "2026-07-07T01:39:33.338Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-07T01:39:33.372Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5827455a30919ec3d290a3"
+    },
+    "userId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "New user 202 joined your activity.",
+    "data": {
+      "activityId": "6a57fb51d04483c1b6588aee",
+      "participantId": "6a5827425a30919ec3d29094",
+      "entityType": "activity",
+      "entityId": "6a57fb51d04483c1b6588aee",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 202",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-16T00:35:17.011Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T00:35:17.011Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5827455a30919ec3d290a6"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"New activity\".",
+    "data": {
+      "activityId": "6a57fb51d04483c1b6588aee",
+      "participantId": "6a5827425a30919ec3d29094",
+      "entityType": "activity",
+      "entityId": "6a57fb51d04483c1b6588aee",
+      "hostId": "6a56a9a58993f78888d74841",
+      "joinedAt": {
+        "$date": "2026-07-16T00:35:14.026Z"
+      }
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-16T00:35:17.590Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5827565a30919ec3d290b4"
+    },
+    "userId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 4-star rating.",
+    "data": {
+      "reviewId": "6a5827545a30919ec3d290af",
+      "targetType": "activity",
+      "targetId": "6a57fb51d04483c1b6588aee"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-16T00:35:34.053Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T00:35:34.053Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bfa4387f22da07f374882"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "New user 125 joined your event.",
+    "data": {
+      "eventId": "6a5bf8a487f22da07f3747fe",
+      "participantId": "6a5bfa4287f22da07f37487c",
+      "entityType": "event",
+      "entityId": "6a5bf8a487f22da07f3747fe",
+      "joinedUserId": "6a56aa578993f78888d74855",
+      "joinedUserName": "New user 125",
+      "joinedUserAvatar": null
+    },
+    "isRead": true,
+    "readAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "createdAt": {
+      "$date": "2026-07-18T22:12:19.897Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:30:35.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bfa4587f22da07f374885"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "event_join_success",
+    "title": "Joined event successfully",
+    "body": "You joined \"Enevtdesc\".",
+    "data": {
+      "eventId": "6a5bf8a487f22da07f3747fe",
+      "participantId": "6a5bfa4287f22da07f37487c",
+      "entityType": "event",
+      "entityId": "6a5bf8a487f22da07f3747fe",
+      "creatorId": "6a15ee3abb047314974900fe",
+      "joinedAt": {
+        "$date": "2026-07-18T22:12:18.390Z"
+      },
+      "priceType": "free"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-18T22:12:21.061Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T22:12:21.061Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5d188d3291b666e0033ccc"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "New user 202 joined your event.",
+    "data": {
+      "eventId": "6a5d134e3291b666e0033bfc",
+      "participantId": "6a5d188d3291b666e0033cc6",
+      "entityType": "event",
+      "entityId": "6a5d134e3291b666e0033bfc",
+      "joinedUserId": "6a15ee3abb047314974900fe",
+      "joinedUserName": "New user 202",
+      "joinedUserAvatar": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-19T18:33:49.773Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T18:33:49.773Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5d19033291b666e0033d38"
+    },
+    "userId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "New user 50 joined your event.",
+    "data": {
+      "eventId": "6a5d134e3291b666e0033bfc",
+      "participantId": "6a5d19033291b666e0033d32",
+      "entityType": "event",
+      "entityId": "6a5d134e3291b666e0033bfc",
+      "joinedUserId": "6a4020fd22ab874b91daecbb",
+      "joinedUserName": "New user 50",
+      "joinedUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-19T18:35:47.775Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T18:35:47.775Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5d19033291b666e0033d3b"
+    },
+    "userId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "type": "event_join_success",
+    "title": "Joined event successfully",
+    "body": "You joined \"New event paid\".",
+    "data": {
+      "eventId": "6a5d134e3291b666e0033bfc",
+      "participantId": "6a5d19033291b666e0033d32",
+      "entityType": "event",
+      "entityId": "6a5d134e3291b666e0033bfc",
+      "creatorId": "6a15f611bb047314974901ab",
+      "joinedAt": {
+        "$date": "2026-07-19T18:35:47.755Z"
+      },
+      "priceType": "paid"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-19T18:35:47.783Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T18:35:47.783Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a7863c8f237be0417d3ff77"
+    },
+    "userId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "type": "content_reported",
+    "title": "Content reported",
+    "body": "One of your community_posts was reported and is under review.",
+    "data": {
+      "entityType": "community_post",
+      "entityId": "6a786240f237be0417d3ff4a",
+      "reportId": "6a7863c7f237be0417d3ff72"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-08-09T11:26:00.048Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-09T11:26:00.048Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9f86098ca236ab68e2e46b"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "Country Filter User joined your event.",
+    "data": {
+      "eventId": "6a9f858c8ca236ab68e2e422",
+      "participantId": "6a9f86098ca236ab68e2e465",
+      "entityType": "event",
+      "entityId": "6a9f858c8ca236ab68e2e422",
+      "joinedUserId": "6a56a9a58993f78888d74841",
+      "joinedUserName": "Country Filter User",
+      "joinedUserAvatar": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-08T03:50:33.514Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T03:50:33.514Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9f86098ca236ab68e2e46e"
+    },
+    "userId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "type": "event_join_success",
+    "title": "Joined event successfully",
+    "body": "You joined \"New paid event 2026\".",
+    "data": {
+      "eventId": "6a9f858c8ca236ab68e2e422",
+      "participantId": "6a9f86098ca236ab68e2e465",
+      "entityType": "event",
+      "entityId": "6a9f858c8ca236ab68e2e422",
+      "creatorId": "6a56aa578993f78888d74855",
+      "joinedAt": {
+        "$date": "2026-09-08T03:50:33.473Z"
+      },
+      "priceType": "paid"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-08T03:50:33.539Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T03:50:33.539Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9f87398ca236ab68e2e556"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 4-star rating.",
+    "data": {
+      "reviewId": "6a9f87398ca236ab68e2e551",
+      "targetType": "event",
+      "targetId": "6a9f858c8ca236ab68e2e422"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-08T03:55:37.249Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T03:55:37.249Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6aa282029db6a2359dadd6b1"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "Shovon Roy joined your event.",
+    "data": {
+      "eventId": "6a9f858c8ca236ab68e2e422",
+      "participantId": "6aa282029db6a2359dadd6ab",
+      "entityType": "event",
+      "entityId": "6a9f858c8ca236ab68e2e422",
+      "joinedUserId": "6aa281c49db6a2359dadd67a",
+      "joinedUserName": "Shovon Roy",
+      "joinedUserAvatar": "https://lh3.googleusercontent.com/a/ACg8ocLnwupzvn-ynULcZxGGiPo7P26fKNVxbXH_QA_uPhg-zFJ3=s96-c"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-10T10:10:10.261Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-10T10:10:10.261Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6aa282029db6a2359dadd6b4"
+    },
+    "userId": {
+      "$oid": "6aa281c49db6a2359dadd67a"
+    },
+    "type": "event_join_success",
+    "title": "Joined event successfully",
+    "body": "You joined \"New paid event 2026\".",
+    "data": {
+      "eventId": "6a9f858c8ca236ab68e2e422",
+      "participantId": "6aa282029db6a2359dadd6ab",
+      "entityType": "event",
+      "entityId": "6a9f858c8ca236ab68e2e422",
+      "creatorId": "6a56aa578993f78888d74855",
+      "joinedAt": {
+        "$date": "2026-09-10T10:10:10.237Z"
+      },
+      "priceType": "paid"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-10T10:10:10.276Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-10T10:10:10.276Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab34381205bb9c0f3cd86ad"
+    },
+    "userId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "type": "event_updated",
+    "title": "Event updated",
+    "body": "The event \"New event test 900 am\" was updated.",
+    "data": {
+      "eventId": "6ab3411a205bb9c0f3cd84fc",
+      "entityType": "event",
+      "entityId": "6ab3411a205bb9c0f3cd84fc",
+      "changedFields": [
+        "title",
+        "category",
+        "description",
+        "startAt",
+        "country",
+        "state",
+        "city",
+        "participantLimit",
+        "priceType",
+        "ticketPrice",
+        "discountPercentage",
+        "durationMinutes"
+      ]
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T03:12:02.527Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T03:12:02.527Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab34592205bb9c0f3cd8722"
+    },
+    "userId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "type": "event_updated",
+    "title": "Event updated",
+    "body": "The event \"New event test 900 am\" was updated.",
+    "data": {
+      "eventId": "6ab3411a205bb9c0f3cd84fc",
+      "entityType": "event",
+      "entityId": "6ab3411a205bb9c0f3cd84fc",
+      "changedFields": [
+        "title",
+        "category",
+        "description",
+        "startAt",
+        "country",
+        "state",
+        "city",
+        "participantLimit",
+        "priceType",
+        "ticketPrice",
+        "discountPercentage",
+        "durationMinutes"
+      ]
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T03:20:50.755Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T03:20:50.755Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab35e5b11c3621d4feb68ac"
+    },
+    "userId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "type": "event_joined",
+    "title": "New event ticket",
+    "body": "Shovon Roy joined your event.",
+    "data": {
+      "eventId": "6ab1fe18205bb9c0f3cd7aff",
+      "participantId": "6ab35e5b11c3621d4feb68a6",
+      "entityType": "event",
+      "entityId": "6ab1fe18205bb9c0f3cd7aff",
+      "joinedUserId": "6aa281c49db6a2359dadd67a",
+      "joinedUserName": "Shovon Roy",
+      "joinedUserAvatar": "https://lh3.googleusercontent.com/a/ACg8ocLnwupzvn-ynULcZxGGiPo7P26fKNVxbXH_QA_uPhg-zFJ3=s96-c"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T05:06:35.334Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T05:06:35.334Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab35e5b11c3621d4feb68af"
+    },
+    "userId": {
+      "$oid": "6aa281c49db6a2359dadd67a"
+    },
+    "type": "event_join_success",
+    "title": "Joined event successfully",
+    "body": "You joined \"New Event 22/09\".",
+    "data": {
+      "eventId": "6ab1fe18205bb9c0f3cd7aff",
+      "participantId": "6ab35e5b11c3621d4feb68a6",
+      "entityType": "event",
+      "entityId": "6ab1fe18205bb9c0f3cd7aff",
+      "creatorId": "6aae64db205bb9c0f3cd70c3",
+      "joinedAt": {
+        "$date": "2026-09-23T05:06:35.294Z"
+      },
+      "priceType": "free"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T05:06:35.350Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T05:06:35.350Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab35ed411c3621d4feb696b"
+    },
+    "userId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "type": "event_updated",
+    "title": "Event updated",
+    "body": "The event \"New event test 900 am\" was updated.",
+    "data": {
+      "eventId": "6ab3411a205bb9c0f3cd84fc",
+      "entityType": "event",
+      "entityId": "6ab3411a205bb9c0f3cd84fc",
+      "changedFields": [
+        "title",
+        "category",
+        "description",
+        "startAt",
+        "country",
+        "state",
+        "city",
+        "participantLimit",
+        "priceType",
+        "ticketPrice",
+        "discountPercentage",
+        "durationMinutes"
+      ]
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T05:08:36.880Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T05:08:36.880Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab365fa11c3621d4feb6b49"
+    },
+    "userId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "type": "event_updated",
+    "title": "Event updated",
+    "body": "The event \"New event test 900 am\" was updated.",
+    "data": {
+      "eventId": "6ab3411a205bb9c0f3cd84fc",
+      "entityType": "event",
+      "entityId": "6ab3411a205bb9c0f3cd84fc",
+      "changedFields": [
+        "title",
+        "category",
+        "description",
+        "startAt",
+        "country",
+        "state",
+        "city",
+        "participantLimit",
+        "priceType",
+        "ticketPrice",
+        "discountPercentage",
+        "durationMinutes"
+      ]
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T05:39:06.480Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T05:39:06.480Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab366d411c3621d4feb6c91"
+    },
+    "userId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "type": "event_updated",
+    "title": "Event updated",
+    "body": "The event \"New event test 900 am\" was updated.",
+    "data": {
+      "eventId": "6ab3411a205bb9c0f3cd84fc",
+      "entityType": "event",
+      "entityId": "6ab3411a205bb9c0f3cd84fc",
+      "changedFields": [
+        "title",
+        "category",
+        "description",
+        "startAt",
+        "country",
+        "state",
+        "city",
+        "participantLimit",
+        "priceType",
+        "ticketPrice",
+        "discountPercentage",
+        "durationMinutes"
+      ]
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T05:42:44.697Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T05:42:44.697Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab36e4711c3621d4feb6e22"
+    },
+    "userId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "type": "event_updated",
+    "title": "Event updated",
+    "body": "The event \"New event test 900 am\" was updated.",
+    "data": {
+      "eventId": "6ab3411a205bb9c0f3cd84fc",
+      "entityType": "event",
+      "entityId": "6ab3411a205bb9c0f3cd84fc",
+      "changedFields": [
+        "title",
+        "category",
+        "description",
+        "startAt",
+        "country",
+        "state",
+        "city",
+        "participantLimit",
+        "priceType",
+        "ticketPrice",
+        "discountPercentage",
+        "durationMinutes"
+      ]
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-23T06:14:31.530Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T06:14:31.530Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5640a24f2dc521620f51b"
+    },
+    "userId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "type": "report_warning",
+    "title": "Account warning",
+    "body": "You received a warning from admin after a report review.",
+    "data": {
+      "reportId": "6a7863c7f237be0417d3ff72",
+      "action": "warn",
+      "note": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T17:55:22.714Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T17:55:22.714Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5640a24f2dc521620f51f"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "report_status_updated",
+    "title": "Report updated",
+    "body": "An admin has completed an action on your report.",
+    "data": {
+      "reportId": "6a7863c7f237be0417d3ff72",
+      "status": "resolved",
+      "action": "warn"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T17:55:22.749Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T17:55:22.749Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5642c24f2dc521620f52a"
+    },
+    "userId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "type": "report_warning",
+    "title": "Account warning",
+    "body": "You received a warning from admin after a report review.",
+    "data": {
+      "reportId": "6a7863c7f237be0417d3ff72",
+      "action": "warn",
+      "note": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T17:55:56.236Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T17:55:56.236Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5642c24f2dc521620f52e"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "type": "report_status_updated",
+    "title": "Report updated",
+    "body": "An admin has completed an action on your report.",
+    "data": {
+      "reportId": "6a7863c7f237be0417d3ff72",
+      "status": "resolved",
+      "action": "warn"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T17:55:56.252Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T17:55:56.252Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5654e24f2dc521620f5aa"
+    },
+    "userId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "type": "content_reported",
+    "title": "Content reported",
+    "body": "One of your community_posts was reported and is under review.",
+    "data": {
+      "entityType": "community_post",
+      "entityId": "6aa8c5b79db6a2359dadef7a",
+      "reportId": "6ab5654e24f2dc521620f5a5"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:00:46.925Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:00:46.925Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5655f24f2dc521620f5da"
+    },
+    "userId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "type": "report_warning",
+    "title": "Account warning",
+    "body": "You received a warning from admin after a report review.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "action": "warn",
+      "note": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:01:03.698Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:01:03.698Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5655f24f2dc521620f5de"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "type": "report_status_updated",
+    "title": "Report updated",
+    "body": "An admin has completed an action on your report.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "status": "resolved",
+      "action": "warn"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:01:03.734Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:01:03.734Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5659024f2dc521620f5eb"
+    },
+    "userId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "type": "account_disabled",
+    "title": "Account disabled",
+    "body": "Your account has been disabled by admin after report review.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "action": "disable_user",
+      "note": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:01:52.937Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:01:52.937Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5659024f2dc521620f5ef"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "type": "report_status_updated",
+    "title": "Report updated",
+    "body": "An admin has completed an action on your report.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "status": "resolved",
+      "action": "disable_user"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:01:52.950Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:01:52.950Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab565b024f2dc521620f610"
+    },
+    "userId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "type": "account_recovered",
+    "title": "Account recovered",
+    "body": "Your account has been recovered by admin after report review.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "action": "recover_user",
+      "note": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:02:24.555Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:02:24.555Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab565b024f2dc521620f614"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "type": "report_status_updated",
+    "title": "Report updated",
+    "body": "An admin has completed an action on your report.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "status": "resolved",
+      "action": "recover_user"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:02:24.570Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:02:24.570Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab566fc24f2dc521620f710"
+    },
+    "userId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "type": "account_disabled",
+    "title": "Account disabled",
+    "body": "Your account has been disabled by admin after report review.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "action": "disable_user",
+      "note": null
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:07:56.567Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:07:56.567Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab566fc24f2dc521620f714"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "type": "report_status_updated",
+    "title": "Report updated",
+    "body": "An admin has completed an action on your report.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "status": "resolved",
+      "action": "disable_user"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:07:56.584Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:07:56.584Z"
+    },
+    "__v": 0
+  }
+]

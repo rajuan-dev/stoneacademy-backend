@@ -1,0 +1,443 @@
+[
+  {
+    "_id": {
+      "$oid": "69e94690d48bec1a271d533c"
+    },
+    "payerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "eventId": {
+      "$oid": "69e68b3b4f6e90932471e7f0"
+    },
+    "grossAmount": 319.5,
+    "currency": "USD",
+    "platformFeeAmount": 31.95,
+    "creatorShareAmount": 287.55,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-04-22T22:07:13.016Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T22:07:36.421Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TP8vREuf4ZHOjkv1CzWxhsw"
+  },
+  {
+    "_id": {
+      "$oid": "69e95365b18bfdc887320d29"
+    },
+    "payerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "eventId": {
+      "$oid": "69e64e464f6e90932471e77f"
+    },
+    "grossAmount": 139.5,
+    "currency": "USD",
+    "platformFeeAmount": 13.95,
+    "creatorShareAmount": 125.55,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-04-22T23:01:57.860Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T23:02:29.069Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TP9mQEuf4ZHOjkv1vo2edhn"
+  },
+  {
+    "_id": {
+      "$oid": "6a10c73abb0473149748f2ca"
+    },
+    "payerId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "eventId": {
+      "$oid": "69e64e464f6e90932471e77f"
+    },
+    "grossAmount": 139.5,
+    "currency": "USD",
+    "platformFeeAmount": 13.95,
+    "creatorShareAmount": 125.55,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-05-22T21:14:34.343Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T21:15:15.608Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3Ta0OsEuf4ZHOjkv1nME5qdd"
+  },
+  {
+    "_id": {
+      "$oid": "6a15e725bb04731497490017"
+    },
+    "payerId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "eventId": {
+      "$oid": "69e64e464f6e90932471e77f"
+    },
+    "grossAmount": 139.5,
+    "currency": "USD",
+    "platformFeeAmount": 13.95,
+    "creatorShareAmount": 125.55,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-05-26T18:32:05.716Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:33:05.187Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TbPlpEuf4ZHOjkv0I5euPaO"
+  },
+  {
+    "_id": {
+      "$oid": "6a15e8bebb04731497490055"
+    },
+    "payerId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "eventId": {
+      "$oid": "69e68b234f6e90932471e7ed"
+    },
+    "grossAmount": 229.5,
+    "currency": "USD",
+    "platformFeeAmount": 22.95,
+    "creatorShareAmount": 206.55,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-05-26T18:38:54.359Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:41:19.585Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TbPsQEuf4ZHOjkv0mga7oLn"
+  },
+  {
+    "_id": {
+      "$oid": "6a15f804bb04731497490289"
+    },
+    "payerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "eventId": {
+      "$oid": "69e64e464f6e90932471e77f"
+    },
+    "grossAmount": 139.5,
+    "currency": "USD",
+    "platformFeeAmount": 13.95,
+    "creatorShareAmount": 125.55,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-05-26T19:44:04.939Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:46:28.708Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TbQtVEuf4ZHOjkv1EGOKeo0"
+  },
+  {
+    "_id": {
+      "$oid": "6a3456d07c0c56fc208af5dd"
+    },
+    "payerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "eventId": {
+      "$oid": "69e68b234f6e90932471e7ed"
+    },
+    "grossAmount": 229.5,
+    "currency": "USD",
+    "platformFeeAmount": 22.95,
+    "creatorShareAmount": 206.55,
+    "platformFeePercent": 10,
+    "status": "pending",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-06-18T20:36:32.111Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-18T20:36:32.543Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TjmfsEuf4ZHOjkv1kMW5YQa"
+  },
+  {
+    "_id": {
+      "$oid": "6a3c46b154b0bd80d012b8cc"
+    },
+    "payerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "eventId": {
+      "$oid": "69e64e464f6e90932471e77f"
+    },
+    "grossAmount": 139.5,
+    "currency": "USD",
+    "platformFeeAmount": 13.95,
+    "creatorShareAmount": 125.55,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-06-24T21:05:53.421Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T21:08:51.605Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TlxzZEuf4ZHOjkv0WLtv6wO"
+  },
+  {
+    "_id": {
+      "$oid": "6a5d13783291b666e0033c2c"
+    },
+    "payerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "eventId": {
+      "$oid": "6a5d134e3291b666e0033bfc"
+    },
+    "grossAmount": 90,
+    "currency": "USD",
+    "platformFeeAmount": 9,
+    "creatorShareAmount": 81,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-07-19T18:12:08.699Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T18:12:59.131Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TuzC8Euf4ZHOjkv07jhYynj"
+  },
+  {
+    "_id": {
+      "$oid": "6a5d18d83291b666e0033d1d"
+    },
+    "payerId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "eventId": {
+      "$oid": "6a5d134e3291b666e0033bfc"
+    },
+    "grossAmount": 90,
+    "currency": "USD",
+    "platformFeeAmount": 9,
+    "creatorShareAmount": 81,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-07-19T18:35:04.782Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T18:35:40.344Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3TuzYKEuf4ZHOjkv0pgnQSMW"
+  },
+  {
+    "_id": {
+      "$oid": "6a9f85d68ca236ab68e2e453"
+    },
+    "payerId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "eventId": {
+      "$oid": "6a9f858c8ca236ab68e2e422"
+    },
+    "grossAmount": 108,
+    "currency": "USD",
+    "platformFeeAmount": 10.8,
+    "creatorShareAmount": 97.2,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-09-08T03:49:42.347Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T03:50:23.043Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3UDG2UEuf4ZHOjkv0MhHgl2s"
+  },
+  {
+    "_id": {
+      "$oid": "6aa281db9db6a2359dadd699"
+    },
+    "payerId": {
+      "$oid": "6aa281c49db6a2359dadd67a"
+    },
+    "eventId": {
+      "$oid": "6a9f858c8ca236ab68e2e422"
+    },
+    "grossAmount": 108,
+    "currency": "USD",
+    "platformFeeAmount": 10.8,
+    "creatorShareAmount": 97.2,
+    "platformFeePercent": 10,
+    "status": "completed",
+    "provider": "stripe",
+    "createdAt": {
+      "$date": "2026-09-10T10:09:31.532Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-10T10:10:04.261Z"
+    },
+    "__v": 0,
+    "providerReference": "pi_3UE4v9Euf4ZHOjkv17WRQ8Ok"
+  },
+  {
+    "_id": {
+      "$oid": "6ab341a7bff4828c309454b8"
+    },
+    "purchaseLockKey": "event:6ab3411a205bb9c0f3cd84fc:payer:6a9ed75e8ca236ab68e2d12a",
+    "activePurchase": true,
+    "paymentStatus": "succeeded",
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-23T03:04:07.764Z"
+    },
+    "creatorEarningStatus": "pending",
+    "creatorId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "creatorShareAmount": 81,
+    "creatorShareAmountMinor": 8100,
+    "currency": "USD",
+    "disputeStatus": "none",
+    "eventId": {
+      "$oid": "6ab3411a205bb9c0f3cd84fc"
+    },
+    "grossAmount": 90,
+    "grossAmountMinor": 9000,
+    "payerId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "paymentArchitecture": "platform_charge_delayed_transfer",
+    "platformFeeAmount": 9,
+    "platformFeeAmountMinor": 900,
+    "platformFeePercent": 10,
+    "provider": "stripe",
+    "refundStatus": "none",
+    "refundedAmountMinor": 0,
+    "status": "completed",
+    "transferGroup": "event_6ab3411a205bb9c0f3cd84fc_payer_6a9ed75e8ca236ab68e2d12a",
+    "transferStatus": "not_created",
+    "updatedAt": {
+      "$date": "2026-09-23T03:05:01.494Z"
+    },
+    "providerReference": "pi_3UIgTbEuf4ZHOjkv15r7tByf",
+    "stripePaymentIntentId": "pi_3UIgTbEuf4ZHOjkv15r7tByf"
+  },
+  {
+    "_id": {
+      "$oid": "6ab3461bbff4828c309454e8"
+    },
+    "paymentStatus": "pending",
+    "purchaseLockKey": "event:6ab3411a205bb9c0f3cd84fc:payer:6aa281c49db6a2359dadd67a",
+    "activePurchase": true,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-23T03:23:07.749Z"
+    },
+    "creatorEarningStatus": "pending",
+    "creatorId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "creatorShareAmount": 81,
+    "creatorShareAmountMinor": 8100,
+    "currency": "USD",
+    "disputeStatus": "none",
+    "eventId": {
+      "$oid": "6ab3411a205bb9c0f3cd84fc"
+    },
+    "grossAmount": 90,
+    "grossAmountMinor": 9000,
+    "payerId": {
+      "$oid": "6aa281c49db6a2359dadd67a"
+    },
+    "paymentArchitecture": "platform_charge_delayed_transfer",
+    "platformFeeAmount": 9,
+    "platformFeeAmountMinor": 900,
+    "platformFeePercent": 10,
+    "provider": "stripe",
+    "refundStatus": "none",
+    "refundedAmountMinor": 0,
+    "status": "pending",
+    "transferGroup": "event_6ab3411a205bb9c0f3cd84fc_payer_6aa281c49db6a2359dadd67a",
+    "transferStatus": "not_created",
+    "updatedAt": {
+      "$date": "2026-09-23T06:08:44.519Z"
+    },
+    "providerReference": "pi_3UIgm7Euf4ZHOjkv0faqb5LC",
+    "stripePaymentIntentId": "pi_3UIgm7Euf4ZHOjkv0faqb5LC"
+  },
+  {
+    "_id": {
+      "$oid": "6ab36f9abff4828c30945809"
+    },
+    "paymentStatus": "pending",
+    "purchaseLockKey": "event:6ab36f7c11c3621d4feb6ef8:payer:6aae64db205bb9c0f3cd70c3",
+    "activePurchase": true,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-23T06:20:10.299Z"
+    },
+    "creatorEarningStatus": "pending",
+    "creatorId": {
+      "$oid": "6ab36dea11c3621d4feb6d9a"
+    },
+    "creatorShareAmount": 81,
+    "creatorShareAmountMinor": 8100,
+    "currency": "USD",
+    "disputeStatus": "none",
+    "eventId": {
+      "$oid": "6ab36f7c11c3621d4feb6ef8"
+    },
+    "grossAmount": 90,
+    "grossAmountMinor": 9000,
+    "payerId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "paymentArchitecture": "platform_charge_delayed_transfer",
+    "platformFeeAmount": 9,
+    "platformFeeAmountMinor": 900,
+    "platformFeePercent": 10,
+    "provider": "stripe",
+    "refundStatus": "none",
+    "refundedAmountMinor": 0,
+    "status": "pending",
+    "transferGroup": "event_6ab36f7c11c3621d4feb6ef8_payer_6aae64db205bb9c0f3cd70c3",
+    "transferStatus": "not_created",
+    "updatedAt": {
+      "$date": "2026-09-23T06:20:10.476Z"
+    },
+    "providerReference": "pi_3UIjXK2WjUUudXs20iuQAm2l",
+    "stripePaymentIntentId": "pi_3UIjXK2WjUUudXs20iuQAm2l"
+  }
+]

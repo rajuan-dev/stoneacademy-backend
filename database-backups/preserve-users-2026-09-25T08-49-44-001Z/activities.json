@@ -1,0 +1,1004 @@
+[
+  {
+    "_id": {
+      "$oid": "6a10e226bb0473149748f68e"
+    },
+    "hostId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "title": "New activity",
+    "type": "Morning Walk",
+    "description": "New desc",
+    "startAt": {
+      "$date": "2026-05-22T23:26:00Z"
+    },
+    "location": {
+      "label": "40.76448508723977,-73.96751806139946",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -73.96751806139946,
+          40.76448508723977
+        ]
+      }
+    },
+    "distanceMiles": 120,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a10e226bb0473149748f68a"
+      },
+      {
+        "$oid": "6a10e226bb0473149748f68b"
+      },
+      {
+        "$oid": "6a10e226bb0473149748f68c"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-05-22T23:09:26.481Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T23:09:26.481Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15e041bb0473149748ff9f"
+    },
+    "hostId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "title": "New Activity",
+    "type": "Morning Walk",
+    "description": "New desc",
+    "startAt": {
+      "$date": "2026-06-10T11:56:00Z"
+    },
+    "distanceMiles": 120,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a15e041bb0473149748ff9d"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-05-26T18:02:41.122Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:45:03.620Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15e1d5bb0473149748ffe0"
+    },
+    "hostId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "title": "New Activity 10",
+    "type": "Morning Walk",
+    "description": "New desc",
+    "startAt": {
+      "$date": "2026-06-30T18:07:00Z"
+    },
+    "location": {
+      "label": "40.782953471137404,-73.95262610167265",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -73.95262610167265,
+          40.782953471137404
+        ]
+      }
+    },
+    "distanceMiles": 120,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a15e1d5bb0473149748ffde"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 3
+    },
+    "createdAt": {
+      "$date": "2026-05-26T18:09:25.471Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:13.617Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f70bbb04731497490227"
+    },
+    "hostId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "title": "Laughing club",
+    "type": "Laughing Club",
+    "description": "New desc",
+    "startAt": {
+      "$date": "2026-06-05T19:39:00Z"
+    },
+    "location": {
+      "label": "19.054999,72.8692035",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          72.8692035,
+          19.054999
+        ]
+      }
+    },
+    "distanceMiles": 120,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a15f70bbb04731497490225"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-05-26T19:39:55.299Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:39:55.299Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a39aac0f3b2b1bd47cd7a8a"
+    },
+    "hostId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "title": "Test",
+    "type": "Laughing Club",
+    "description": "Tedt",
+    "startAt": {
+      "$date": "2026-06-26T21:35:00Z"
+    },
+    "location": {
+      "label": "40.778842974638216,-73.96678615361452",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -73.96678615361452,
+          40.778842974638216
+        ]
+      }
+    },
+    "distanceMiles": 120,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a39aabff3b2b1bd47cd7a88"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-06-22T21:36:00.300Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T21:21:42.897Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c167b54b0bd80d012b638"
+    },
+    "hostId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "title": "New Activity 10",
+    "type": "Morning Walk",
+    "description": "New description",
+    "startAt": {
+      "$date": "2027-06-09T17:31:00Z"
+    },
+    "location": {
+      "label": "23.7020956,90.4240059",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4240059,
+          23.7020956
+        ]
+      }
+    },
+    "distanceMiles": 120,
+    "participantLimit": 30,
+    "media": [
+      {
+        "$oid": "6a3c167b54b0bd80d012b635"
+      },
+      {
+        "$oid": "6a3c167b54b0bd80d012b636"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-06-24T17:40:11.107Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-06T21:08:56.412Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d8fde22ab874b91dae422"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Walking",
+    "type": "Laughing Club",
+    "description": "",
+    "startAt": {
+      "$date": "2026-06-25T21:26:00Z"
+    },
+    "location": {
+      "label": "32.773214,-97.3051738",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -97.3051738,
+          32.773214
+        ]
+      }
+    },
+    "distanceMiles": 15,
+    "participantLimit": 20,
+    "media": [
+      {
+        "$oid": "6a3d8fde22ab874b91dae420"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-06-25T20:30:22.638Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:30:22.638Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d915822ab874b91dae47c"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Morning walk with Tiger",
+    "type": "Laughing Club",
+    "description": "3 people....",
+    "startAt": {
+      "$date": "2026-06-28T15:33:00Z"
+    },
+    "location": {
+      "label": "23.0842444,89.1246937",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          89.1246937,
+          23.0842444
+        ]
+      }
+    },
+    "distanceMiles": 9,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a3d915822ab874b91dae47a"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-06-25T20:36:40.857Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:36:40.857Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d91a422ab874b91dae4a1"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Biking",
+    "type": "Morning Walk",
+    "description": "Bike with friends",
+    "startAt": {
+      "$date": "2026-06-25T21:36:00Z"
+    },
+    "location": {
+      "label": "32.773214,-97.3051738",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -97.3051738,
+          32.773214
+        ]
+      }
+    },
+    "distanceMiles": 78,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a3d91a422ab874b91dae49f"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-06-25T20:37:56.087Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:37:56.087Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3dc71322ab874b91dae80f"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Walkk",
+    "type": "Laughing Club",
+    "description": "",
+    "startAt": {
+      "$date": "2026-06-26T00:49:00Z"
+    },
+    "location": {
+      "label": "32.773214,-97.3051738",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -97.3051738,
+          32.773214
+        ]
+      }
+    },
+    "distanceMiles": 1999,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a3dc71322ab874b91dae80d"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-06-26T00:25:55.053Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-26T00:25:55.053Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4ac57c22ab874b91db14e5"
+    },
+    "hostId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "title": "Walking Activity",
+    "type": "Morning Walk",
+    "description": "Test",
+    "startAt": {
+      "$date": "2027-07-05T20:57:00Z"
+    },
+    "location": {
+      "label": "55.6764526,12.5754685",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          12.5754685,
+          55.6764526
+        ]
+      }
+    },
+    "distanceMiles": 120,
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a4ac57c22ab874b91db14e3"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-07-05T20:58:36.550Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-07T01:39:33.348Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a57fb51d04483c1b6588aee"
+    },
+    "hostId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "title": "New activity",
+    "type": "Laughing Club",
+    "description": "Activity",
+    "startAt": {
+      "$date": "2026-07-16T21:26:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7808132,90.4074913",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4074913,
+          23.7808132
+        ]
+      }
+    },
+    "distanceMiles": 100,
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a57fb50d04483c1b6588aec"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-07-15T21:27:45.238Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T00:35:16.161Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a58148aa65ca039a6f95a76"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Activity new 10",
+    "type": "Laughing Club",
+    "description": "Activity desc",
+    "startAt": {
+      "$date": "2027-07-18T22:14:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7093978,90.433806",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.433806,
+          23.7093978
+        ]
+      }
+    },
+    "distanceMiles": 1,
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a581489a65ca039a6f95a74"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-15T23:15:22.202Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-15T23:15:22.202Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a596f814fe5a7003093e8ff"
+    },
+    "hostId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "title": "New activity 100",
+    "type": "Morning Walk",
+    "description": "Desc",
+    "startAt": {
+      "$date": "2026-07-17T23:54:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Narayanganj",
+    "location": {
+      "label": "23.6236732,90.4988075",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4988075,
+          23.6236732
+        ]
+      }
+    },
+    "distanceMiles": 10,
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a596f814fe5a7003093e8fd"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-16T23:55:45.866Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T23:55:45.866Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5970f94fe5a7003093e98a"
+    },
+    "hostId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "title": "New event 100",
+    "type": "Laughing Club",
+    "description": "Desx",
+    "startAt": {
+      "$date": "2026-07-18T00:01:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Khulna Division",
+    "city": "Satkhira",
+    "location": {
+      "label": "22.7166509,89.0749857",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          89.0749857,
+          22.7166509
+        ]
+      }
+    },
+    "distanceMiles": 10,
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a5970f94fe5a7003093e988"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-17T00:02:01.849Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-17T00:02:01.849Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5be3c333d8e9449fbfbbd1"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Country Filter Activity",
+    "type": "sports",
+    "description": "Activity for geo-filter verification",
+    "startAt": {
+      "$date": "2026-08-02T18:00:00Z"
+    },
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "location": {
+      "label": "Santa Monica",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -118.4912,
+          34.0195
+        ]
+      }
+    },
+    "participantLimit": 15,
+    "media": [],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T20:36:19.745Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T20:36:19.745Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bec52ff2b9650f97cc95c"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Country Filter Activity",
+    "category": "sports",
+    "type": "sports",
+    "description": "Activity for geo-filter verification",
+    "startAt": {
+      "$date": "2026-08-02T18:00:00Z"
+    },
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "location": {
+      "label": "Santa Monica",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -118.4912,
+          34.0195
+        ]
+      }
+    },
+    "distance": 5,
+    "distanceType": "miles",
+    "distanceMiles": 5,
+    "duration": "45 min",
+    "participantLimit": 15,
+    "media": [],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T21:12:50.652Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T21:12:50.652Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bec60ff2b9650f97cc961"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Country Filter Activity",
+    "category": "general",
+    "type": "general",
+    "description": "Activity for geo-filter verification",
+    "startAt": {
+      "$date": "2026-08-02T18:00:00Z"
+    },
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "location": {
+      "label": "Santa Monica",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -118.4912,
+          34.0195
+        ]
+      }
+    },
+    "distance": 5,
+    "distanceType": "miles",
+    "distanceMiles": 5,
+    "duration": "45 min",
+    "participantLimit": 15,
+    "media": [],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T21:13:04.051Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T21:13:04.051Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bec79ff2b9650f97cc966"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Country Filter Activity",
+    "category": "test category",
+    "type": "test category",
+    "description": "Activity for geo-filter verification",
+    "startAt": {
+      "$date": "2026-08-02T18:00:00Z"
+    },
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "location": {
+      "label": "Santa Monica",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -118.4912,
+          34.0195
+        ]
+      }
+    },
+    "distance": 5,
+    "distanceType": "miles",
+    "distanceMiles": 5,
+    "duration": "45 min",
+    "participantLimit": 15,
+    "media": [],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T21:13:29.762Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T21:13:29.762Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bf26d87f22da07f3747bd"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Activity dex update",
+    "category": "Morning Walk",
+    "description": "Dex",
+    "startAt": {
+      "$date": "2026-07-29T21:38:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Sylhet Division",
+    "city": "Sylhet",
+    "location": {
+      "label": "24.89922,91.8685271",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          91.8685271,
+          24.89922
+        ]
+      }
+    },
+    "distance": 100,
+    "distanceType": "km",
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a5bf26c87f22da07f3747bb"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T21:38:53.343Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T00:27:13.802Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a64c91a3291b666e0034d0b"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Walk at trinity",
+    "category": "Laughing Club",
+    "description": "No pets",
+    "startAt": {
+      "$date": "2026-07-31T05:29:00Z"
+    },
+    "country": "United States",
+    "state": "Texas",
+    "city": "Fort Worth",
+    "location": {
+      "label": "32.7730483,-97.3051664",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -97.3051664,
+          32.7730483
+        ]
+      }
+    },
+    "distance": 2,
+    "distanceType": "miles",
+    "distanceMiles": 2,
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a64c91a3291b666e0034d09"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-25T14:32:58.380Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T14:32:58.380Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a64caa63291b666e0034de5"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "T3st",
+    "category": "Morning Walk",
+    "description": "Test",
+    "startAt": {
+      "$date": "2026-07-25T17:05:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Mymensingh Division",
+    "city": "Mymensingh District",
+    "location": {
+      "label": "24.476406373718017,90.2962177991867",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.2962177991867,
+          24.476406373718017
+        ]
+      }
+    },
+    "distance": 2,
+    "distanceType": "miles",
+    "distanceMiles": 2,
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a64caa63291b666e0034de3"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-25T14:39:34.083Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T14:39:34.083Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a64da6d3291b666e0034edf"
+    },
+    "hostId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Testing 5",
+    "category": "Laughing Club",
+    "description": "Testing description. \nvbn\nn",
+    "startAt": {
+      "$date": "2026-07-30T03:46:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.8693275,90.3926893",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3926893,
+          23.8693275
+        ]
+      }
+    },
+    "distance": 56,
+    "distanceType": "km",
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a64da6c3291b666e0034edd"
+      }
+    ],
+    "status": "approved",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-25T15:46:53.010Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:46:53.010Z"
+    },
+    "__v": 0
+  }
+]

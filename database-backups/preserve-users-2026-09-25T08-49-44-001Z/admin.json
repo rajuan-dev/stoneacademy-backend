@@ -1,0 +1,33 @@
+[
+  {
+    "_id": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "email": "admin@stoneacademy.com",
+    "passwordHash": "$2b$12$FcYtt3zr5yxfqMQ3j0hHMeAvQbX.vsagt0/xI6oxMKsfujlXbC1.6",
+    "fullName": "Admin User",
+    "phoneNumber": "+1234567890",
+    "contactNo": "+1234567890",
+    "role": "admin",
+    "status": "active",
+    "accountStatus": "active",
+    "emailVerified": true,
+    "emailVerifiedAt": {
+      "$date": "2026-04-20T15:19:39.059Z"
+    },
+    "profilePhoto": {
+      "$oid": "69e92d8815f9b9047555a59a"
+    },
+    "profileImageUrl": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/admins/69e6440b4f6e90932471e6ef/2fb20bfc-13ab-44fc-9bd4-d726968987a5.png",
+    "createdAt": {
+      "$date": "2026-04-20T15:19:39.059Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T17:44:37.877Z"
+    },
+    "__v": 0,
+    "lastLoginAt": {
+      "$date": "2026-09-24T17:44:37.877Z"
+    }
+  }
+]

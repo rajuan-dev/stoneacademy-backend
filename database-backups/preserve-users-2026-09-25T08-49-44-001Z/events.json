@@ -1,0 +1,903 @@
+[
+  {
+    "_id": {
+      "$oid": "69e64e464f6e90932471e77f"
+    },
+    "creatorId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "title": "paid Event",
+    "type": "running",
+    "description": "Desc",
+    "startAt": {
+      "$date": "2027-02-20T00:48:12Z"
+    },
+    "endAt": {
+      "$date": "2027-02-20T01:08:12Z"
+    },
+    "location": {
+      "label": "23.7643863,90.3890144",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3890144,
+          23.7643863
+        ]
+      }
+    },
+    "participantLimit": 25,
+    "media": [],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 155,
+    "discountPercentage": 10,
+    "durationMinutes": 20,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 5
+    },
+    "createdAt": {
+      "$date": "2026-04-20T16:03:18.042Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T21:09:05.149Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69e68b234f6e90932471e7ed"
+    },
+    "creatorId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "title": "paid Event",
+    "type": "walking",
+    "description": "Desc",
+    "startAt": {
+      "$date": "2027-02-20T00:48:12Z"
+    },
+    "endAt": {
+      "$date": "2027-02-20T01:08:12Z"
+    },
+    "location": {
+      "label": "23.7643863,90.3890144",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3890144,
+          23.7643863
+        ]
+      }
+    },
+    "participantLimit": 25,
+    "media": [],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 255,
+    "discountPercentage": 10,
+    "durationMinutes": 20,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-04-20T20:22:59.007Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:41:42.994Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69e68b3b4f6e90932471e7f0"
+    },
+    "creatorId": {
+      "$oid": "69e645854f6e90932471e767"
+    },
+    "title": "paid Event",
+    "type": "jogging",
+    "description": "Desc",
+    "startAt": {
+      "$date": "2027-02-20T00:48:12Z"
+    },
+    "endAt": {
+      "$date": "2027-02-20T01:08:12Z"
+    },
+    "location": {
+      "label": "23.7643863,90.3890144",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3890144,
+          23.7643863
+        ]
+      }
+    },
+    "participantLimit": 25,
+    "media": [],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 355,
+    "discountPercentage": 10,
+    "durationMinutes": 20,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-04-20T20:23:23.695Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T22:08:04.372Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69e8d3a146efa9ddaa9da4de"
+    },
+    "creatorId": {
+      "$oid": "69e8d36546efa9ddaa9da4d6"
+    },
+    "title": "paid Event",
+    "type": "jogging",
+    "description": "Desc",
+    "startAt": {
+      "$date": "2027-02-20T00:48:12Z"
+    },
+    "endAt": {
+      "$date": "2027-02-20T01:08:12Z"
+    },
+    "location": {
+      "label": "23.7643863,90.3890144",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3890144,
+          23.7643863
+        ]
+      }
+    },
+    "participantLimit": 25,
+    "media": [],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 355,
+    "discountPercentage": 10,
+    "durationMinutes": 20,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-04-22T13:56:49.448Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T16:12:30.055Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f78cbb04731497490245"
+    },
+    "creatorId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "title": "New event",
+    "type": "Laughing Club",
+    "description": "New event",
+    "startAt": {
+      "$date": "2026-07-31T19:41:00Z"
+    },
+    "endAt": {
+      "$date": "2026-07-31T21:41:00Z"
+    },
+    "location": {
+      "label": "23.7643863,90.3890144",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3890144,
+          23.7643863
+        ]
+      }
+    },
+    "participantLimit": 25,
+    "media": [
+      {
+        "$oid": "6a15f78cbb04731497490243"
+      }
+    ],
+    "status": "approved",
+    "priceType": "free",
+    "ticketPrice": 0,
+    "discountPercentage": 0,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 2
+    },
+    "createdAt": {
+      "$date": "2026-05-26T19:42:04.683Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T20:52:16.735Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5808b9d04483c1b6588c6a"
+    },
+    "creatorId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Event title",
+    "type": "Morning Walk",
+    "description": "Event desc",
+    "startAt": {
+      "$date": "2026-07-18T22:23:00Z"
+    },
+    "endAt": {
+      "$date": "2026-07-18T22:24:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7808132,90.4074913",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4074913,
+          23.7808132
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a5808b9d04483c1b6588c68"
+      }
+    ],
+    "status": "approved",
+    "priceType": "free",
+    "ticketPrice": 0,
+    "discountPercentage": 0,
+    "durationMinutes": 1,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-15T22:24:57.426Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-15T22:24:57.426Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bd3a35522674f171d931a"
+    },
+    "creatorId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "New paid event",
+    "type": "Morning Walk",
+    "description": "New desx",
+    "startAt": {
+      "$date": "2026-07-20T19:26:00Z"
+    },
+    "endAt": {
+      "$date": "2026-07-20T21:29:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Barisal Division",
+    "city": "Barisal District",
+    "location": {
+      "label": "22.4934035,90.3548015",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3548015,
+          22.4934035
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a5bd3a05522674f171d9318"
+      }
+    ],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 100,
+    "discountPercentage": 10,
+    "durationMinutes": 123,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T19:27:31.051Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T19:27:31.051Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5be3ac33d8e9449fbfbbcc"
+    },
+    "creatorId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Country Filter Event",
+    "type": "networking",
+    "description": "Event for geo-filter verification",
+    "startAt": {
+      "$date": "2026-08-01T18:00:00Z"
+    },
+    "endAt": {
+      "$date": "2026-08-01T19:00:00Z"
+    },
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "location": {
+      "label": "Downtown Los Angeles",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -118.2437,
+          34.0522
+        ]
+      }
+    },
+    "participantLimit": 25,
+    "media": [],
+    "status": "approved",
+    "priceType": "free",
+    "ticketPrice": 0,
+    "discountPercentage": 0,
+    "durationMinutes": 60,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T20:35:56.821Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T20:35:56.821Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5beefa87f22da07f37475f"
+    },
+    "creatorId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Event",
+    "category": "Laughing Club",
+    "description": "Dec",
+    "startAt": {
+      "$date": "2026-07-26T21:23:00Z"
+    },
+    "endAt": {
+      "$date": "2026-07-26T21:24:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Chittagong Division",
+    "city": "Chittagong",
+    "location": {
+      "label": "22.333778,91.8344348",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          91.8344348,
+          22.333778
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a5beefa87f22da07f37475d"
+      }
+    ],
+    "status": "approved",
+    "priceType": "free",
+    "ticketPrice": 0,
+    "discountPercentage": 0,
+    "durationMinutes": 1,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-07-18T21:24:10.977Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T21:24:10.977Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5bf8a487f22da07f3747fe"
+    },
+    "creatorId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "title": "Country Filter Event Updated",
+    "category": "wellness",
+    "description": "Updated event for geo-filter verification",
+    "startAt": {
+      "$date": "2026-08-03T18:30:00Z"
+    },
+    "endAt": {
+      "$date": "2026-08-03T20:00:00Z"
+    },
+    "country": "United States",
+    "state": "California",
+    "city": "Los Angeles",
+    "location": {
+      "label": "Hollywood",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          -118.3267,
+          34.0983
+        ]
+      }
+    },
+    "participantLimit": 30,
+    "media": [
+      {
+        "$oid": "6a5bf8a487f22da07f3747fc"
+      }
+    ],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 15,
+    "discountPercentage": 10,
+    "durationMinutes": 90,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-07-18T22:05:24.995Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T00:17:17.163Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a5d134e3291b666e0033bfc"
+    },
+    "creatorId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "title": "New event paid",
+    "category": "Morning Walk",
+    "description": "Desx",
+    "startAt": {
+      "$date": "2026-07-30T18:10:00Z"
+    },
+    "endAt": {
+      "$date": "2026-07-30T20:10:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7643863,90.3890144",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3890144,
+          23.7643863
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a5d134e3291b666e0033bfa"
+      }
+    ],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 100,
+    "discountPercentage": 10,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 2
+    },
+    "createdAt": {
+      "$date": "2026-07-19T18:11:26.243Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T18:35:47.764Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9e8cb672eb03f42a2b06ee"
+    },
+    "creatorId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "title": "New event 130",
+    "category": "Morning Walk",
+    "description": "Description",
+    "startAt": {
+      "$date": "2027-09-07T10:06:00Z"
+    },
+    "endAt": {
+      "$date": "2027-09-07T12:06:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Khulna Division",
+    "city": "Jessore District",
+    "location": {
+      "label": "22.9372087,89.2852741",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          89.2852741,
+          22.9372087
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a9e8cb672eb03f42a2b06ec"
+      }
+    ],
+    "status": "approved",
+    "priceType": "free",
+    "ticketPrice": 0,
+    "discountPercentage": 0,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-09-07T10:06:46.265Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-07T10:06:46.265Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9f858c8ca236ab68e2e422"
+    },
+    "creatorId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "title": "New paid event 2026",
+    "category": "Morning Walk",
+    "description": "Description",
+    "startAt": {
+      "$date": "2027-09-08T03:46:00Z"
+    },
+    "endAt": {
+      "$date": "2027-09-08T05:46:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7643863,90.3890144",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.3890144,
+          23.7643863
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6a9f858c8ca236ab68e2e420"
+      }
+    ],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 120,
+    "discountPercentage": 10,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 2
+    },
+    "createdAt": {
+      "$date": "2026-09-08T03:48:28.629Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-10T10:10:10.248Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6aae66a2205bb9c0f3cd7162"
+    },
+    "creatorId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "title": "Teat 1",
+    "category": "Laughing Club",
+    "description": "Description",
+    "startAt": {
+      "$date": "2026-09-26T10:40:00Z"
+    },
+    "endAt": {
+      "$date": "2026-09-26T10:42:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.78482201985304,90.4096993803978",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4096993803978,
+          23.78482201985304
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6aae66a2205bb9c0f3cd7160"
+      }
+    ],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 99,
+    "discountPercentage": 0,
+    "durationMinutes": 2,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-09-19T10:40:34.318Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-19T10:40:34.318Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab1eb54205bb9c0f3cd78ce"
+    },
+    "creatorId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "title": "New Event 200",
+    "category": "Laughing Club",
+    "description": "Description",
+    "startAt": {
+      "$date": "2027-09-22T02:42:00Z"
+    },
+    "endAt": {
+      "$date": "2027-09-22T04:42:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7019244,90.4240862",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4240862,
+          23.7019244
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6ab1eb54205bb9c0f3cd78cc"
+      }
+    ],
+    "status": "cancelled",
+    "priceType": "paid",
+    "ticketPrice": 100,
+    "discountPercentage": 10,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-09-22T02:43:32.943Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-22T03:05:02.306Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab1fe18205bb9c0f3cd7aff"
+    },
+    "creatorId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "title": "New Event 22/09",
+    "category": "Laughing Club",
+    "description": "Description",
+    "startAt": {
+      "$date": "2027-09-22T04:02:00Z"
+    },
+    "endAt": {
+      "$date": "2027-09-22T06:02:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.701923,90.4240801",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4240801,
+          23.701923
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6ab1fe18205bb9c0f3cd7afd"
+      }
+    ],
+    "status": "approved",
+    "priceType": "free",
+    "ticketPrice": 0,
+    "discountPercentage": 0,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-09-22T04:03:36.034Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T05:06:35.319Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab3411a205bb9c0f3cd84fc"
+    },
+    "creatorId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "title": "New event test 900 am",
+    "category": "Laughing Club",
+    "description": "Description",
+    "startAt": {
+      "$date": "2026-09-23T06:25:00Z"
+    },
+    "endAt": {
+      "$date": "2026-09-23T08:25:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7020862,90.4240768",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.4240768,
+          23.7020862
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6ab34119205bb9c0f3cd84fa"
+      }
+    ],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 100,
+    "discountPercentage": 10,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 1
+    },
+    "createdAt": {
+      "$date": "2026-09-23T03:01:46.018Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T06:14:31.517Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab36f7c11c3621d4feb6ef8"
+    },
+    "creatorId": {
+      "$oid": "6ab36dea11c3621d4feb6d9a"
+    },
+    "title": "New event tester paid",
+    "category": "Morning Walk",
+    "description": "Desc",
+    "startAt": {
+      "$date": "2026-09-23T06:25:00Z"
+    },
+    "endAt": {
+      "$date": "2026-09-23T08:25:00Z"
+    },
+    "country": "Bangladesh",
+    "state": "Dhaka Division",
+    "city": "Dhaka",
+    "location": {
+      "label": "23.7020817,90.424073",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [
+          90.424073,
+          23.7020817
+        ]
+      }
+    },
+    "participantLimit": 3,
+    "media": [
+      {
+        "$oid": "6ab36f7c11c3621d4feb6ef6"
+      }
+    ],
+    "status": "approved",
+    "priceType": "paid",
+    "ticketPrice": 100,
+    "discountPercentage": 10,
+    "durationMinutes": 120,
+    "currency": "USD",
+    "stats": {
+      "joinedCount": 0
+    },
+    "createdAt": {
+      "$date": "2026-09-23T06:19:40.915Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T06:19:40.915Z"
+    },
+    "__v": 0
+  }
+]

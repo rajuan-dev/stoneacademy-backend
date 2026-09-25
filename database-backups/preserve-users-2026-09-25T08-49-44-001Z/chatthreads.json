@@ -1,0 +1,244 @@
+[
+  {
+    "_id": {
+      "$oid": "6a10cb30bb0473149748f352"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a10b9c0bb0473149748f23e"
+      },
+      {
+        "$oid": "69e645854f6e90932471e767"
+      }
+    ],
+    "directKey": "69e645854f6e90932471e767|6a10b9c0bb0473149748f23e",
+    "createdAt": {
+      "$date": "2026-05-22T21:31:28.807Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T21:31:28.807Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10d963bb0473149748f3db"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a10b9c0bb0473149748f23e"
+      },
+      {
+        "$oid": "69e6440b4f6e90932471e6ef"
+      }
+    ],
+    "directKey": "69e6440b4f6e90932471e6ef|6a10b9c0bb0473149748f23e",
+    "createdAt": {
+      "$date": "2026-05-22T22:32:03.870Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T22:34:37.500Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f69dbb047314974901f5"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a15f611bb047314974901ab"
+      },
+      {
+        "$oid": "6a15d9f4bb0473149748ff39"
+      }
+    ],
+    "directKey": "6a15d9f4bb0473149748ff39|6a15f611bb047314974901ab",
+    "createdAt": {
+      "$date": "2026-05-26T19:38:05.246Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:38:12.586Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f982bb047314974902fe"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a15f611bb047314974901ab"
+      },
+      {
+        "$oid": "69e6440b4f6e90932471e6ef"
+      }
+    ],
+    "directKey": "69e6440b4f6e90932471e6ef|6a15f611bb047314974901ab",
+    "createdAt": {
+      "$date": "2026-05-26T19:50:26.456Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:50:45.726Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a315a75d66854885c6b7668"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "69e8e34f46efa9ddaa9da535"
+      },
+      {
+        "$oid": "6a15f611bb047314974901ab"
+      }
+    ],
+    "directKey": "69e8e34f46efa9ddaa9da535|6a15f611bb047314974901ab",
+    "createdAt": {
+      "$date": "2026-06-16T14:15:17.171Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-16T14:15:17.171Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a32f3697c0c56fc208af280"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "69e8e34f46efa9ddaa9da535"
+      },
+      {
+        "$oid": "69e6440b4f6e90932471e6ef"
+      }
+    ],
+    "directKey": "69e6440b4f6e90932471e6ef|69e8e34f46efa9ddaa9da535",
+    "createdAt": {
+      "$date": "2026-06-17T19:20:09.740Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-17T19:20:09.740Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6fbaf5b96c0518ce8386"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      },
+      {
+        "$oid": "6a15d9f4bb0473149748ff39"
+      }
+    ],
+    "directKey": "6a15d9f4bb0473149748ff39|6a15ee3abb047314974900fe",
+    "createdAt": {
+      "$date": "2026-06-25T00:00:58.501Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:50:00.311Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d94fe22ab874b91dae5ea"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      },
+      {
+        "$oid": "6a15f611bb047314974901ab"
+      }
+    ],
+    "directKey": "6a15ee3abb047314974900fe|6a15f611bb047314974901ab",
+    "createdAt": {
+      "$date": "2026-06-25T20:52:14.999Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:52:14.999Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d957622ab874b91dae61f"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      },
+      {
+        "$oid": "69e8e34f46efa9ddaa9da535"
+      }
+    ],
+    "directKey": "69e8e34f46efa9ddaa9da535|6a15ee3abb047314974900fe",
+    "createdAt": {
+      "$date": "2026-06-25T20:54:14.501Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-26T00:27:32.819Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d994622ab874b91dae72f"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      },
+      {
+        "$oid": "6a15dddcbb0473149748ff86"
+      }
+    ],
+    "directKey": "6a15dddcbb0473149748ff86|6a15ee3abb047314974900fe",
+    "createdAt": {
+      "$date": "2026-06-25T21:10:30.231Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T21:10:30.231Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a617dc63291b666e003460e"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a15ee3abb047314974900fe"
+      },
+      {
+        "$oid": "6a56aa578993f78888d74855"
+      }
+    ],
+    "directKey": "6a15ee3abb047314974900fe|6a56aa578993f78888d74855",
+    "createdAt": {
+      "$date": "2026-07-23T02:34:46.870Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T03:37:29.337Z"
+    },
+    "__v": 0
+  }
+]

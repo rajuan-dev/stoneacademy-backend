@@ -1,0 +1,146 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7a50b525d79c939cb9b56e"
+    },
+    "postId": {
+      "$oid": "6a7a506425d79c939cb9b4fe"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "createdAt": {
+      "$date": "2026-08-10T22:29:09.333Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-10T22:29:09.333Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a803ec1938a2801e94437a6"
+    },
+    "postId": {
+      "$oid": "6a7dce3c25d79c939cb9bf25"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "createdAt": {
+      "$date": "2026-08-15T10:26:09.367Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-15T10:26:09.367Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9cf697938a2801e94476f1"
+    },
+    "postId": {
+      "$oid": "6a786240f237be0417d3ff4a"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "createdAt": {
+      "$date": "2026-09-06T05:13:59.995Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-06T05:13:59.995Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9cf6b7938a2801e9447725"
+    },
+    "postId": {
+      "$oid": "6a7a693425d79c939cb9b65d"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "createdAt": {
+      "$date": "2026-09-06T05:14:31.510Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-06T05:14:31.510Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9eca8b5117d6f1c33ef160"
+    },
+    "postId": {
+      "$oid": "6a7a6a1825d79c939cb9b6b6"
+    },
+    "userId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "createdAt": {
+      "$date": "2026-09-07T14:30:35.371Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-07T14:30:35.371Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a9ff2af8ca236ab68e2f8cd"
+    },
+    "postId": {
+      "$oid": "6a7dce3c25d79c939cb9bf25"
+    },
+    "userId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "createdAt": {
+      "$date": "2026-09-08T11:34:07.771Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T11:34:07.771Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6aa3da119db6a2359daddbc9"
+    },
+    "postId": {
+      "$oid": "6a7a693425d79c939cb9b65d"
+    },
+    "userId": {
+      "$oid": "6aa281209db6a2359dadd583"
+    },
+    "createdAt": {
+      "$date": "2026-09-11T10:38:09.069Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-11T10:38:09.069Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5664324f2dc521620f6b8"
+    },
+    "postId": {
+      "$oid": "6aa8c5b79db6a2359dadef7a"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "createdAt": {
+      "$date": "2026-09-24T18:04:51.413Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:04:51.413Z"
+    },
+    "__v": 0
+  }
+]

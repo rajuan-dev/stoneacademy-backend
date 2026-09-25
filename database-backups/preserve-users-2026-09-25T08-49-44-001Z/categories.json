@@ -1,0 +1,44 @@
+[
+  {
+    "_id": {
+      "$oid": "6a10c1bdbb0473149748f29a"
+    },
+    "name": "Morning Walk",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-05-22T20:51:09.888Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T20:51:09.888Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10c1d6bb0473149748f29f"
+    },
+    "name": "Laughing Club",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-05-22T20:51:34.013Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T20:51:34.013Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5638e24f2dc521620f4f7"
+    },
+    "name": "Cycling",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-09-24T17:53:18.351Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T17:53:18.351Z"
+    },
+    "__v": 0
+  }
+]

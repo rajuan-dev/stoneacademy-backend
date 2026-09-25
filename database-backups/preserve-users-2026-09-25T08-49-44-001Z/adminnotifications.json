@@ -1,0 +1,507 @@
+[
+  {
+    "_id": {
+      "$oid": "69e645864f6e90932471e76a"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "Rajuan Hossen (host) just registered.",
+    "data": {
+      "userId": "69e645854f6e90932471e767",
+      "email": "rajuan.official.mail@gmail.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-04-20T15:25:58.051Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-20T15:25:58.051Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69e8d36646efa9ddaa9da4d9"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "Rajuan Hossen (host) just registered.",
+    "data": {
+      "userId": "69e8d36546efa9ddaa9da4d6",
+      "email": "rajuan.developer@gmail.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-04-22T13:55:50.506Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T13:55:50.506Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "69e8e34f46efa9ddaa9da538"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "Rajuan Hossen (user) just registered.",
+    "data": {
+      "userId": "69e8e34f46efa9ddaa9da535",
+      "email": "quantumerrors@gmail.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-04-22T15:03:43.691Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T15:03:43.691Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10b9c0bb0473149748f241"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New User just registered.",
+    "data": {
+      "userId": "6a10b9c0bb0473149748f23e",
+      "email": "lehoge1612@nuitx.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-22T20:17:04.797Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T20:17:04.797Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10eaccbb0473149748f6b4"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user just registered.",
+    "data": {
+      "userId": "6a10eaccbb0473149748f6b1",
+      "email": "jiwiw57215@nuitx.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-22T23:46:20.373Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T23:46:20.373Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15d9f4bb0473149748ff3c"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 5 just registered.",
+    "data": {
+      "userId": "6a15d9f4bb0473149748ff39",
+      "email": "henil39487@nuitx.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T17:35:48.903Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T17:35:48.903Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15dddcbb0473149748ff89"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 10 just registered.",
+    "data": {
+      "userId": "6a15dddcbb0473149748ff86",
+      "email": "movavod142@nuitx.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T17:52:28.113Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T17:52:28.113Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15eb37bb047314974900aa"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New User 15 just registered.",
+    "data": {
+      "userId": "6a15eb37bb047314974900a7",
+      "email": "sisabiw792@nuitx.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T18:49:27.791Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:49:27.791Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15ee3abb04731497490101"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 20 just registered.",
+    "data": {
+      "userId": "6a15ee3abb047314974900fe",
+      "email": "salev32728@nuitx.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T19:02:18.608Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:02:18.608Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a15f611bb047314974901ae"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 25 just registered.",
+    "data": {
+      "userId": "6a15f611bb047314974901ab",
+      "email": "rasacex176@nuitx.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-05-26T19:35:45.887Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:35:45.887Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c66b874867b96dd6d89ea"
+    },
+    "adminId": null,
+    "type": "report_submitted",
+    "title": "New report submitted",
+    "body": "A new activity report has been submitted.",
+    "data": {
+      "reportId": "6a3c66b574867b96dd6d89e8",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "reporterId": "69e8e34f46efa9ddaa9da535",
+      "reportedUserId": "6a15d9f4bb0473149748ff39"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:22:32.751Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:22:32.751Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c68e274867b96dd6d8a08"
+    },
+    "adminId": null,
+    "type": "report_submitted",
+    "title": "New report submitted",
+    "body": "A new activity report has been submitted.",
+    "data": {
+      "reportId": "6a3c68e274867b96dd6d8a06",
+      "entityType": "activity",
+      "entityId": "6a15e041bb0473149748ff9f",
+      "reporterId": "6a15ee3abb047314974900fe",
+      "reportedUserId": "6a15dddcbb0473149748ff86"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:31:46.741Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:31:46.741Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c68fd74867b96dd6d8a1d"
+    },
+    "adminId": null,
+    "type": "report_submitted",
+    "title": "New report submitted",
+    "body": "A new event report has been submitted.",
+    "data": {
+      "reportId": "6a3c68fd74867b96dd6d8a1b",
+      "entityType": "event",
+      "entityId": "6a15f78cbb04731497490245",
+      "reporterId": "6a15ee3abb047314974900fe",
+      "reportedUserId": "6a15f611bb047314974901ab"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-24T23:32:13.971Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:32:13.971Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6f99f5b96c0518ce8364"
+    },
+    "adminId": null,
+    "type": "report_submitted",
+    "title": "New report submitted",
+    "body": "A new activity report has been submitted.",
+    "data": {
+      "reportId": "6a3c6f99f5b96c0518ce8362",
+      "entityType": "activity",
+      "entityId": "6a15e1d5bb0473149748ffe0",
+      "reporterId": "6a15ee3abb047314974900fe",
+      "reportedUserId": "6a15d9f4bb0473149748ff39"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-25T00:00:25.658Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:00:25.658Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a4020fd22ab874b91daecbe"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 50 just registered.",
+    "data": {
+      "userId": "6a4020fd22ab874b91daecbb",
+      "email": "mofok14474@luxudata.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-27T19:14:05.508Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-27T19:14:05.508Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a40498a22ab874b91daf79c"
+    },
+    "adminId": null,
+    "type": "report_submitted",
+    "title": "New report submitted",
+    "body": "A new activity report has been submitted.",
+    "data": {
+      "reportId": "6a40498a22ab874b91daf79a",
+      "entityType": "activity",
+      "entityId": "6a10e226bb0473149748f68e",
+      "reporterId": "6a4020fd22ab874b91daecbb",
+      "reportedUserId": "6a10b9c0bb0473149748f23e"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-06-27T22:07:06.832Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-27T22:07:06.832Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a56a66a3e2a1001a9eebf77"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 75 just registered.",
+    "data": {
+      "userId": "6a56a6693e2a1001a9eebf74",
+      "email": "bajopes180@fisedo.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-14T21:13:14.285Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-14T21:13:14.285Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a56a7f43e2a1001a9eebfc5"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 100 just registered.",
+    "data": {
+      "userId": "6a56a7f33e2a1001a9eebfc2",
+      "email": "yijaday574@fisedo.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-14T21:19:48.101Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-14T21:19:48.101Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a56a9a68993f78888d74844"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "Country Filter User just registered.",
+    "data": {
+      "userId": "6a56a9a58993f78888d74841",
+      "email": "lisowa9760@buloan.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-14T21:27:02.023Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-14T21:27:02.023Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a56aa588993f78888d7485a"
+    },
+    "adminId": null,
+    "type": "new_user",
+    "title": "New user registered",
+    "body": "New user 125 just registered.",
+    "data": {
+      "userId": "6a56aa578993f78888d74855",
+      "email": "kisafe6992@ezimb.com"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-07-14T21:30:00.433Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-14T21:30:00.433Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a7863c7f237be0417d3ff74"
+    },
+    "adminId": null,
+    "type": "report_submitted",
+    "title": "New report submitted",
+    "body": "A new community_post report has been submitted.",
+    "data": {
+      "reportId": "6a7863c7f237be0417d3ff72",
+      "entityType": "community_post",
+      "entityId": "6a786240f237be0417d3ff4a",
+      "reporterId": "6a56aa578993f78888d74855",
+      "reportedUserId": "6a56a9a58993f78888d74841"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-08-09T11:25:59.544Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-09T11:25:59.544Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab5654e24f2dc521620f5a7"
+    },
+    "adminId": null,
+    "type": "report_submitted",
+    "title": "New report submitted",
+    "body": "A new community_post report has been submitted.",
+    "data": {
+      "reportId": "6ab5654e24f2dc521620f5a5",
+      "entityType": "community_post",
+      "entityId": "6aa8c5b79db6a2359dadef7a",
+      "reporterId": "6ab560e524f2dc521620f44f",
+      "reportedUserId": "6aa456dd9db6a2359daddd5d"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-24T18:00:46.911Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:00:46.911Z"
+    },
+    "__v": 0
+  }
+]

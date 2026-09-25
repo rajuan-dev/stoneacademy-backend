@@ -1,0 +1,1672 @@
+[
+  {
+    "_id": {
+      "$oid": "69e92d8815f9b9047555a59a"
+    },
+    "ownerId": {
+      "$oid": "69e6440b4f6e90932471e6ef"
+    },
+    "ownerModel": "Admin",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "admins/69e6440b4f6e90932471e6ef/2fb20bfc-13ab-44fc-9bd4-d726968987a5.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/admins/69e6440b4f6e90932471e6ef/2fb20bfc-13ab-44fc-9bd4-d726968987a5.png",
+    "mimeType": "image/png",
+    "sizeBytes": 657887,
+    "createdAt": {
+      "$date": "2026-04-22T20:20:24.390Z"
+    },
+    "updatedAt": {
+      "$date": "2026-04-22T20:20:24.390Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10d4c1bb0473149748f39b"
+    },
+    "ownerId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "profiles/6a10b9c0bb0473149748f23e/24e147cd-36bb-4a00-9134-7f93d7994d66.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a10b9c0bb0473149748f23e/24e147cd-36bb-4a00-9134-7f93d7994d66.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 26583,
+    "createdAt": {
+      "$date": "2026-05-22T22:12:17.842Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T22:12:17.842Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10d89fbb0473149748f3b9"
+    },
+    "ownerId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "profiles/6a10b9c0bb0473149748f23e/93384a6a-655f-4af6-aa8c-9c5733397112.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a10b9c0bb0473149748f23e/93384a6a-655f-4af6-aa8c-9c5733397112.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 20492,
+    "createdAt": {
+      "$date": "2026-05-22T22:28:47.003Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T22:28:47.003Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a10e226bb0473149748f68b"
+    },
+    "ownerId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a10b9c0bb0473149748f23e/cb0b234c-3079-4baf-84d6-2b6115b85714.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a10b9c0bb0473149748f23e/cb0b234c-3079-4baf-84d6-2b6115b85714.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 454549,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-05-22T23:09:26.439Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T23:09:26.439Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a10e226bb0473149748f68c"
+    },
+    "ownerId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a10b9c0bb0473149748f23e/4cf6c04b-9042-4438-b863-51f60d1acd16.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a10b9c0bb0473149748f23e/4cf6c04b-9042-4438-b863-51f60d1acd16.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 404172,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-05-22T23:09:26.439Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T23:09:26.439Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a10e226bb0473149748f68a"
+    },
+    "ownerId": {
+      "$oid": "6a10b9c0bb0473149748f23e"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a10b9c0bb0473149748f23e/144215df-cfd9-46b8-95af-b1da909aa566.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a10b9c0bb0473149748f23e/144215df-cfd9-46b8-95af-b1da909aa566.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 31177,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-05-22T23:09:26.439Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-22T23:09:26.439Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a15e041bb0473149748ff9d"
+    },
+    "ownerId": {
+      "$oid": "6a15dddcbb0473149748ff86"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15dddcbb0473149748ff86/cd170ef1-06d3-4167-b303-0bbb021f6da8.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15dddcbb0473149748ff86/cd170ef1-06d3-4167-b303-0bbb021f6da8.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 27163,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-05-26T18:02:41.094Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:02:41.094Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a15e1d5bb0473149748ffde"
+    },
+    "ownerId": {
+      "$oid": "6a15d9f4bb0473149748ff39"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15d9f4bb0473149748ff39/ab13249f-ba7e-4b8f-9928-763e609db630.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15d9f4bb0473149748ff39/ab13249f-ba7e-4b8f-9928-763e609db630.png",
+    "mimeType": "image/png",
+    "sizeBytes": 170741,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-05-26T18:09:25.449Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T18:09:25.449Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a15f70bbb04731497490225"
+    },
+    "ownerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15f611bb047314974901ab/612a8f73-c29a-46af-a2b6-7fb2facd1e87.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15f611bb047314974901ab/612a8f73-c29a-46af-a2b6-7fb2facd1e87.png",
+    "mimeType": "image/png",
+    "sizeBytes": 350063,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-05-26T19:39:55.288Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:39:55.288Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a15f78cbb04731497490243"
+    },
+    "ownerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a15f611bb047314974901ab/bc20bc5f-70c5-4dce-99e4-b10752260382.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a15f611bb047314974901ab/bc20bc5f-70c5-4dce-99e4-b10752260382.png",
+    "mimeType": "image/png",
+    "sizeBytes": 457111,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-05-26T19:42:04.656Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:42:04.656Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a15f8e4bb047314974902e8"
+    },
+    "ownerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "profiles/6a15f611bb047314974901ab/6da1d9e3-8697-42ca-bef4-ad0358858fe9.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15f611bb047314974901ab/6da1d9e3-8697-42ca-bef4-ad0358858fe9.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 21343,
+    "createdAt": {
+      "$date": "2026-05-26T19:47:48.086Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-26T19:47:48.086Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a39a229f3b2b1bd47cd7a0c"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "profiles/69e8e34f46efa9ddaa9da535/0446f657-a9c4-4c61-a78f-444acea1c77b.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/69e8e34f46efa9ddaa9da535/0446f657-a9c4-4c61-a78f-444acea1c77b.png",
+    "mimeType": "image/png",
+    "sizeBytes": 139293,
+    "createdAt": {
+      "$date": "2026-06-22T20:59:21.886Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-22T20:59:21.886Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a39a240f3b2b1bd47cd7a15"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "covers/69e8e34f46efa9ddaa9da535/744e020a-e3dd-4bb2-bb27-3b36c1717438.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/covers/69e8e34f46efa9ddaa9da535/744e020a-e3dd-4bb2-bb27-3b36c1717438.png",
+    "mimeType": "image/png",
+    "sizeBytes": 97185,
+    "createdAt": {
+      "$date": "2026-06-22T20:59:44.842Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-22T20:59:44.842Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a39a725f3b2b1bd47cd7a48"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/69e8e34f46efa9ddaa9da535/6163c8f0-d9a5-4f35-a1e0-6829a57cd72f.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/69e8e34f46efa9ddaa9da535/6163c8f0-d9a5-4f35-a1e0-6829a57cd72f.png",
+    "mimeType": "image/png",
+    "sizeBytes": 121982,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-22T21:20:37.142Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-22T21:20:37.142Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a39a894f3b2b1bd47cd7a69"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/69e8e34f46efa9ddaa9da535/a96e0c41-6285-40b2-b55c-876a4f032a30.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/69e8e34f46efa9ddaa9da535/a96e0c41-6285-40b2-b55c-876a4f032a30.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 609039,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-22T21:26:44.744Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-22T21:26:44.744Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a39aabff3b2b1bd47cd7a88"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/69e8e34f46efa9ddaa9da535/75fd2f4e-5882-4991-a8f3-f143278e6ed7.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/69e8e34f46efa9ddaa9da535/75fd2f4e-5882-4991-a8f3-f143278e6ed7.png",
+    "mimeType": "image/png",
+    "sizeBytes": 139293,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-22T21:35:59.969Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-22T21:35:59.969Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a3ad3927c0c56fc208b03f4"
+    },
+    "ownerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a15f611bb047314974901ab/b8d98817-3320-4c10-9d4c-094a15097926.mov",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a15f611bb047314974901ab/b8d98817-3320-4c10-9d4c-094a15097926.mov",
+    "mimeType": "video/quicktime",
+    "sizeBytes": 709764,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-23T18:42:26.232Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-23T18:42:26.232Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a3c167b54b0bd80d012b635"
+    },
+    "ownerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15f611bb047314974901ab/08fe263e-ba2f-4ef3-a8d1-eca5a26bf0ae.mov",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15f611bb047314974901ab/08fe263e-ba2f-4ef3-a8d1-eca5a26bf0ae.mov",
+    "mimeType": "video/quicktime",
+    "sizeBytes": 709764,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-24T17:40:11.056Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T17:40:11.056Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a3c167b54b0bd80d012b636"
+    },
+    "ownerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15f611bb047314974901ab/88f553dd-b942-4927-aae1-8bd7a05eaaa8.heic",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15f611bb047314974901ab/88f553dd-b942-4927-aae1-8bd7a05eaaa8.heic",
+    "mimeType": "image/heic",
+    "sizeBytes": 1660035,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-24T17:40:11.057Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T17:40:11.057Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6f03f5b96c0518ce8311"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "covers/6a15ee3abb047314974900fe/a0aa51ee-d4dd-4225-ae38-a67e27087367.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/covers/6a15ee3abb047314974900fe/a0aa51ee-d4dd-4225-ae38-a67e27087367.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 426101,
+    "createdAt": {
+      "$date": "2026-06-24T23:57:55.418Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-24T23:57:55.418Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3c6ff2f5b96c0518ce83c2"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a15ee3abb047314974900fe/f276dca4-908f-4707-a7b0-ce5d5efc63a9.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 426101,
+    "createdAt": {
+      "$date": "2026-06-25T00:01:54.936Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T00:01:54.936Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a3d8fde22ab874b91dae420"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/22d8c104-b01b-4755-9d15-26bd50c7eeef.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/22d8c104-b01b-4755-9d15-26bd50c7eeef.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 309492,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-25T20:30:22.590Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:30:22.590Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a3d915822ab874b91dae47a"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/fb663e70-d61b-4eeb-b640-fc3b64af208e.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/fb663e70-d61b-4eeb-b640-fc3b64af208e.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 6377950,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-25T20:36:40.833Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:36:40.833Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a3d91a422ab874b91dae49f"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/89169e77-d43e-4bcc-af93-780fd8f14a7b.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/89169e77-d43e-4bcc-af93-780fd8f14a7b.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 362669,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-25T20:37:56.079Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-25T20:37:56.079Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a3dc71322ab874b91dae80d"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/b837316d-cd2a-426a-9d5c-78b6c4c53bfe.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/b837316d-cd2a-426a-9d5c-78b6c4c53bfe.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 154252,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-06-26T00:25:55.024Z"
+    },
+    "updatedAt": {
+      "$date": "2026-06-26T00:25:55.024Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a4ac57c22ab874b91db14e3"
+    },
+    "ownerId": {
+      "$oid": "6a4020fd22ab874b91daecbb"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a4020fd22ab874b91daecbb/b3d6c87f-f264-4e2d-aded-72c7f43f233b.heic",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a4020fd22ab874b91daecbb/b3d6c87f-f264-4e2d-aded-72c7f43f233b.heic",
+    "mimeType": "image/heic",
+    "sizeBytes": 1660035,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-05T20:58:36.514Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-05T20:58:36.514Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a57fb50d04483c1b6588aec"
+    },
+    "ownerId": {
+      "$oid": "6a56a9a58993f78888d74841"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a56a9a58993f78888d74841/fea67592-4f9b-44a0-984a-772e340bda07.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a56a9a58993f78888d74841/fea67592-4f9b-44a0-984a-772e340bda07.png",
+    "mimeType": "image/png",
+    "sizeBytes": 923653,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-15T21:27:44.917Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-15T21:27:44.917Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a57fee6d04483c1b6588b88"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a56aa578993f78888d74855/031c88bd-c84f-41bc-81b7-ad7e5e27719e.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a56aa578993f78888d74855/031c88bd-c84f-41bc-81b7-ad7e5e27719e.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 8601153,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-15T21:43:02.315Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-15T21:43:02.315Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5808b9d04483c1b6588c68"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a15ee3abb047314974900fe/5b4c4c0d-9974-4980-bc8e-80a28129b581.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a15ee3abb047314974900fe/5b4c4c0d-9974-4980-bc8e-80a28129b581.png",
+    "mimeType": "image/png",
+    "sizeBytes": 69983,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-15T22:24:57.116Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-15T22:24:57.116Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a581489a65ca039a6f95a74"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/55a1f95c-4750-40dd-b3d8-040766bfc211.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/55a1f95c-4750-40dd-b3d8-040766bfc211.png",
+    "mimeType": "image/png",
+    "sizeBytes": 91536,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-15T23:15:21.893Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-15T23:15:21.893Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a581c8ca65ca039a6f95b12"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "covers/6a15ee3abb047314974900fe/bc12bf75-ca1a-41f0-aa7d-f8cf9fb8781b.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/covers/6a15ee3abb047314974900fe/bc12bf75-ca1a-41f0-aa7d-f8cf9fb8781b.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 842327,
+    "createdAt": {
+      "$date": "2026-07-15T23:49:32.801Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-15T23:49:32.801Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a596f814fe5a7003093e8fd"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a56aa578993f78888d74855/c72a91cc-8c60-4f0c-bde3-f4d14796bcfb.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a56aa578993f78888d74855/c72a91cc-8c60-4f0c-bde3-f4d14796bcfb.png",
+    "mimeType": "image/png",
+    "sizeBytes": 113572,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-16T23:55:45.555Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-16T23:55:45.555Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5970f94fe5a7003093e988"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a56aa578993f78888d74855/106eb535-97fb-4e2a-a149-535c8381106c.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a56aa578993f78888d74855/106eb535-97fb-4e2a-a149-535c8381106c.png",
+    "mimeType": "image/png",
+    "sizeBytes": 407680,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-17T00:02:01.542Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-17T00:02:01.542Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5bd3a05522674f171d9318"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a15ee3abb047314974900fe/c84870c5-4fd6-4177-8506-ff910a53c86e.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a15ee3abb047314974900fe/c84870c5-4fd6-4177-8506-ff910a53c86e.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 842253,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-18T19:27:28.375Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T19:27:28.375Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5beefa87f22da07f37475d"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a15ee3abb047314974900fe/1c4b4a80-4081-48e9-85fc-1d872021f5bd.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a15ee3abb047314974900fe/1c4b4a80-4081-48e9-85fc-1d872021f5bd.png",
+    "mimeType": "image/png",
+    "sizeBytes": 201221,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-18T21:24:10.642Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T21:24:10.642Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5bf26c87f22da07f3747bb"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/3ba0ba6f-120d-4396-8ed8-601bc444c784.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/3ba0ba6f-120d-4396-8ed8-601bc444c784.png",
+    "mimeType": "image/png",
+    "sizeBytes": 92583,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-18T21:38:52.780Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T21:38:52.780Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5bf8a487f22da07f3747fc"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a15ee3abb047314974900fe/6f80e011-b6de-4bb4-9747-8fda192db8b9.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a15ee3abb047314974900fe/6f80e011-b6de-4bb4-9747-8fda192db8b9.png",
+    "mimeType": "image/png",
+    "sizeBytes": 446743,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-18T22:05:24.637Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T22:05:24.637Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5c01138d42ca2e08bf6fab"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a15ee3abb047314974900fe/2f9b6200-f914-4689-8538-fae31114779a.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a15ee3abb047314974900fe/2f9b6200-f914-4689-8538-fae31114779a.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 8601153,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-18T22:41:23.119Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T22:41:23.119Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5c01318d42ca2e08bf6faf"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a15ee3abb047314974900fe/144caeff-be6f-4b19-afe1-cc1173e98218.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a15ee3abb047314974900fe/144caeff-be6f-4b19-afe1-cc1173e98218.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 8601153,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-18T22:41:53.608Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-18T22:41:53.608Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a5d134e3291b666e0033bfa"
+    },
+    "ownerId": {
+      "$oid": "6a15f611bb047314974901ab"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a15f611bb047314974901ab/c4b8f013-f616-4c11-b31c-3f93fa182c77.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a15f611bb047314974901ab/c4b8f013-f616-4c11-b31c-3f93fa182c77.png",
+    "mimeType": "image/png",
+    "sizeBytes": 446743,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-19T18:11:26.205Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-19T18:11:26.205Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a64c91a3291b666e0034d09"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/c1c68655-5a76-455b-8d89-d78f6fed0198.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/c1c68655-5a76-455b-8d89-d78f6fed0198.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 67494,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-25T14:32:58.345Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T14:32:58.345Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a64caa63291b666e0034de3"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/cb8455bf-7a15-42a4-9c1e-115b465a422c.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/cb8455bf-7a15-42a4-9c1e-115b465a422c.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 67494,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-25T14:39:34.063Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T14:39:34.063Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a64da6c3291b666e0034edd"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "activities/6a15ee3abb047314974900fe/2d81f86e-3a5a-4fcd-8118-7e833f48d161.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/activities/6a15ee3abb047314974900fe/2d81f86e-3a5a-4fcd-8118-7e833f48d161.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 438241,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-25T15:46:52.985Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-25T15:46:52.985Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a6879d74e4a476a3c418b13"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a56aa578993f78888d74855/1779963c-3fee-4fce-b567-0ee6776579ea.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a56aa578993f78888d74855/1779963c-3fee-4fce-b567-0ee6776579ea.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 66072,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-28T09:43:51.059Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-28T09:43:51.059Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a6879d74e4a476a3c418b15"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a56aa578993f78888d74855/810727d7-9f00-4dd4-988e-2af976615895.png",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a56aa578993f78888d74855/810727d7-9f00-4dd4-988e-2af976615895.png",
+    "mimeType": "image/png",
+    "sizeBytes": 290940,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-28T09:43:51.060Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-28T09:43:51.060Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a6879d74e4a476a3c418b14"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a56aa578993f78888d74855/e5b6c675-846f-4e55-9fbb-34c03a6fa171.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a56aa578993f78888d74855/e5b6c675-846f-4e55-9fbb-34c03a6fa171.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 34018,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-28T09:43:51.060Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-28T09:43:51.060Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a687b8a4e4a476a3c418b40"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a56aa578993f78888d74855/bc912b0e-33bd-42fe-91b9-8ef9cd194ce9.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a56aa578993f78888d74855/bc912b0e-33bd-42fe-91b9-8ef9cd194ce9.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 18246556,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-28T09:51:06.059Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-28T09:51:06.059Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a687ca64e4a476a3c418b86"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "gallery/6a56aa578993f78888d74855/7f55a14d-8de8-439f-abdc-b8e1988b3736.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/gallery/6a56aa578993f78888d74855/7f55a14d-8de8-439f-abdc-b8e1988b3736.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 18246556,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-07-28T09:55:50.614Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-28T09:55:50.614Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a71c5344e4a476a3c419f4c"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "profiles/6a56aa578993f78888d74855/fb4be4c7-1257-4c0d-b7a4-d59603b39a0e.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6a56aa578993f78888d74855/fb4be4c7-1257-4c0d-b7a4-d59603b39a0e.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 52154,
+    "createdAt": {
+      "$date": "2026-08-04T10:55:48.389Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-04T10:55:48.389Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6a732a149702c4c2eb8128c6"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a56aa578993f78888d74855/1db92b2d-35e4-4174-b3cd-177b7d16cb11.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a56aa578993f78888d74855/1db92b2d-35e4-4174-b3cd-177b7d16cb11.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 7887410,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-05T12:18:28.744Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-05T12:18:28.744Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a732a149702c4c2eb8128c5"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a56aa578993f78888d74855/e26d7415-d95d-4af2-97e3-8d96a1964ef0.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a56aa578993f78888d74855/e26d7415-d95d-4af2-97e3-8d96a1964ef0.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 20952,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-05T12:18:28.744Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-05T12:18:28.744Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7a506425d79c939cb9b4fc"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a15ee3abb047314974900fe/9185e8cc-a80c-492e-9384-00bdb5e39fcf.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a15ee3abb047314974900fe/9185e8cc-a80c-492e-9384-00bdb5e39fcf.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 485600,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-10T22:27:48.940Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-10T22:27:48.940Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7a511425d79c939cb9b5a1"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a15ee3abb047314974900fe/5d3f5789-cfd0-4497-8295-17665ddea142.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a15ee3abb047314974900fe/5d3f5789-cfd0-4497-8295-17665ddea142.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 4850399,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-10T22:30:44.540Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-10T22:30:44.540Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7a693425d79c939cb9b65b"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/69e8e34f46efa9ddaa9da535/4bdb5132-e64b-49bb-89e3-123aa03f79df.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/69e8e34f46efa9ddaa9da535/4bdb5132-e64b-49bb-89e3-123aa03f79df.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 449809,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-11T00:13:40.497Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-11T00:13:40.497Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7a698c25d79c939cb9b67a"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/69e8e34f46efa9ddaa9da535/84c239c4-8472-4b85-b64a-7102659f28cc.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/69e8e34f46efa9ddaa9da535/84c239c4-8472-4b85-b64a-7102659f28cc.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 327069,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-11T00:15:08.399Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-11T00:15:08.399Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7a69b225d79c939cb9b697"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/69e8e34f46efa9ddaa9da535/d469758d-ffa5-405f-ab78-96c873665182.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/69e8e34f46efa9ddaa9da535/d469758d-ffa5-405f-ab78-96c873665182.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 327069,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-11T00:15:46.294Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-11T00:15:46.294Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7a6a1825d79c939cb9b6b4"
+    },
+    "ownerId": {
+      "$oid": "69e8e34f46efa9ddaa9da535"
+    },
+    "ownerModel": "User",
+    "type": "video",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/69e8e34f46efa9ddaa9da535/219486cd-c7b6-432d-95d0-d972e5245b65.mp4",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/69e8e34f46efa9ddaa9da535/219486cd-c7b6-432d-95d0-d972e5245b65.mp4",
+    "mimeType": "video/mp4",
+    "sizeBytes": 14236595,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-11T00:17:28.880Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-11T00:17:28.880Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7dce3c25d79c939cb9bf23"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a56aa578993f78888d74855/aab14d92-4099-46fe-9fd7-1f4b2802354a.heic",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a56aa578993f78888d74855/aab14d92-4099-46fe-9fd7-1f4b2802354a.heic",
+    "mimeType": "image/heic",
+    "sizeBytes": 2808983,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-13T14:01:32.188Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-13T14:01:32.188Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a8047c5938a2801e9443860"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a15ee3abb047314974900fe/96cee25f-1917-4d56-901c-a69c3b727ab2.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a15ee3abb047314974900fe/96cee25f-1917-4d56-901c-a69c3b727ab2.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 409999,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-15T11:04:37.452Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-15T11:04:37.452Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a807fcd938a2801e9443958"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a15ee3abb047314974900fe/7a7355a0-74dc-40ee-ad6a-e755d7a39a52.webp",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a15ee3abb047314974900fe/7a7355a0-74dc-40ee-ad6a-e755d7a39a52.webp",
+    "mimeType": "image/webp",
+    "sizeBytes": 162807,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-08-15T15:03:41.262Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-15T15:03:41.262Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a9e8cb672eb03f42a2b06ec"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a56aa578993f78888d74855/ca66d51c-3231-4b93-bf62-fc8d9bc77b33.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a56aa578993f78888d74855/ca66d51c-3231-4b93-bf62-fc8d9bc77b33.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 90770,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-07T10:06:46.226Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-07T10:06:46.226Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a9f858c8ca236ab68e2e420"
+    },
+    "ownerId": {
+      "$oid": "6a56aa578993f78888d74855"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a56aa578993f78888d74855/6a8b12dc-37cc-4bc6-a4ce-7b7614f4784d.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a56aa578993f78888d74855/6a8b12dc-37cc-4bc6-a4ce-7b7614f4784d.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 12239,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-08T03:48:28.592Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-08T03:48:28.592Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa2c5e79db6a2359dadd830"
+    },
+    "ownerId": {
+      "$oid": "6a15ee3abb047314974900fe"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6a15ee3abb047314974900fe/6759a66f-9969-45c1-ace7-80c13e3c2903.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6a15ee3abb047314974900fe/6759a66f-9969-45c1-ace7-80c13e3c2903.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 3854833,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-10T14:59:51.404Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-10T14:59:51.404Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa4588f9db6a2359dadddda"
+    },
+    "ownerId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6aa456dd9db6a2359daddd5d/5f14cacf-289d-4d21-b52c-7bcaa38dc12a.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6aa456dd9db6a2359daddd5d/5f14cacf-289d-4d21-b52c-7bcaa38dc12a.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 190257,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-11T19:37:51.072Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-11T19:37:51.072Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aa8c5b79db6a2359dadef78"
+    },
+    "ownerId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6aa456dd9db6a2359daddd5d/c03be608-b30a-47d1-a279-9bbf589012f8.jpeg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6aa456dd9db6a2359daddd5d/c03be608-b30a-47d1-a279-9bbf589012f8.jpeg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 167419,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-15T04:12:39.642Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-15T04:12:39.642Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6aae66a2205bb9c0f3cd7160"
+    },
+    "ownerId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6aae64db205bb9c0f3cd70c3/2330e330-435d-4644-b35b-5ab0868a76b9.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6aae64db205bb9c0f3cd70c3/2330e330-435d-4644-b35b-5ab0868a76b9.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 68659,
+    "width": 960,
+    "height": 1280,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-19T10:40:34.304Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-19T10:40:34.304Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab1eb54205bb9c0f3cd78cc"
+    },
+    "ownerId": {
+      "$oid": "6a9ed75e8ca236ab68e2d12a"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6a9ed75e8ca236ab68e2d12a/bf8238e9-a8f9-45a0-9be4-0d5c5fc742d2.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6a9ed75e8ca236ab68e2d12a/bf8238e9-a8f9-45a0-9be4-0d5c5fc742d2.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 12610,
+    "width": 960,
+    "height": 1280,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-22T02:43:32.919Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-22T02:43:32.919Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab1fe18205bb9c0f3cd7afd"
+    },
+    "ownerId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6aae64db205bb9c0f3cd70c3/8f27f4c4-b895-4590-8345-91dd5601ce12.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6aae64db205bb9c0f3cd70c3/8f27f4c4-b895-4590-8345-91dd5601ce12.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 13614,
+    "width": 960,
+    "height": 1280,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-22T04:03:36.023Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-22T04:03:36.023Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab33d98205bb9c0f3cd8421"
+    },
+    "ownerId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "profiles/6aa456dd9db6a2359daddd5d/75a95d70-5d40-4555-a988-b17f847429f5.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/profiles/6aa456dd9db6a2359daddd5d/75a95d70-5d40-4555-a988-b17f847429f5.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 28059,
+    "width": 1280,
+    "height": 640,
+    "createdAt": {
+      "$date": "2026-09-23T02:46:48.908Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T02:46:48.908Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab33dab205bb9c0f3cd842b"
+    },
+    "ownerId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "covers/6aa456dd9db6a2359daddd5d/517af1af-8137-4f3e-8e5a-000fe2ea2fb6.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/covers/6aa456dd9db6a2359daddd5d/517af1af-8137-4f3e-8e5a-000fe2ea2fb6.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 163963,
+    "width": 1280,
+    "height": 815,
+    "createdAt": {
+      "$date": "2026-09-23T02:47:07.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T02:47:07.028Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab34119205bb9c0f3cd84fa"
+    },
+    "ownerId": {
+      "$oid": "6aae64db205bb9c0f3cd70c3"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6aae64db205bb9c0f3cd70c3/76c35e9c-d393-4737-81ac-de60a350f4de.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6aae64db205bb9c0f3cd70c3/76c35e9c-d393-4737-81ac-de60a350f4de.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 45759,
+    "width": 1280,
+    "height": 702,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-23T03:01:45.991Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T03:01:45.991Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab36f7c11c3621d4feb6ef6"
+    },
+    "ownerId": {
+      "$oid": "6ab36dea11c3621d4feb6d9a"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "events/6ab36dea11c3621d4feb6d9a/a69e7da7-3130-4b8e-acdc-2bf540ec129a.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/events/6ab36dea11c3621d4feb6d9a/a69e7da7-3130-4b8e-acdc-2bf540ec129a.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 45485,
+    "width": 585,
+    "height": 1280,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-23T06:19:40.900Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-23T06:19:40.900Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab5485624f2dc521620f26a"
+    },
+    "ownerId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6aa456dd9db6a2359daddd5d/a5b0774b-874e-4065-826c-8df3671827ef.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6aa456dd9db6a2359daddd5d/a5b0774b-874e-4065-826c-8df3671827ef.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 63531,
+    "width": 1103,
+    "height": 1280,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-24T15:57:10.696Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T15:57:10.696Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab5485624f2dc521620f26b"
+    },
+    "ownerId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6aa456dd9db6a2359daddd5d/11b6c165-b58a-4065-95a5-c49ef68a5beb.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6aa456dd9db6a2359daddd5d/11b6c165-b58a-4065-95a5-c49ef68a5beb.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 63531,
+    "width": 1103,
+    "height": 1280,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-24T15:57:10.696Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T15:57:10.696Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ab5674f24f2dc521620f76a"
+    },
+    "ownerId": {
+      "$oid": "6aa456dd9db6a2359daddd5d"
+    },
+    "ownerModel": "User",
+    "type": "image",
+    "s3Bucket": "stoneacademy-storage",
+    "s3Key": "community/6aa456dd9db6a2359daddd5d/90eeb283-5994-41dd-89e7-601480c78f72.jpg",
+    "url": "https://stoneacademy-storage.s3.us-east-1.amazonaws.com/community/6aa456dd9db6a2359daddd5d/90eeb283-5994-41dd-89e7-601480c78f72.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 44965,
+    "width": 1060,
+    "height": 1280,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-09-24T18:09:19.539Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-24T18:09:19.539Z"
+    }
+  }
+]

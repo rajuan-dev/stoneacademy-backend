@@ -1,0 +1,533 @@
+{
+  "database": "stoneacademyDB",
+  "backupRoot": "D:\\RAJUAN-PERSONAL\\VSCODE\\stoneacademy\\stoneacademy-backend\\database-backups\\preserve-users-2026-09-25T08-49-44-001Z",
+  "preservedCollections": [
+    "admin",
+    "adminrefreshtokenblacklists",
+    "refreshtokenblacklists",
+    "users"
+  ],
+  "before": [
+    {
+      "name": "activities",
+      "count": 23,
+      "action": "deleteMany"
+    },
+    {
+      "name": "activityparticipants",
+      "count": 10,
+      "action": "deleteMany"
+    },
+    {
+      "name": "admin",
+      "count": 1,
+      "action": "preserve"
+    },
+    {
+      "name": "adminauditlogs",
+      "count": 4,
+      "action": "deleteMany"
+    },
+    {
+      "name": "adminnotifications",
+      "count": 22,
+      "action": "deleteMany"
+    },
+    {
+      "name": "adminrefreshtokenblacklists",
+      "count": 0,
+      "action": "preserve"
+    },
+    {
+      "name": "ads",
+      "count": 2,
+      "action": "deleteMany"
+    },
+    {
+      "name": "carts",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "categories",
+      "count": 3,
+      "action": "deleteMany"
+    },
+    {
+      "name": "chatthreads",
+      "count": 11,
+      "action": "deleteMany"
+    },
+    {
+      "name": "cmspages",
+      "count": 3,
+      "action": "deleteMany"
+    },
+    {
+      "name": "communitycomments",
+      "count": 13,
+      "action": "deleteMany"
+    },
+    {
+      "name": "communitylikes",
+      "count": 8,
+      "action": "deleteMany"
+    },
+    {
+      "name": "communityposts",
+      "count": 22,
+      "action": "deleteMany"
+    },
+    {
+      "name": "conversations",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "eventparticipants",
+      "count": 17,
+      "action": "deleteMany"
+    },
+    {
+      "name": "eventqrtokens",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "events",
+      "count": 18,
+      "action": "deleteMany"
+    },
+    {
+      "name": "media",
+      "count": 75,
+      "action": "deleteMany"
+    },
+    {
+      "name": "messages",
+      "count": 13,
+      "action": "deleteMany"
+    },
+    {
+      "name": "notifications",
+      "count": 126,
+      "action": "deleteMany"
+    },
+    {
+      "name": "orders",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "otpcodes",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "paymenttransactions",
+      "count": 15,
+      "action": "deleteMany"
+    },
+    {
+      "name": "payoutrequests",
+      "count": 1,
+      "action": "deleteMany"
+    },
+    {
+      "name": "pendingregistrations",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "products",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "qrtokens",
+      "count": 11,
+      "action": "deleteMany"
+    },
+    {
+      "name": "refreshtokenblacklists",
+      "count": 56,
+      "action": "preserve"
+    },
+    {
+      "name": "reports",
+      "count": 7,
+      "action": "deleteMany"
+    },
+    {
+      "name": "reviews",
+      "count": 12,
+      "action": "deleteMany"
+    },
+    {
+      "name": "settings",
+      "count": 1,
+      "action": "deleteMany"
+    },
+    {
+      "name": "stripewebhookevents",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "subscriptionpayments",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "subscriptions",
+      "count": 3,
+      "action": "deleteMany"
+    },
+    {
+      "name": "supporttickets",
+      "count": 0,
+      "action": "deleteMany"
+    },
+    {
+      "name": "users",
+      "count": 27,
+      "action": "preserve"
+    }
+  ],
+  "deleted": [
+    {
+      "name": "activities",
+      "before": 23,
+      "deleted": 23
+    },
+    {
+      "name": "activityparticipants",
+      "before": 10,
+      "deleted": 10
+    },
+    {
+      "name": "adminauditlogs",
+      "before": 4,
+      "deleted": 4
+    },
+    {
+      "name": "adminnotifications",
+      "before": 22,
+      "deleted": 22
+    },
+    {
+      "name": "ads",
+      "before": 2,
+      "deleted": 2
+    },
+    {
+      "name": "carts",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "categories",
+      "before": 3,
+      "deleted": 3
+    },
+    {
+      "name": "chatthreads",
+      "before": 11,
+      "deleted": 11
+    },
+    {
+      "name": "cmspages",
+      "before": 3,
+      "deleted": 3
+    },
+    {
+      "name": "communitycomments",
+      "before": 13,
+      "deleted": 13
+    },
+    {
+      "name": "communitylikes",
+      "before": 8,
+      "deleted": 8
+    },
+    {
+      "name": "communityposts",
+      "before": 22,
+      "deleted": 22
+    },
+    {
+      "name": "conversations",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "eventparticipants",
+      "before": 17,
+      "deleted": 17
+    },
+    {
+      "name": "eventqrtokens",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "events",
+      "before": 18,
+      "deleted": 18
+    },
+    {
+      "name": "media",
+      "before": 75,
+      "deleted": 75
+    },
+    {
+      "name": "messages",
+      "before": 13,
+      "deleted": 13
+    },
+    {
+      "name": "notifications",
+      "before": 126,
+      "deleted": 126
+    },
+    {
+      "name": "orders",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "otpcodes",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "paymenttransactions",
+      "before": 15,
+      "deleted": 15
+    },
+    {
+      "name": "payoutrequests",
+      "before": 1,
+      "deleted": 1
+    },
+    {
+      "name": "pendingregistrations",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "products",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "qrtokens",
+      "before": 11,
+      "deleted": 11
+    },
+    {
+      "name": "reports",
+      "before": 7,
+      "deleted": 7
+    },
+    {
+      "name": "reviews",
+      "before": 12,
+      "deleted": 12
+    },
+    {
+      "name": "settings",
+      "before": 1,
+      "deleted": 1
+    },
+    {
+      "name": "stripewebhookevents",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "subscriptionpayments",
+      "before": 0,
+      "deleted": 0
+    },
+    {
+      "name": "subscriptions",
+      "before": 3,
+      "deleted": 3
+    },
+    {
+      "name": "supporttickets",
+      "before": 0,
+      "deleted": 0
+    }
+  ],
+  "preserved": [
+    {
+      "name": "admin",
+      "count": 1
+    },
+    {
+      "name": "adminrefreshtokenblacklists",
+      "count": 0
+    },
+    {
+      "name": "refreshtokenblacklists",
+      "count": 56
+    },
+    {
+      "name": "users",
+      "count": 27
+    }
+  ],
+  "after": [
+    {
+      "name": "activities",
+      "count": 0
+    },
+    {
+      "name": "activityparticipants",
+      "count": 0
+    },
+    {
+      "name": "admin",
+      "count": 1
+    },
+    {
+      "name": "adminauditlogs",
+      "count": 0
+    },
+    {
+      "name": "adminnotifications",
+      "count": 0
+    },
+    {
+      "name": "adminrefreshtokenblacklists",
+      "count": 0
+    },
+    {
+      "name": "ads",
+      "count": 0
+    },
+    {
+      "name": "carts",
+      "count": 0
+    },
+    {
+      "name": "categories",
+      "count": 0
+    },
+    {
+      "name": "chatthreads",
+      "count": 0
+    },
+    {
+      "name": "cmspages",
+      "count": 0
+    },
+    {
+      "name": "communitycomments",
+      "count": 0
+    },
+    {
+      "name": "communitylikes",
+      "count": 0
+    },
+    {
+      "name": "communityposts",
+      "count": 0
+    },
+    {
+      "name": "conversations",
+      "count": 0
+    },
+    {
+      "name": "eventparticipants",
+      "count": 0
+    },
+    {
+      "name": "eventqrtokens",
+      "count": 0
+    },
+    {
+      "name": "events",
+      "count": 0
+    },
+    {
+      "name": "media",
+      "count": 0
+    },
+    {
+      "name": "messages",
+      "count": 0
+    },
+    {
+      "name": "notifications",
+      "count": 0
+    },
+    {
+      "name": "orders",
+      "count": 0
+    },
+    {
+      "name": "otpcodes",
+      "count": 0
+    },
+    {
+      "name": "paymenttransactions",
+      "count": 0
+    },
+    {
+      "name": "payoutrequests",
+      "count": 0
+    },
+    {
+      "name": "pendingregistrations",
+      "count": 0
+    },
+    {
+      "name": "products",
+      "count": 0
+    },
+    {
+      "name": "qrtokens",
+      "count": 0
+    },
+    {
+      "name": "refreshtokenblacklists",
+      "count": 56
+    },
+    {
+      "name": "reports",
+      "count": 0
+    },
+    {
+      "name": "reviews",
+      "count": 0
+    },
+    {
+      "name": "settings",
+      "count": 0
+    },
+    {
+      "name": "stripewebhookevents",
+      "count": 0
+    },
+    {
+      "name": "subscriptionpayments",
+      "count": 0
+    },
+    {
+      "name": "subscriptions",
+      "count": 0
+    },
+    {
+      "name": "supporttickets",
+      "count": 0
+    },
+    {
+      "name": "users",
+      "count": 27
+    }
+  ],
+  "finishedAt": "2026-09-25T08:50:31.890Z"
+}
