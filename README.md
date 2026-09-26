@@ -1,505 +1,148 @@
-# SCBHS Case Management System - Backend API
-
-> A comprehensive RESTful API for managing cases, resources, meetings, and notifications in a behavioral health support system.
-
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [API Documentation](#api-documentation)
-- [User Roles](#user-roles)
-- [License](#license)
+# Stone Academy - Enterprise Backend API & Realtime Service
+**Platform:** [exercisewithme.org](https://exercisewithme.org) | `api.exercisewithme.org`  
+**API Documentation:** [https://api.exercisewithme.org/docs](https://api.exercisewithme.org/docs) (or local `http://localhost:5000/docs`)  
+**Raw OpenAPI Spec:** [https://api.exercisewithme.org/docs.json](https://api.exercisewithme.org/docs.json)
 
 ---
 
-## 🎯 Overview
+## 📋 Overview
 
-SCBHS (School-Based Behavioral Health Support) is a comprehensive case management system designed to streamline the coordination between administrators, counselors, clinicians, and supervisors. The system provides tools for case management, resource sharing, meeting scheduling, and real-time notifications.
+**Stone Academy** is a high-performance community fitness and creator event platform backend built with Node.js 22 LTS, Express 5, TypeScript 5.8, MongoDB/Mongoose, Stripe Connect, AWS S3, and Socket.io.
+
+### Key Capabilities
+* **Identity & Authentication:** JWT authentication with secure refresh token rotation, email OTP verification via Resend/SMTP, and role-based access control (`user`, `creator`, `admin`, `super_admin`).
+* **Activities & Free Social Workouts:** Discovery, geofencing radius searches, registration, and QR activity pass generation.
+* **Creator Events & Monetized Ticketing:** Paid events with automated **90% Creator / 10% Platform fee split**, participant roster caps, and Stripe PaymentIntent checkouts.
+* **Creator Subscriptions:** Monthly ($29.99/mo) and yearly ($299.99/yr) creator membership passes gating paid event hosting.
+* **Stripe Connect Express Payouts:** Automated host onboarding, instant balance withdrawals, manual payout review queues, and webhook processing.
+* **Realtime Messaging:** Socket.io powered direct chat, activity/event host threads, presence tracking, typing indicators, and read receipts.
+* **Trust, Safety & Moderation:** Abuse reporting, admin dispute resolution, account sanctions, and helpdesk support ticketing.
+* **Dynamic CMS, Ads & Commerce:** In-app merchandise cart/checkout, dynamic CMS pages (Terms, Privacy, About Us), and targeted local ad cards.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Runtime:** Node.js (v18+)
-- **Framework:** Express.js with TypeScript
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** JWT (JSON Web Tokens)
-- **Validation:** Zod
-- **File Storage:** AWS S3 (via Multer)
-- **Notifications:** Firebase Cloud Messaging (FCM)
-- **Email:** Nodemailer
-- **Logging:** Pino
-- **Security:** Helmet, CORS, Rate Limiting
+* **Runtime:** Node.js v22 LTS / `tsx`
+* **Framework:** Express.js v5 with strict TypeScript
+* **Database:** MongoDB with Mongoose ODM
+* **Realtime:** Socket.io 4.8
+* **Payments:** Stripe SDK (PaymentIntents, Stripe Connect Express, Webhooks)
+* **File Storage:** AWS S3 (Presigned URLs / Multer-S3)
+* **Validation:** Zod 4 runtime schema parsing
+* **Documentation:** Swagger UI Express & Swagger-JSDoc (OpenAPI 3.0.3)
+* **Logging:** Pino & Pino-HTTP structured JSON logger
+* **Security:** Helmet, CORS, Express-Rate-Limit, Cookie-Parser, Compression
 
 ---
 
-## ✨ Features
+## 🚀 Quick Start Guide
 
-### 🔐 Authentication & Authorization
+### 1. Prerequisites
+* Node.js `v22.x` or higher
+* npm or bun
+* Running MongoDB instance or MongoDB Atlas cluster connection string
 
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Email verification
-- Password reset via email
-- Secure password hashing
-
-### 👥 User Management
-
-- User CRUD operations
-- Profile image upload to S3
-- Role-based user filtering
-- Pagination support
-
-### 📋 Case Management
-
-- Create, update, delete cases
-- Case assignment to counselors/clinicians
-- Case status tracking (Ongoing, Pending, In Progress, Complete)
-- Auto-generated case numbers
-- Filter cases by status, date, assignment
-- Separate views for "My Cases" and "Available Cases"
-
-### 📚 Resource Management
-
-- Resource CRUD operations
-- Bookmark/unbookmark resources
-- Toggle bookmark feature
-- Filter by category, location, service type
-- Role-based resource visibility
-- Notification on resource deletion (for bookmarked users)
-
-### 📅 Meeting Management
-
-- Supervisor creates meeting slots
-- Counselor/Clinician booking system
-- Support for 12-hour (AM/PM) and 24-hour time formats
-- Meeting cancellation (with 30-min restriction)
-- Meeting update functionality
-- Separate meeting history for all roles
-- Auto-completion of meetings based on end time
-- Overlap detection
-
-### 🔔 Notification System
-
-- Real-time push notifications via FCM
-- In-app notification history
-- Unread notification count
-- Mark as read functionality
-- Notification triggers:
-  - Case created → Notify Counselors & Clinicians
-  - Resource created → Notify Counselors, Clinicians & Supervisors
-  - Case assigned → Notify Admins & SuperAdmins
-  - Resource deleted → Notify bookmarked users
-
-### 📊 Dashboard
-
-- Statistics overview for Admins
-- Total users, active cases, resources count
-- Role-specific user counts
-- Recent activity feed
-
----
-
-## 📁 Project Structure
-
-```
-
-```
-
-src/
-├── config/ # Configuration files (DB, HTTP status, Firebase)
-├── enums/ # Enums (error codes, roles)
-├── middlewares/ # Auth, error handling, validation, rate limiting
-├── mailers/ # Email services
-├── modules/ # Feature modules
-│ ├── auth/ # Authentication
-│ ├── user/ # User management
-│ ├── case/ # Case management
-│ ├── resource/ # Resource management
-│ ├── meeting/ # Meeting scheduling
-│ ├── notification/ # Notification system
-│ ├── dashboard/ # Dashboard analytics
-│ └── base/ # Base repository pattern
-├── routes/ # API routes
-├── services/ # External services (FCM, S3)
-├── utils/ # Utility functions
-└── app.ts # Express app entry point
-
-```
-
-```
-
-## Project architecture pattern
-
-   <img width="635" height="115" alt="image" src="https://github.com/user-attachments/assets/1c04a45c-9bbc-4a05-bc21-1212499baafc" />
-
-## 🚀 Installation
-
-### Prerequisites
-
-- Node.js v18+
-- MongoDB
-- AWS S3 Account
-- Firebase Account (for FCM)
-
-### Steps
-
-1. **Clone the repository**
-
+### 2. Installation
 ```bash
-git clone https://github.com/yourusername/scbhs-backend.git
-cd scbhs-backend
-```
-
-2. **Install dependencies**
-
-```bash
+git clone <repository-url>
+cd stoneacademy/stoneacademy-backend
 npm install
 ```
 
-3. **Set up environment variables**
-
-```bash
-cp .env.example .env
-# Edit .env with your credentials
+### 3. Environment Configuration
+Create `.env` in `stoneacademy-backend/` (refer to `.env.example` or root `PROJECT_DOCUMENTATION.md` for full schema):
+```ini
+PORT=5000
+APP_NAME="Stone Academy"
+BASE_URL=/api/v1
+MONGO_URI=mongodb+srv://...
+JWT_SECRET=super_strong_jwt_access_secret_key_minimum_32_characters
+JWT_REFRESH_SECRET=super_strong_jwt_refresh_secret_key_minimum_32_characters
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+AWS_S3_BUCKET_NAME=stoneacademy-media
 ```
 
-4. **Run the development server**
+### 4. Seed Initial Super Admin
+```bash
+npm run seed:super-admin
+```
 
+### 5. Start Development Server
 ```bash
 npm run dev
 ```
+The server will boot at `http://localhost:5000`.
 
-5. **Build for production**
+---
+
+## 📖 Interactive Swagger API Documentation
+
+Stone Academy features an interactive OpenAPI 3.0.3 Swagger interface documenting **177+ endpoints** across 32 domain modules:
+
+* **Interactive Swagger UI:** Visit [`http://localhost:5000/docs`](http://localhost:5000/docs) in your browser.
+* **OpenAPI 3.0 JSON Specification:** Available at [`http://localhost:5000/docs.json`](http://localhost:5000/docs.json).
+
+### How to Authenticate in Swagger UI
+1. Execute `POST /api/v1/auth/login` (for user/creator) or `POST /api/v1/admin/login` (for admin).
+2. Copy the returned `accessToken`.
+3. Click the green **Authorize** button at the top of `/docs`.
+4. Enter `Bearer <your_access_token>` and click **Authorize**.
+5. Test any protected endpoint directly from the browser!
+
+---
+
+## 📂 Module Directory Overview
+
+All business domains are decoupled under `src/modules/`:
+
+| Module | Route Prefix | Description |
+| :--- | :--- | :--- |
+| `auth` | `/api/v1/auth` | User registration, login, Google/Apple OAuth, OTP, password recovery |
+| `user` | `/api/v1/users` | User profile, photo/cover uploads, galleries, ratings, blocklists |
+| `activity` | `/api/v1/activities` | Free social workouts, radius searches, participants, QR passes |
+| `event` | `/api/v1/events` | Paid creator events, pricing, capacity, ticket check-in passes |
+| `subscription` | `/api/v1/subscriptions` | Creator tier subscription checkout intents and gating |
+| `billing` | `/api/v1/billing` | Transactions, creator earnings (90/10 split), payouts, Stripe webhooks |
+| `host-stripe` | `/api/v1/hosts` | Stripe Connect Express onboarding links, status, and dashboard logins |
+| `chat` | `/api/v1/chat` | Realtime messaging threads with hosts and support |
+| `message` | `/api/v1/messages` | 1-on-1 direct conversations, typing indicators, read receipts |
+| `feed` | `/api/v1/feed` | Aggregated discovery feed and multi-criteria search |
+| `community` | `/api/v1/community` | Social posts, comments, nested replies, post likes |
+| `community-creator`| `/api/v1/community-creator` | Rich post publishing with multi-asset media attachments |
+| `notification` | `/api/v1/notifications` | User notifications, unread badges, notification preferences |
+| `review` | `/api/v1/reviews` | Post-workout host reviews and rating score aggregation |
+| `report` | `/api/v1/reports` | Abuse reporting and moderation enforcement workflows |
+| `support` | `/api/v1/support` | Helpdesk customer inquiry tickets and replies |
+| `shop` | `/api/v1/shop` | Merchandise cart, items, and checkout |
+| `ads` | `/api/v1/ads` | Promotional ad cards and sponsored city banners |
+| `cms` | `/api/v1/cms` | Dynamic CMS pages, About Us, Privacy Policy, Terms & Conditions |
+| `onboarding` | `/api/v1/onboarding` | Walkthrough carousel slides and onboarding status |
+| `admin` | `/api/v1/admin` | Platform KPIs, user moderation, refund status, manual payouts |
+| `admin-auth` | `/api/v1/admin` | Dedicated admin authentication and session revocation |
+| `admin-notification`| `/api/v1/admin/notifications` | Administrative system alerts and telemetry |
+| `settings` | `/api/v1/admin/settings`| Commission rate configuration, refund policies, admin credentials |
+
+---
+
+## 🧪 Testing & Validation
 
 ```bash
-npm run build
-npm start
-```
+# Typecheck TypeScript codebase with strict compiler flags
+npm run typecheck
 
----
-
-## 🔑 Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Server
-PORT=4000
-NODE_ENV=development
-
-# Database
-MONGODB_URI=mongodb://localhost:27017/scbhs
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key
-JWT_EXPIRES_IN=7d
-REFRESH_TOKEN_SECRET=your-refresh-token-secret
-REFRESH_TOKEN_EXPIRES_IN=30d
-
-# Email (Nodemailer)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-FROM_EMAIL=noreply@scbhs.com
-
-# AWS S3
-AWS_REGION=ap-southeast-2
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_PROFILE_IMAGES_BUCKET=scbhs-images-uploads-2025
-
-# Firebase Cloud Messaging
-FIREBASE_PROJECT_ID=scbhs-85801
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk@scbhs-85801.iam.gserviceaccount.com
-
-# Frontend URL (for CORS)
-FRONTEND_URL=http://localhost:3000
-```
-
-## Stripe Checkout (Billing)
-
-Configure Stripe to use Checkout sessions and webhooks. Payments are confirmed only by webhook events.
-
-```env
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_CHECKOUT_SUCCESS_URL=http://localhost:3000/checkout/success?session_id={CHECKOUT_SESSION_ID}
-STRIPE_CHECKOUT_CANCEL_URL=http://localhost:3000/checkout/cancel
-```
-
-Local webhook forwarding (Stripe CLI):
-
-```bash
-stripe listen --forward-to http://localhost:8080/api/v1/billing/webhook
-```
-
-Pricing is computed server-side from active cleaning services and quantities. To switch to live mode, replace your Stripe keys and webhook secret with live values.
-
----
-
-## 📖 API Documentation
-
-### Base URL
-
-```
-http://localhost:4000/api/v1
-```
-
-### Authentication Endpoints
-
-| Method | Endpoint                | Description            | Access        |
-| ------ | ----------------------- | ---------------------- | ------------- |
-| POST   | `/auth/register`        | Register new user      | Public        |
-| POST   | `/auth/login`           | Login user             | Public        |
-| POST   | `/auth/verify-email`    | Verify email           | Public        |
-| POST   | `/auth/forgot-password` | Request password reset | Public        |
-| POST   | `/auth/reset-password`  | Reset password         | Public        |
-| POST   | `/auth/refresh-token`   | Refresh access token   | Public        |
-| GET    | `/auth/me`              | Get current user       | Authenticated |
-
-### User Endpoints
-
-| Method | Endpoint                      | Description          | Access                  |
-| ------ | ----------------------------- | -------------------- | ----------------------- |
-| GET    | `/users`                      | Get all users        | Admin, SuperAdmin       |
-| GET    | `/users/:id`                  | Get user by ID       | Admin, SuperAdmin       |
-| POST   | `/users`                      | Create user          | Admin, SuperAdmin       |
-| PUT    | `/users/:id`                  | Update user          | Admin, SuperAdmin, Self |
-| DELETE | `/users/:id`                  | Delete user          | Admin, SuperAdmin       |
-| POST   | `/users/profile/image-upload` | Upload profile image | Authenticated           |
-| POST   | `/users/fcm-token`            | Update FCM token     | Authenticated           |
-
-### Case Endpoints
-
-| Method | Endpoint                 | Description         | Access               |
-| ------ | ------------------------ | ------------------- | -------------------- |
-| POST   | `/cases`                 | Create case         | Admin, SuperAdmin    |
-| GET    | `/cases`                 | Get all cases       | Authenticated        |
-| GET    | `/cases/my-cases`        | Get assigned cases  | Counselor, Clinician |
-| GET    | `/cases/available-cases` | Get available cases | Counselor, Clinician |
-| GET    | `/cases/:id`             | Get case by ID      | Authenticated        |
-| PUT    | `/cases/:id`             | Update case         | Admin, SuperAdmin    |
-| DELETE | `/cases/:id`             | Delete case         | Admin, SuperAdmin    |
-| POST   | `/cases/:caseId/apply`   | Apply to case       | Counselor, Clinician |
-
-### Resource Endpoints
-
-| Method | Endpoint                         | Description              | Access                           |
-| ------ | -------------------------------- | ------------------------ | -------------------------------- |
-| POST   | `/resources`                     | Create resource          | Admin, SuperAdmin                |
-| GET    | `/resources`                     | Get all resources        | Authenticated                    |
-| GET    | `/resources/:id`                 | Get resource by ID       | Authenticated                    |
-| PUT    | `/resources/:id`                 | Update resource          | Admin, SuperAdmin                |
-| DELETE | `/resources/:id`                 | Delete resource          | Admin, SuperAdmin                |
-| POST   | `/resources/:id/bookmark/toggle` | Toggle bookmark          | Supervisor, Counselor, Clinician |
-| GET    | `/resources/bookmarks`           | Get bookmarked resources | Authenticated                    |
-
-### Meeting Endpoints
-
-| Method | Endpoint                               | Description                       | Access               |
-| ------ | -------------------------------------- | --------------------------------- | -------------------- |
-| POST   | `/meetings`                            | Create meeting slot               | Supervisor           |
-| GET    | `/meetings/supervisor-meetings`        | Get all supervisor meetings       | Supervisor           |
-| GET    | `/meetings/supervisor/meeting-history` | Get supervisor completed meetings | Supervisor           |
-| PUT    | `/meetings/:meetingId`                 | Update meeting slot               | Supervisor           |
-| DELETE | `/meetings/:meetingId`                 | Delete meeting slot               | Supervisor           |
-| PUT    | `/meetings/zoom-link`                  | Update Zoom link                  | Supervisor           |
-| GET    | `/meetings/available`                  | Get available meetings            | Counselor, Clinician |
-| GET    | `/meetings/my-bookings`                | Get booked meetings               | Counselor, Clinician |
-| GET    | `/meetings/meeting-history`            | Get meeting history               | Counselor, Clinician |
-| POST   | `/meetings/:meetingId/book`            | Book meeting                      | Counselor, Clinician |
-| PUT    | `/meetings/:meetingId/cancel`          | Cancel booking                    | Counselor, Clinician |
-
-### Notification Endpoints
-
-| Method | Endpoint                      | Description            | Access        |
-| ------ | ----------------------------- | ---------------------- | ------------- |
-| GET    | `/notifications`              | Get user notifications | Authenticated |
-| GET    | `/notifications/unread-count` | Get unread count       | Authenticated |
-| PATCH  | `/notifications/:id/read`     | Mark as read           | Authenticated |
-| PATCH  | `/notifications/read-all`     | Mark all as read       | Authenticated |
-| DELETE | `/notifications/:id`          | Delete notification    | Authenticated |
-
-### Dashboard Endpoints
-
-| Method | Endpoint              | Description         | Access            |
-| ------ | --------------------- | ------------------- | ----------------- |
-| GET    | `/dashboard/overview` | Get dashboard stats | Admin, SuperAdmin |
-
----
-
-## 👥 User Roles
-
-| Role           | Permissions                                                     |
-| -------------- | --------------------------------------------------------------- |
-| **SuperAdmin** | Full system access, user management, case & resource management |
-| **Admin**      | User management (except SuperAdmin), case & resource management |
-| **Supervisor** | Create/manage meeting slots, view meeting history               |
-| **Counselor**  | View/apply to cases, book meetings, bookmark resources          |
-| **Clinician**  | View/apply to cases, book meetings, bookmark resources          |
-
----
-
-## 📝 Example API Requests
-
-### Register User
-
-```bash
-POST /api/v1/auth/register
-Content-Type: application/json
-
-{
-  "fullName": "John Doe",
-  "email": "john@example.com",
-  "password": "SecurePass123!",
-  "role": "Counselor"
-}
-```
-
-### Create Case
-
-```bash
-POST /api/v1/cases
-Authorization: Bearer <admin-token>
-Content-Type: application/json
-
-{
-  "title": "Child Counseling",
-  "description": "Individual therapy for anxiety",
-  "startDate": "2025-11-01",
-  "endDate": "2025-12-01",
-  "client": {
-    "fullName": "Jane Smith",
-    "age": 15,
-    "gender": "Female",
-    "phone": "555-1234",
-    "emergencyContact": "555-5678",
-    "email": "parent@example.com",
-    "address": "123 Main St"
-  }
-}
-```
-
-### Create Meeting Slot (12-hour format)
-
-```bash
-POST /api/v1/meetings
-Authorization: Bearer <supervisor-token>
-Content-Type: application/json
-
-{
-  "date": "2025-11-05",
-  "startTime": "2:00 PM",
-  "endTime": "3:00 PM"
-}
-```
-
-### Book Meeting
-
-```bash
-POST /api/v1/meetings/:meetingId/book
-Authorization: Bearer <counselor-token>
-```
-
----
-
-## 🔒 Security Features
-
-- **Helmet.js** for securing HTTP headers
-- **CORS** with configurable origins
-- **Rate Limiting** to prevent abuse
-- **JWT** with refresh token rotation
-- **Password Hashing** using bcrypt
-- **Input Validation** using Zod
-- **SQL Injection Prevention** via Mongoose
-- **XSS Protection** via sanitization
-
----
-
-## 📧 Email Templates
-
-The system includes professional email templates for:
-
-- Email verification
-- Password reset
-- Welcome emails
-- Case assignment notifications
-
----
-
-## 📱 Push Notifications
-
-Integrated Firebase Cloud Messaging for:
-
-- Real-time case updates
-- Resource notifications
-- Meeting reminders
-- System alerts
-
----
-
-## 🧪 Testing
-
-```bash
-# Run tests
+# Run unit and integration tests
 npm test
 
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests in watch mode
-npm run test:watch
+# Run ESLint validation
+npm run lint
 ```
 
 ---
 
-## 🤝 Contributing
+## 🚢 Production Deployment
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👨‍💻 Author
-
-**Your Name**
-
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
-
----
-
-## 🙏 Acknowledgments
-
-- Express.js community
-- MongoDB team
-- Firebase team
-- All contributors
-
----
-
-## 📞 Support
-
-For support, email support@scbhs.com or open an issue in the repository.
-
----
-
-**Built with ❤️ for School-Based Behavioral Health Support**
+Refer to [`DEPLOYMENT.md`](../DEPLOYMENT.md) and [`PROJECT_DOCUMENTATION.md`](../PROJECT_DOCUMENTATION.md) in the workspace root for complete Docker Compose orchestration, Nginx reverse proxy routing, and Let's Encrypt automated SSL certificate management.
