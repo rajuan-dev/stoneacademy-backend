@@ -1,0 +1,156 @@
+{
+  "database": "stoneacademyDB",
+  "backupRoot": "D:\\RAJUAN-PERSONAL\\VSCODE\\stoneacademy\\stoneacademy-backend\\database-backups\\before-restore-2026-09-27T07-59-46-788Z",
+  "startedAt": "2026-09-27T07:59:49.871Z",
+  "collections": [
+    {
+      "name": "activities",
+      "count": 3
+    },
+    {
+      "name": "activityparticipants",
+      "count": 2
+    },
+    {
+      "name": "admin",
+      "count": 1
+    },
+    {
+      "name": "adminauditlogs",
+      "count": 0
+    },
+    {
+      "name": "adminnotifications",
+      "count": 0
+    },
+    {
+      "name": "adminrefreshtokenblacklists",
+      "count": 0
+    },
+    {
+      "name": "ads",
+      "count": 0
+    },
+    {
+      "name": "carts",
+      "count": 0
+    },
+    {
+      "name": "categories",
+      "count": 3
+    },
+    {
+      "name": "chatthreads",
+      "count": 4
+    },
+    {
+      "name": "cmspages",
+      "count": 0
+    },
+    {
+      "name": "communitycomments",
+      "count": 0
+    },
+    {
+      "name": "communitylikes",
+      "count": 0
+    },
+    {
+      "name": "communityposts",
+      "count": 0
+    },
+    {
+      "name": "conversations",
+      "count": 0
+    },
+    {
+      "name": "eventparticipants",
+      "count": 0
+    },
+    {
+      "name": "eventqrtokens",
+      "count": 0
+    },
+    {
+      "name": "events",
+      "count": 0
+    },
+    {
+      "name": "media",
+      "count": 5
+    },
+    {
+      "name": "messages",
+      "count": 1
+    },
+    {
+      "name": "notifications",
+      "count": 5
+    },
+    {
+      "name": "orders",
+      "count": 0
+    },
+    {
+      "name": "otpcodes",
+      "count": 0
+    },
+    {
+      "name": "paymenttransactions",
+      "count": 0
+    },
+    {
+      "name": "payoutrequests",
+      "count": 0
+    },
+    {
+      "name": "pendingregistrations",
+      "count": 0
+    },
+    {
+      "name": "products",
+      "count": 0
+    },
+    {
+      "name": "qrtokens",
+      "count": 2
+    },
+    {
+      "name": "refreshtokenblacklists",
+      "count": 52
+    },
+    {
+      "name": "reports",
+      "count": 0
+    },
+    {
+      "name": "reviews",
+      "count": 1
+    },
+    {
+      "name": "settings",
+      "count": 1
+    },
+    {
+      "name": "stripewebhookevents",
+      "count": 0
+    },
+    {
+      "name": "subscriptionpayments",
+      "count": 0
+    },
+    {
+      "name": "subscriptions",
+      "count": 0
+    },
+    {
+      "name": "supporttickets",
+      "count": 0
+    },
+    {
+      "name": "users",
+      "count": 29
+    }
+  ],
+  "finishedAt": "2026-09-27T08:00:01.061Z"
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "_id": {
+      "$oid": "6ab6e6b9f0a4503b96b7b0d8"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6ab6e6b9f0a4503b96b7b0d7"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmFiNmU2YjlmMGE0NTAzYjk2YjdiMGQ3IiwiaWF0IjoxNzkwMzcxNTEzLCJleHAiOjE3OTI5NjM1MTN9.JfDQqrQc__mYg5-sdp3UclLlJfuR1QPF5KpSvkXn8xY",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-09-25T21:25:13.421Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T21:25:13.421Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab83581f0a4503b96b7b468"
+    },
+    "kind": "activity",
+    "participantId": {
+      "$oid": "6ab83581f0a4503b96b7b467"
+    },
+    "payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJraW5kIjoiYWN0aXZpdHkiLCJwYXJ0aWNpcGFudElkIjoiNmFiODM1ODFmMGE0NTAzYjk2YjdiNDY3IiwiaWF0IjoxNzkwNDU3MjE3LCJleHAiOjE3OTMwNDkyMTd9.EZGDyiZzofXiAjeLS5v0d4iUimJJmfrNy0aQr_JZyH8",
+    "scannedAt": [],
+    "createdAt": {
+      "$date": "2026-09-26T21:13:37.457Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-26T21:13:37.457Z"
+    },
+    "__v": 0
+  }
+]

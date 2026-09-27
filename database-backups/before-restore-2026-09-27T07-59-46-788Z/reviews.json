@@ -1,0 +1,30 @@
+[
+  {
+    "_id": {
+      "$oid": "6ab6ffc2f0a4503b96b7b174"
+    },
+    "reviewerId": {
+      "$oid": "6ab6e615f0a4503b96b7b0a9"
+    },
+    "targetUserId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "targetType": "activity",
+    "targetId": {
+      "$oid": "6ab6e4aff0a4503b96b7b058"
+    },
+    "rating": 5,
+    "tags": [
+      "friendly",
+      "motivating"
+    ],
+    "comment": "Nikki and her grandson was so much fun",
+    "createdAt": {
+      "$date": "2026-09-25T23:12:02.181Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T23:12:02.181Z"
+    },
+    "__v": 0
+  }
+]

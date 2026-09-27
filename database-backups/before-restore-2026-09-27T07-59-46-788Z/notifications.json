@@ -1,0 +1,145 @@
+[
+  {
+    "_id": {
+      "$oid": "6ab6e6b9f0a4503b96b7b0df"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "Jade Pearl joined your activity.",
+    "data": {
+      "activityId": "6ab6e4aff0a4503b96b7b058",
+      "participantId": "6ab6e6b9f0a4503b96b7b0d7",
+      "entityType": "activity",
+      "entityId": "6ab6e4aff0a4503b96b7b058",
+      "joinedUserId": "6ab6e615f0a4503b96b7b0a9",
+      "joinedUserName": "Jade Pearl",
+      "joinedUserAvatar": "https://lh3.googleusercontent.com/a/ACg8ocLJXDw92tJVhyi3i9nl-OEgJuRV6VeZ30Splvpynw6awmwSNA=s96-c"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-25T21:25:13.467Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T21:25:13.467Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab6e6b9f0a4503b96b7b0e2"
+    },
+    "userId": {
+      "$oid": "6ab6e615f0a4503b96b7b0a9"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Bike ride downtown Fort Worth\".",
+    "data": {
+      "activityId": "6ab6e4aff0a4503b96b7b058",
+      "participantId": "6ab6e6b9f0a4503b96b7b0d7",
+      "entityType": "activity",
+      "entityId": "6ab6e4aff0a4503b96b7b058",
+      "hostId": "6ab560e524f2dc521620f44f",
+      "joinedAt": {
+        "$date": "2026-09-25T21:25:13.420Z"
+      }
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-25T21:25:13.480Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T21:25:13.480Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab6ffc2f0a4503b96b7b179"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "type": "rating_received",
+    "title": "New rating received",
+    "body": "You received a 5-star rating.",
+    "data": {
+      "reviewId": "6ab6ffc2f0a4503b96b7b174",
+      "targetType": "activity",
+      "targetId": "6ab6e4aff0a4503b96b7b058"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-25T23:12:02.275Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T23:12:02.275Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab83581f0a4503b96b7b46f"
+    },
+    "userId": {
+      "$oid": "6ab6e615f0a4503b96b7b0a9"
+    },
+    "type": "activity_joined",
+    "title": "New activity join",
+    "body": "Stone Academy Plus joined your activity.",
+    "data": {
+      "activityId": "6ab82a2ef0a4503b96b7b427",
+      "participantId": "6ab83581f0a4503b96b7b467",
+      "entityType": "activity",
+      "entityId": "6ab82a2ef0a4503b96b7b427",
+      "joinedUserId": "6ab560e524f2dc521620f44f",
+      "joinedUserName": "Stone Academy Plus",
+      "joinedUserAvatar": "https://lh3.googleusercontent.com/a/ACg8ocK_d4PH4OwY9CzAENkDzbzyP7bNJqO3t6Fkndyg2ET3iBIRzCw=s96-c"
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-26T21:13:37.491Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-26T21:13:37.491Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab83581f0a4503b96b7b472"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "type": "activity_join_success",
+    "title": "Joined activity successfully",
+    "body": "You joined \"Walk\".",
+    "data": {
+      "activityId": "6ab82a2ef0a4503b96b7b427",
+      "participantId": "6ab83581f0a4503b96b7b467",
+      "entityType": "activity",
+      "entityId": "6ab82a2ef0a4503b96b7b427",
+      "hostId": "6ab6e615f0a4503b96b7b0a9",
+      "joinedAt": {
+        "$date": "2026-09-26T21:13:37.455Z"
+      }
+    },
+    "isRead": false,
+    "readAt": null,
+    "createdAt": {
+      "$date": "2026-09-26T21:13:37.509Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-26T21:13:37.509Z"
+    },
+    "__v": 0
+  }
+]

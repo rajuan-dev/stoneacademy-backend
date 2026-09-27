@@ -1,0 +1,44 @@
+[
+  {
+    "_id": {
+      "$oid": "6ab6cff3f0a4503b96b7afc1"
+    },
+    "name": "Biking",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-09-25T19:48:03.943Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T19:48:03.943Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab6d00ef0a4503b96b7afd2"
+    },
+    "name": "Walking",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-09-25T19:48:30.684Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T19:48:30.684Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab6d039f0a4503b96b7afde"
+    },
+    "name": "Running",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-09-25T19:49:13.865Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T19:49:13.865Z"
+    },
+    "__v": 0
+  }
+]

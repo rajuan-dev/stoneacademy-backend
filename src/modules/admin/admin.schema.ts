@@ -2,6 +2,17 @@ import { z } from "zod";
 
 import { ACTIVITY_STATUS, ROLES, USER_STATUS } from "@/constants/app.constants";
 
+const activityStatusSchema = z.preprocess((value) => {
+  if (typeof value !== "string")
+    return value;
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "complete")
+    return ACTIVITY_STATUS.COMPLETED;
+  if (normalized === "canceled")
+    return ACTIVITY_STATUS.CANCELLED;
+  return normalized;
+}, z.enum(Object.values(ACTIVITY_STATUS) as [string, ...string[]]));
+
 export const listUsersSchema = z.object({
   query: z.object({
     page: z.coerce.number().min(1).optional(),
@@ -96,7 +107,7 @@ export const updateActivityStatusSchema = z.object({
     id: z.string().trim().min(1),
   }),
   body: z.object({
-    status: z.enum(Object.values(ACTIVITY_STATUS) as [string, ...string[]]),
+    status: activityStatusSchema,
   }),
 });
 
@@ -105,7 +116,7 @@ export const updateEventStatusSchema = z.object({
     id: z.string().trim().min(1),
   }),
   body: z.object({
-    status: z.enum(Object.values(ACTIVITY_STATUS) as [string, ...string[]]),
+    status: activityStatusSchema,
   }),
 });
 

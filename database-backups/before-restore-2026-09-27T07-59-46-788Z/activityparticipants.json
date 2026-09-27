@@ -1,0 +1,52 @@
+[
+  {
+    "_id": {
+      "$oid": "6ab6e6b9f0a4503b96b7b0d7"
+    },
+    "activityId": {
+      "$oid": "6ab6e4aff0a4503b96b7b058"
+    },
+    "userId": {
+      "$oid": "6ab6e615f0a4503b96b7b0a9"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-09-25T21:25:13.420Z"
+    },
+    "qrTokenId": {
+      "$oid": "6ab6e6b9f0a4503b96b7b0d8"
+    },
+    "createdAt": {
+      "$date": "2026-09-25T21:25:13.442Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T21:25:13.442Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab83581f0a4503b96b7b467"
+    },
+    "activityId": {
+      "$oid": "6ab82a2ef0a4503b96b7b427"
+    },
+    "userId": {
+      "$oid": "6ab560e524f2dc521620f44f"
+    },
+    "status": "joined",
+    "joinedAt": {
+      "$date": "2026-09-26T21:13:37.455Z"
+    },
+    "qrTokenId": {
+      "$oid": "6ab83581f0a4503b96b7b468"
+    },
+    "createdAt": {
+      "$date": "2026-09-26T21:13:37.467Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-26T21:13:37.467Z"
+    },
+    "__v": 0
+  }
+]

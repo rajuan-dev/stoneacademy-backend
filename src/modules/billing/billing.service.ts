@@ -485,6 +485,50 @@ export class BillingService {
     return intent;
   }
 
+  async refreshEventTicketPaymentStatus(eventId: string, payerId: string) {
+    const transaction = await PaymentTransaction.findOne({
+      eventId,
+      payerId,
+      provider: "stripe",
+      activePurchase: true,
+      $or: [
+        { paymentStatus: PAYMENT_STATUS_PENDING },
+        { status: PAYMENT_STATUS.PENDING },
+      ],
+    }).sort({ createdAt: -1 }).exec();
+
+    if (!transaction)
+      return null;
+
+    const paymentIntentId
+      = transaction.stripePaymentIntentId || transaction.providerReference;
+    if (!paymentIntentId)
+      return transaction;
+
+    const paymentIntent = await stripeService.retrievePaymentIntent(paymentIntentId);
+    const latestCharge
+      = typeof paymentIntent.latest_charge === "string"
+        ? paymentIntent.latest_charge
+        : paymentIntent.latest_charge?.id;
+
+    if (paymentIntent.status === "succeeded") {
+      return this.handleEventTicketPaymentSucceeded(paymentIntent.id, latestCharge);
+    }
+
+    if (
+      paymentIntent.status === "canceled"
+      || paymentIntent.status === "requires_payment_method"
+    ) {
+      return this.markTransactionFailedByProviderRef(
+        paymentIntent.id,
+        paymentIntent.last_payment_error?.message || paymentIntent.status,
+        "stripe",
+      );
+    }
+
+    return transaction;
+  }
+
   async handleEventTicketPaymentSucceeded(
     paymentIntentId: string,
     stripeChargeId?: string | null,

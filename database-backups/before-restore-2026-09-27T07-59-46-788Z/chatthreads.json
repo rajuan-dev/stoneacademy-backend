@@ -1,0 +1,90 @@
+[
+  {
+    "_id": {
+      "$oid": "6ab6e6c0f0a4503b96b7b0ee"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6ab6e615f0a4503b96b7b0a9"
+      },
+      {
+        "$oid": "6ab560e524f2dc521620f44f"
+      }
+    ],
+    "directKey": "6ab560e524f2dc521620f44f|6ab6e615f0a4503b96b7b0a9",
+    "createdAt": {
+      "$date": "2026-09-25T21:25:20.256Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-25T21:25:20.256Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab884d3f0a4503b96b7b593"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6ab88442f0a4503b96b7b51e"
+      },
+      {
+        "$oid": "69e6440b4f6e90932471e6ef"
+      }
+    ],
+    "directKey": "69e6440b4f6e90932471e6ef|6ab88442f0a4503b96b7b51e",
+    "createdAt": {
+      "$date": "2026-09-27T02:52:03.116Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-27T02:57:00.314Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab89b22f0a4503b96b7b817"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6ab560e524f2dc521620f44f"
+      },
+      {
+        "$oid": "6ab88442f0a4503b96b7b51e"
+      }
+    ],
+    "directKey": "6ab560e524f2dc521620f44f|6ab88442f0a4503b96b7b51e",
+    "createdAt": {
+      "$date": "2026-09-27T04:27:14.979Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-27T04:27:14.979Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ab89cf5f0a4503b96b7b8bc"
+    },
+    "type": "direct",
+    "memberUserIds": [
+      {
+        "$oid": "6a9f9a048ca236ab68e2f168"
+      },
+      {
+        "$oid": "69e6440b4f6e90932471e6ef"
+      }
+    ],
+    "directKey": "69e6440b4f6e90932471e6ef|6a9f9a048ca236ab68e2f168",
+    "createdAt": {
+      "$date": "2026-09-27T04:35:01.674Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-27T04:35:01.674Z"
+    },
+    "__v": 0
+  }
+]

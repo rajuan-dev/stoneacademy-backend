@@ -511,6 +511,18 @@ export class EventService {
       event.discountPercentage || 0,
     );
 
+    if (payableTicketPrice > 0) {
+      try {
+        await this.billingService.refreshEventTicketPaymentStatus(
+          event._id.toString(),
+          userId,
+        );
+      }
+      catch {
+        // Join status should remain readable even if Stripe cannot be reached.
+      }
+    }
+
     const [participant, latestSucceededPayment, latestPayment] = await Promise.all([
       EventParticipant.findOne({
         eventId: event._id,

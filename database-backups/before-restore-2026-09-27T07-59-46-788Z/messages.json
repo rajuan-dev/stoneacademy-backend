@@ -1,0 +1,28 @@
+[
+  {
+    "_id": {
+      "$oid": "6ab885fcf0a4503b96b7b60d"
+    },
+    "threadId": {
+      "$oid": "6ab884d3f0a4503b96b7b593"
+    },
+    "senderUserId": {
+      "$oid": "6ab88442f0a4503b96b7b51e"
+    },
+    "type": "text",
+    "text": "Hello",
+    "imageUrl": null,
+    "seenByUserIds": [
+      {
+        "$oid": "6ab88442f0a4503b96b7b51e"
+      }
+    ],
+    "createdAt": {
+      "$date": "2026-09-27T02:57:00.301Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-27T02:57:00.301Z"
+    },
+    "__v": 0
+  }
+]
