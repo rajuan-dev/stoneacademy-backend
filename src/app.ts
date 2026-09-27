@@ -24,6 +24,117 @@ import { requestBodyLogger } from "./middlewares/request-body-logger.middleware.
 const app: Application = express();
 app.set("trust proxy", 1);
 
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+const stripeOnboardingPage = ({
+  title,
+  message,
+  tone = "success",
+}: {
+  title: string;
+  message: string;
+  tone?: "success" | "warning";
+}) => {
+  const safeClientUrl = escapeHtml(env.CLIENT_URL);
+  const accent = tone === "success" ? "#0ea5e9" : "#f59e0b";
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${escapeHtml(title)}</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #f5f8fc;
+        color: #10233a;
+      }
+      .card {
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        border: 1px solid #d8e5f2;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 45px rgba(15, 35, 58, 0.08);
+      }
+      .icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: ${accent}1f;
+        color: ${accent};
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 24px;
+        line-height: 1.2;
+      }
+      p {
+        margin: 0;
+        color: #4b5f76;
+        font-size: 15px;
+        line-height: 1.55;
+      }
+      .actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 22px;
+      }
+      button, a {
+        width: 100%;
+        min-height: 44px;
+        border-radius: 10px;
+        border: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font: inherit;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      button {
+        background: ${accent};
+        color: #fff;
+      }
+      a {
+        background: #eef4fb;
+        color: #10233a;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="icon">${tone === "success" ? "✓" : "!"}</div>
+      <h1>${escapeHtml(title)}</h1>
+      <p>${escapeHtml(message)}</p>
+      <div class="actions">
+        <button type="button" onclick="window.close()">Close</button>
+        <a href="${safeClientUrl}">Return to app</a>
+      </div>
+    </main>
+  </body>
+</html>`;
+};
+
 app.use(
   cors({
     origin: true,
@@ -92,54 +203,19 @@ app.get("/healthz", (_req, res) => {
   });
 });
 
-// Temporary public fallback pages for Stripe Connect onboarding redirects.
-// These let you test the flow before mobile/web frontend screens are ready.
 app.get("/onboarding/success", (_req, res) => {
-  res.status(200).type("html").send(`<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stone Academy - Stripe Onboarding Success</title>
-    <style>
-      body { font-family: Arial, sans-serif; background: #f4f7fb; color: #10233a; margin: 0; padding: 24px; }
-      .card { max-width: 680px; margin: 0 auto; background: #fff; border: 1px solid #d7e3ef; border-radius: 12px; padding: 20px; }
-      h1 { margin-top: 0; }
-      code { background: #eef3f8; padding: 2px 6px; border-radius: 6px; }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Stripe onboarding completed</h1>
-      <p>You can close this page and return to the app.</p>
-      <p>Next step: verify webhook delivery to <code>/api/v1/stripe/webhook</code> and check <code>stripeOnboardingCompleted</code> from <code>/api/v1/users/me</code>.</p>
-    </div>
-  </body>
-</html>`);
+  res.status(200).type("html").send(stripeOnboardingPage({
+    title: "Stripe onboarding completed",
+    message: "Your payout account setup is complete. You can close this page and return to the app.",
+  }));
 });
 
 app.get("/onboarding/refresh", (_req, res) => {
-  res.status(200).type("html").send(`<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stone Academy - Stripe Onboarding Refresh</title>
-    <style>
-      body { font-family: Arial, sans-serif; background: #f4f7fb; color: #10233a; margin: 0; padding: 24px; }
-      .card { max-width: 680px; margin: 0 auto; background: #fff; border: 1px solid #d7e3ef; border-radius: 12px; padding: 20px; }
-      h1 { margin-top: 0; }
-      a { color: #0f766e; text-decoration: none; font-weight: 600; }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Stripe onboarding needs refresh</h1>
-      <p>The onboarding link expired or was interrupted.</p>
-      <p>Go back to your app and request a new onboarding link.</p>
-    </div>
-  </body>
-</html>`);
+  res.status(200).type("html").send(stripeOnboardingPage({
+    title: "Onboarding link expired",
+    message: "This setup link expired or was interrupted. Return to the app and start Stripe onboarding again.",
+    tone: "warning",
+  }));
 });
 
 app.use(env.BASE_URL, responseCache, rootRouter);
