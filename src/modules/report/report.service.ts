@@ -1,4 +1,8 @@
-import { PAGINATION, USER_STATUS } from "@/constants/app.constants";
+import {
+  ACCOUNT_STATUS,
+  PAGINATION,
+  USER_STATUS,
+} from "@/constants/app.constants";
 import { adminNotificationService } from "@/modules/admin-notification/admin-notification.service";
 import { AdminAuditLog } from "@/modules/admin/admin-audit-log.model";
 import { notificationService } from "@/modules/notification/notification.service";
@@ -590,11 +594,13 @@ export class ReportService {
   ) {
     const update: Record<string, unknown> = { status };
     if (status === USER_STATUS.BLOCKED) {
+      update.accountStatus = ACCOUNT_STATUS.SUSPENDED;
       update.blockedReason = reason ?? null;
       update.blockedAt = new Date();
       update.blockedBy = adminId as any;
     }
     else if (status === USER_STATUS.ACTIVE) {
+      update.accountStatus = ACCOUNT_STATUS.ACTIVE;
       update.blockedReason = null;
       update.blockedAt = null;
       update.blockedBy = null;
