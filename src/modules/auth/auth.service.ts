@@ -622,6 +622,14 @@ export class AuthService {
           throw new UnauthorizedException(MESSAGES.AUTH.REFRESH_TOKEN_INVALID);
         }
 
+        if (admin.status === USER_STATUS.BLOCKED) {
+          throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
+        }
+
+        if (admin.status === USER_STATUS.DELETED) {
+          throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
+        }
+
         const accessToken = AuthUtil.generateAccessToken({
           userId: admin._id.toString(),
           adminId: admin._id.toString(),

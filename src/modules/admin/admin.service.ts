@@ -5,6 +5,7 @@ import { Types } from "mongoose";
 import type { StorageUploadInput } from "@/services/s3.service";
 
 import {
+  ACCOUNT_STATUS,
   ACTIVITY_STATUS,
   CREATOR_EARNING_STATUS,
   PAGINATION,
@@ -614,11 +615,13 @@ export class AdminService {
     const update: Record<string, any> = { status };
 
     if (status === USER_STATUS.BLOCKED) {
+      update.accountStatus = ACCOUNT_STATUS.SUSPENDED;
       update.blockedReason = reason ?? null;
       update.blockedAt = new Date();
       update.blockedBy = adminId ? new Types.ObjectId(adminId) : null;
     }
     else if (status === USER_STATUS.ACTIVE) {
+      update.accountStatus = ACCOUNT_STATUS.ACTIVE;
       update.blockedReason = null;
       update.blockedAt = null;
       update.blockedBy = null;

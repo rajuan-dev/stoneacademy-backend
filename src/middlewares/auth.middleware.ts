@@ -5,7 +5,9 @@ import type { NextFunction, Request, Response } from "express";
 import { MESSAGES, USER_STATUS } from "@/constants/app.constants";
 import { ErrorCodeEnum } from "@/enums/error-code.enum";
 import { logger } from "@/middlewares/pino-logger";
+import { AdminAccount } from "@/modules/admin-account/admin-account.model";
 import { AuthUtil } from "@/modules/auth/auth.utils";
+import { User } from "@/modules/user/user.model";
 import {
   ForbiddenException,
   UnauthorizedException,
@@ -37,7 +39,7 @@ declare global {
 /* eslint-enable ts/consistent-type-definitions, ts/no-namespace */
 
 export class AuthMiddleware {
-  static verifyToken = (req: Request, res: Response, next: NextFunction) => {
+  static verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const authHeader = req.get("Authorization") || req.get("authorization");
       const requestId = req.id || req.headers["x-request-id"];
@@ -77,6 +79,25 @@ export class AuthMiddleware {
         throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
       }
 
+      const account = await AuthMiddleware.getCurrentAccountStatus(
+        req.user.userId,
+        req.user.subjectType,
+      );
+
+      if (!account) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
+      }
+
+      req.user.status = account.status;
+      req.user.accountStatus = account.accountStatus;
+
+      if (account.status === USER_STATUS.BLOCKED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_SUSPENDED);
+      }
+      if (account.status === USER_STATUS.DELETED) {
+        throw new UnauthorizedException(MESSAGES.AUTH.ACCOUNT_INACTIVE);
+      }
+
       next();
     }
     catch (error) {
@@ -87,6 +108,26 @@ export class AuthMiddleware {
       next(error);
     }
   };
+
+  private static async getCurrentAccountStatus(
+    userId: string,
+    subjectType: "user" | "admin" = "user",
+  ) {
+    const account = subjectType === "admin"
+      ? await AdminAccount.findById(userId)
+          .select("status accountStatus isDeleted")
+          .lean()
+      : await User.findById(userId)
+          .select("status accountStatus isDeleted")
+          .lean();
+
+    if (!account || (account as any).isDeleted) return null;
+
+    return {
+      status: account.status,
+      accountStatus: account.accountStatus,
+    };
+  }
 
   static authorize = (...allowedRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
